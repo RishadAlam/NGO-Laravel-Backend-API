@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Hamcrest\Type\IsNumeric;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
-use Hamcrest\Type\IsNumeric;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\ChangePasswordRequest;
 
 class AuthController extends Controller
 {
@@ -138,5 +139,32 @@ class AuthController extends Controller
     {
         auth::user()->currentAccessToken()->delete();
         return $this->create_response('Logout Successful');
+    }
+
+
+    /**
+     * Change Password
+     *
+     * @param App\Http\Requests\ChangePasswordRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function change_password(ChangePasswordRequest $request)
+    {
+        $data = (object) $request->validated();
+        if (!Hash::check($data->current_password, Auth::user()->password)) {
+            return $this->create_validation_error_response(
+                'current_password',
+                'Current password did not match.'
+            );
+        }
+
+        User::find(Auth::user()->id)
+            ->update(
+                [
+                    'password' => bcrypt($data->new_password),
+                ]
+            );
+
+        return $this->create_response('Password change Successfully');
     }
 }
