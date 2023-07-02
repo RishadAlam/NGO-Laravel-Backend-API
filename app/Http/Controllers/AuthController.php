@@ -32,6 +32,23 @@ class AuthController extends Controller
     }
 
     /**
+     * Create Response
+     *
+     * @param $message Message Body, $code Error Code, $success Message Status
+     * @return Illuminate\Http\Response
+     */
+    public function create_response($message, $code = '200', $success = true)
+    {
+        return response(
+            [
+                'success' => $success,
+                'message' => $message,
+            ],
+            $code
+        );
+    }
+
+    /**
      * Login User
      *
      * @param App\Http\Requests\LoginRequest $request
