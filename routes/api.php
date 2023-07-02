@@ -39,7 +39,7 @@ Route::PUT('/reset-password', [AuthController::class, 'reset_password']);
 Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     /**
      * -------------------------------------------------------------------------
-     * Authirzation Routes
+     * Authorzation Routes
      * -------------------------------------------------------------------------
      */
     Route::POST('/registration', [AuthController::class, 'registration']);

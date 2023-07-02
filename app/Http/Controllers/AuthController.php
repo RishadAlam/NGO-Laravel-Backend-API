@@ -127,4 +127,16 @@ class AuthController extends Controller
             200
         );
     }
+
+    /**
+     * User Logout
+     * Revoke the token that was used to authenticate the current request...
+     *
+     * @return Illuminate\Http\Response
+     */
+    public function logout()
+    {
+        auth::user()->currentAccessToken()->delete();
+        return $this->create_response('Logout Successful');
+    }
 }
