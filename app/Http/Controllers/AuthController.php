@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Hamcrest\Type\IsNumeric;
 use Illuminate\Http\Request;
+use App\Mail\EmailVerifyMail;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\ForgetPasswordRequest;
+use App\Http\Requests\OTPVerificationRequest;
 
 class AuthController extends Controller
 {
@@ -47,6 +53,24 @@ class AuthController extends Controller
             ],
             $code
         );
+    }
+
+    /**
+     * Send Otp Mail
+     * 
+     * @param $email
+     * @return Boolean
+     */
+    public function sendMail($email, $name, $otp)
+    {
+        Mail::to($email)
+            ->send(
+                new EmailVerifyMail(
+                    $name,
+                    $email,
+                    $otp
+                )
+            );
     }
 
     /**
@@ -166,5 +190,105 @@ class AuthController extends Controller
             );
 
         return $this->create_response('Password change Successfully');
+    }
+
+    /**
+     * Forget Password
+     *
+     * @param App\Http\Requests\ForgetPasswordRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function forget_password(ForgetPasswordRequest $request)
+    {
+        $data = (object) $request->validated();
+        $user = User::where(function ($query) use ($data) {
+            if (is_numeric($data->emailPhone)) {
+                $query->where('phone', $data->emailPhone);
+            } else {
+                $query->where('email', $data->emailPhone);
+            }
+        })->first();
+
+        if (!$user) {
+            return $this->create_validation_error_response(
+                'message',
+                'Account not found!',
+                404
+            );
+        } elseif ($user && !$user->status) {
+            return $this->create_validation_error_response(
+                'message',
+                'Your Account is temporary deactivate!',
+                202
+            );
+        }
+
+        $otp = rand(111111, 999999);
+        User::find($user->id)->update(['otp' => bcrypt($otp)]);
+        is_numeric($data->emailPhone) ? "" : $this->sendMail($user->email, $user->name, $otp);
+
+        return response(
+            [
+                'success'       => true,
+                'message'       => "OTP Send Successful",
+                'email'          => $user->email
+            ]
+        );
+    }
+
+    /**
+     * Verified Email and OTP
+     *
+     * @param App\Http\Requests\OTPVerificationRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function otp_verification(OTPVerificationRequest $request)
+    {
+        $data = (object) $request->validated();
+        $user = User::where('email', $data->email)->first();
+
+        if (!$user || !HASH::check($data->otp, $user->otp)) {
+            return $this->create_validation_error_response(
+                false,
+                'message',
+                'OTP isInvalid!',
+                '202'
+            );
+        }
+
+        User::find($user->id)
+            ->update(
+                [
+                    'email_verified_at' => Carbon::now(),
+                    'otp'               => NULL
+                ]
+            );
+
+        return response(
+            [
+                'success'       => true,
+                'message'       => "Email Verification Successful",
+                'email'          => $user->email
+            ]
+        );
+    }
+
+    /**
+     * reset Password
+     *
+     * @param App\Http\Requests\ResetPasswordRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function reset_password(ResetPasswordRequest $request)
+    {
+        $data = (object) $request->validated();
+        User::where('email', $data->email)->first()
+            ->update(
+                [
+                    'password' => bcrypt($request->new_password),
+                ]
+            );
+
+        return $this->create_response('Password reset Successfully');
     }
 }
