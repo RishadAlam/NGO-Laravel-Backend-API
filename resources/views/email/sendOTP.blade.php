@@ -9,7 +9,7 @@
 </head>
 
 <body class="antialiased">
-    <h1>Hello {{ $name }}, Your otp is {{ $otp }}</h1>
+    <h1>Hello {{ $name }}, Your otp is {{ $otp }} and expired at {{ $expired }}</h1>
 </body>
 
 </html>

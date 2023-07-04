@@ -9,20 +9,19 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class EmailVerifyMail extends Mailable
+class RegistrationGreetingsMail extends Mailable
 {
     use Queueable, SerializesModels;
-    public $name, $email, $otp, $expired;
+    public $name, $email, $password;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($name, $email, $otp, $expired)
+    public function __construct($name, $email, $password)
     {
         $this->name     = $name;
         $this->email    = $email;
-        $this->otp      = $otp;
-        $this->expired  = $expired;
+        $this->password = $password;
     }
 
     /**
@@ -31,7 +30,7 @@ class EmailVerifyMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Account Verification',
+            subject: 'Login Credentials',
         );
     }
 
@@ -41,7 +40,7 @@ class EmailVerifyMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'email.sendOTP',
+            view: 'email.loginCredentials',
         );
     }
 

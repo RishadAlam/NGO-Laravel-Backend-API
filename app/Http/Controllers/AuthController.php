@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\UsersVerify;
 use Hamcrest\Type\IsNumeric;
 use Illuminate\Http\Request;
 use App\Mail\EmailVerifyMail;
@@ -12,6 +13,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\RegistrationGreetingsMail;
+use App\Http\Requests\RegistrationRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgetPasswordRequest;
@@ -59,18 +62,83 @@ class AuthController extends Controller
      * Send Otp Mail
      * 
      * @param $email
-     * @return Boolean
+     * @return boolean
      */
-    public function sendMail($email, $name, $otp)
+    public static function sendOTP($email, $name, $otp, $expired)
     {
         Mail::to($email)
             ->send(
                 new EmailVerifyMail(
                     $name,
                     $email,
-                    $otp
+                    $otp,
+                    $expired
                 )
             );
+    }
+
+    /**
+     * Send Login Credentrials
+     * 
+     * @param $email
+     * @return boolean
+     */
+    public static function sendCredentrials($name, $email, $password)
+    {
+        Mail::to($email)
+            ->send(
+                new RegistrationGreetingsMail(
+                    $name,
+                    $email,
+                    $password
+                )
+            );
+    }
+
+    /**
+     * Create OTP
+     * 
+     * @param $userId
+     * @return array
+     */
+    public static function createOTP($userId)
+    {
+        $otp        = rand(111111, 999999);
+        $expired    = Carbon::now()->addMinutes(5);
+        UsersVerify::create(
+            [
+                'user_id'       => $userId,
+                'otp'           => $otp,
+                'expired_at'    => $expired
+            ]
+        );
+
+        return [
+            'otp'       => $otp,
+            'expired'   => $expired
+        ];
+    }
+
+    /**
+     * User Registration
+     *
+     * @param App\Http\Requests\RegistrationRequest
+     * @return Illuminate\Http\Response
+     */
+    public function registration(RegistrationRequest $request)
+    {
+        $data = (object) $request->validated();
+        User::create(
+            [
+                'name'      => $data->name,
+                'email'     => $data->email,
+                'password'  => bcrypt($data->password),
+                'phone'     => $request->phone
+            ]
+        );
+
+        self::sendCredentrials($data->name, $data->email, $data->password);
+        return $this->create_response('Registration Successful');
     }
 
     /**
@@ -82,18 +150,12 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $data = (object) $request->validated();
-        $user = User::where(function ($query) use ($data) {
-            if (is_numeric($data->emailPhone)) {
-                $query->where('phone', $data->emailPhone);
-            } else {
-                $query->where('email', $data->emailPhone);
-            }
-        })->first();
+        $user = User::where('email', $data->email)->first();
 
         if (!$user) {
             return $this->create_validation_error_response(
-                'emailPhone',
-                'The email or phone is incorrect.'
+                'email',
+                'The email is incorrect.'
             );
         } elseif (
             $user
@@ -108,14 +170,17 @@ class AuthController extends Controller
                 'The password is incorrect.'
             );
         } elseif ($user && !$user->email_verified_at) {
+            // Create OTP & send it to user email address
+            $otpResponse = self::createOTP($user->id);
+            self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
+
             return $this->create_validation_error_response(
                 'message',
-                'You need to verified your Phone Number!',
+                'You need to verified your Email Address! We already send an OTP into your Email Address. Please Check your Email inbox or spam folder.',
                 '202'
             );
         } elseif ($user && !$user->status) {
             return $this->create_validation_error_response(
-                false,
                 'message',
                 'Your Account is temporary deactivate!',
                 '202'
@@ -201,13 +266,7 @@ class AuthController extends Controller
     public function forget_password(ForgetPasswordRequest $request)
     {
         $data = (object) $request->validated();
-        $user = User::where(function ($query) use ($data) {
-            if (is_numeric($data->emailPhone)) {
-                $query->where('phone', $data->emailPhone);
-            } else {
-                $query->where('email', $data->emailPhone);
-            }
-        })->first();
+        $user = User::where('email', $data->email)->first();
 
         if (!$user) {
             return $this->create_validation_error_response(
@@ -223,15 +282,12 @@ class AuthController extends Controller
             );
         }
 
-        $otp = rand(111111, 999999);
-        User::find($user->id)->update(['otp' => bcrypt($otp)]);
-        is_numeric($data->emailPhone) ? "" : $this->sendMail($user->email, $user->name, $otp);
-
+        $otpResponse = self::createOTP($user->id);
+        self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
         return response(
             [
                 'success'       => true,
-                'message'       => "OTP Send Successful",
-                'email'          => $user->email
+                'message'       => "OTP Send into your Email Address. Please Check your Email inbox or spam folder."
             ]
         );
     }
@@ -245,30 +301,29 @@ class AuthController extends Controller
     public function otp_verification(OTPVerificationRequest $request)
     {
         $data = (object) $request->validated();
-        $user = User::where('email', $data->email)->first();
+        $userOtp = UsersVerify::where('otp', $data->otp)->latest()->first();
 
-        if (!$user || !HASH::check($data->otp, $user->otp)) {
+        if (!$userOtp) {
             return $this->create_validation_error_response(
-                false,
                 'message',
                 'OTP isInvalid!',
                 '202'
             );
+        } elseif ($userOtp->expired_at < Carbon::now()) {
+            return $this->create_validation_error_response(
+                'message',
+                'OTP is Expired!',
+                '202'
+            );
         }
 
-        User::find($user->id)
-            ->update(
-                [
-                    'email_verified_at' => Carbon::now(),
-                    'otp'               => NULL
-                ]
-            );
+        User::find($userOtp->user_id)->update(['email_verified_at' => Carbon::now()]);
+        UsersVerify::where('user_id', $userOtp->user_id)->delete();
 
         return response(
             [
                 'success'       => true,
-                'message'       => "Email Verification Successful",
-                'email'          => $user->email
+                'message'       => "Account Verified Successfully"
             ]
         );
     }
@@ -282,12 +337,9 @@ class AuthController extends Controller
     public function reset_password(ResetPasswordRequest $request)
     {
         $data = (object) $request->validated();
-        User::where('email', $data->email)->first()
-            ->update(
-                [
-                    'password' => bcrypt($request->new_password),
-                ]
-            );
+        $user = User::where('email', $data->email)->first();
+        $user->update(['password' => bcrypt($request->new_password)]);
+        $user->tokens()->delete();
 
         return $this->create_response('Password reset Successfully');
     }

@@ -23,8 +23,8 @@ use App\Http\Controllers\AuthController;
  * Here is where you can hit unAuthenticate routes
  */
 Route::POST('/login', [AuthController::class, 'login']);
-Route::GET('/forget-password', [AuthController::class, 'forget_password']);
-Route::POST('/verify-email', [AuthController::class, 'otp_verification']);
+Route::POST('/forget-password', [AuthController::class, 'forget_password']);
+Route::POST('/account-verification', [AuthController::class, 'otp_verification']);
 Route::PUT('/reset-password', [AuthController::class, 'reset_password']);
 
 
