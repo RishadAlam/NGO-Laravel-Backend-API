@@ -22,10 +22,13 @@ use App\Http\Controllers\AuthController;
  * 
  * Here is where you can hit unAuthenticate routes
  */
-Route::POST('/login', [AuthController::class, 'login']);
-Route::POST('/forget-password', [AuthController::class, 'forget_password']);
-Route::POST('/account-verification', [AuthController::class, 'otp_verification']);
-Route::PUT('/reset-password', [AuthController::class, 'reset_password']);
+Route::group(['middleware' => 'LangCheck'], function () {
+    Route::POST('/login', [AuthController::class, 'login']);
+    Route::POST('/forget-password', [AuthController::class, 'forget_password']);
+    Route::POST('/account-verification', [AuthController::class, 'otp_verification']);
+    Route::PUT('/reset-password', [AuthController::class, 'reset_password']);
+});
+
 
 
 /**
@@ -36,7 +39,7 @@ Route::PUT('/reset-password', [AuthController::class, 'reset_password']);
  * Here is where you can hit Aithenticate routes. All of them are protected 
  * by auth Sanctum middleware and email verified
  */
-Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
+Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck']], function () {
     /**
      * -------------------------------------------------------------------------
      * Authorzation Routes
