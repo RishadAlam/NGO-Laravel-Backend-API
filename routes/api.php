@@ -20,9 +20,16 @@ use App\Http\Controllers\AuthController;
  * Public Routes
  * ------------------------------------------------------------------------
  * 
- * Here is where you can hit unAuthenticate routes
+ * All routes are protected by LangCheck middleware
  */
 Route::group(['middleware' => 'LangCheck'], function () {
+    /**
+     * -------------------------------------------------------------------------
+     * unAuthenticated Routes
+     * -------------------------------------------------------------------------
+     * 
+     * Here is where you can hit unAuthenticated routes
+     */
     Route::POST('/login', [AuthController::class, 'login']);
     Route::POST('/forget-password', [AuthController::class, 'forget_password']);
     Route::POST('/account-verification', [AuthController::class, 'otp_verification']);
