@@ -176,7 +176,7 @@ class AuthController extends Controller
 
             return $this->create_validation_error_response(
                 'message',
-                __('customValidations.login.otpSend'),
+                __('customValidations.otp.otpSent'),
                 '202'
             );
         } elseif ($user && !$user->status) {
@@ -343,6 +343,6 @@ class AuthController extends Controller
         $user->update(['password' => bcrypt($request->new_password)]);
         $user->tokens()->delete();
 
-        return $this->create_response('Password reset Successfully');
+        return $this->create_response(__('customValidations.resetPassword.successfull'));
     }
 }

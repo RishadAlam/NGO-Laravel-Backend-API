@@ -31,7 +31,6 @@ return [
         'successfull' => 'login Successful',
         'incorrectEmail' => 'The email is incorrect.',
         'incorrectPassword' => 'The password is incorrect.',
-        'otpSend' => 'You need to verified your Email Address! We already send an OTP into your Email Address. Please Check your Email inbox or spam folder.',
         'accDeactivate' => 'Your Account is temporary deactivate!',
     ],
 
@@ -71,8 +70,18 @@ return [
     */
     'otp' => [
         'successfull' => 'Account Verified Successfully',
+        'otpSent' => 'আপনাকে আপনার ইমেল ঠিকানা যাচাই করতে হবে। আমরা ইতিমধ্যেই আপনার ইমেল ঠিকানায় একটি OTP পাঠিয়েছি। আপনার ইমেল ইনবক্স বা স্প্যাম ফোল্ডার চেক করুন।',
         'otpIsInvalid' => 'OTP is Invalid!',
         'otpIsExpired' => 'OTP is Expired!',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reset Password Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'resetPassword' => [
+        'successfull' => 'Password reset Successfully',
     ]
 
 ];
