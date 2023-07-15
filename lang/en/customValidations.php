@@ -37,11 +37,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Login Custom Message
+    | Logout Custom Message
     |--------------------------------------------------------------------------
     */
     'logout' => [
         'successfull' => 'Logout Successful',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password Change Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'passwordChange' => [
+        'successfull' => 'Password changed Successful',
+        'notMatch' => 'Current password did not match.',
     ]
 
 ];

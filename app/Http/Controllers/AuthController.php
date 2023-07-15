@@ -243,7 +243,7 @@ class AuthController extends Controller
         if (!Hash::check($data->current_password, Auth::user()->password)) {
             return $this->create_validation_error_response(
                 'current_password',
-                'Current password did not match.'
+                __('customValidations.passwordChange.notMatch')
             );
         }
 
@@ -254,7 +254,9 @@ class AuthController extends Controller
                 ]
             );
 
-        return $this->create_response('Password change Successfully');
+        return $this->create_response(
+            __('customValidations.passwordChange.successfull')
+        );
     }
 
     /**
