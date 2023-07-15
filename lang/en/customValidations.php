@@ -62,6 +62,17 @@ return [
     'forgotPassword' => [
         'successfull' => 'OTP Send into your Email Address. Please Check your Email inbox or spam folder.',
         'accountNotFound' => 'Account not found!',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OTP Verification Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'otp' => [
+        'successfull' => 'Account Verified Successfully',
+        'otpIsInvalid' => 'OTP is Invalid!',
+        'otpIsExpired' => 'OTP is Expired!',
     ]
 
 ];

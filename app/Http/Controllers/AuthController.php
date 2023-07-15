@@ -308,13 +308,13 @@ class AuthController extends Controller
         if (!$userOtp) {
             return $this->create_validation_error_response(
                 'message',
-                'OTP isInvalid!',
+                __('customValidations.otp.otpIsInvalid'),
                 '202'
             );
         } elseif ($userOtp->expired_at < Carbon::now()) {
             return $this->create_validation_error_response(
                 'message',
-                'OTP is Expired!',
+                __('customValidations.otp.otpIsExpired'),
                 '202'
             );
         }
@@ -325,7 +325,7 @@ class AuthController extends Controller
         return response(
             [
                 'success'       => true,
-                'message'       => "Account Verified Successfully"
+                'message'       => __('customValidations.otp.successfull'),
             ]
         );
     }
