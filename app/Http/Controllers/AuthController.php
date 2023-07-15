@@ -155,7 +155,7 @@ class AuthController extends Controller
         if (!$user) {
             return $this->create_validation_error_response(
                 'email',
-                'The email is incorrect.'
+                __('customValidations.login.incorrectEmail')
             );
         } elseif (
             $user
@@ -167,7 +167,7 @@ class AuthController extends Controller
         ) {
             return $this->create_validation_error_response(
                 'password',
-                'The password is incorrect.'
+                __('customValidations.login.incorrectPassword')
             );
         } elseif ($user && !$user->email_verified_at) {
             // Create OTP & send it to user email address
@@ -176,13 +176,13 @@ class AuthController extends Controller
 
             return $this->create_validation_error_response(
                 'message',
-                'You need to verified your Email Address! We already send an OTP into your Email Address. Please Check your Email inbox or spam folder.',
+                __('customValidations.login.otpSend'),
                 '202'
             );
         } elseif ($user && !$user->status) {
             return $this->create_validation_error_response(
                 'message',
-                'Your Account is temporary deactivate!',
+                __('customValidations.login.accDeactivate'),
                 '202'
             );
         } elseif (!Auth::attempt(
@@ -194,7 +194,7 @@ class AuthController extends Controller
         )) {
             return $this->create_validation_error_response(
                 'message',
-                'Something went wrong!',
+                __('customValidations.common.somethingWentWrong'),
                 '500'
             );
         }
@@ -204,7 +204,7 @@ class AuthController extends Controller
         return response(
             [
                 'success'           => true,
-                'message'           => "login Successful",
+                'message'           => __('customValidations.login.successfull'),
                 'access_token'      => $token,
                 'token_type'        => "Bearer",
                 'id'                => $user->id,
