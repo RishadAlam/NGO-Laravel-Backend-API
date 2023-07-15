@@ -52,6 +52,16 @@ return [
     'passwordChange' => [
         'successfull' => 'Password changed Successful',
         'notMatch' => 'Current password did not match.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Forgot Password Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'forgotPassword' => [
+        'successfull' => 'OTP Send into your Email Address. Please Check your Email inbox or spam folder.',
+        'accountNotFound' => 'Account not found!',
     ]
 
 ];

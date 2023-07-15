@@ -273,13 +273,13 @@ class AuthController extends Controller
         if (!$user) {
             return $this->create_validation_error_response(
                 'message',
-                'Account not found!',
+                __('customValidations.forgotPassword.accountNotFound'),
                 404
             );
         } elseif ($user && !$user->status) {
             return $this->create_validation_error_response(
                 'message',
-                'Your Account is temporary deactivate!',
+                __('customValidations.login.accDeactivate'),
                 202
             );
         }
@@ -289,7 +289,7 @@ class AuthController extends Controller
         return response(
             [
                 'success'       => true,
-                'message'       => "OTP Send into your Email Address. Please Check your Email inbox or spam folder."
+                'message'       => __('customValidations.forgotPassword.successfull'),
             ]
         );
     }
