@@ -27,13 +27,21 @@ return [
     | Login Custom Message
     |--------------------------------------------------------------------------
     */
-
     'login' => [
         'successfull' => 'login Successful',
         'incorrectEmail' => 'The email is incorrect.',
         'incorrectPassword' => 'The password is incorrect.',
         'otpSend' => 'You need to verified your Email Address! We already send an OTP into your Email Address. Please Check your Email inbox or spam folder.',
         'accDeactivate' => 'Your Account is temporary deactivate!',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Login Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'logout' => [
+        'successfull' => 'Logout Successful',
     ]
 
 ];

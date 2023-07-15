@@ -227,7 +227,7 @@ class AuthController extends Controller
     public function logout()
     {
         auth::user()->currentAccessToken()->delete();
-        return $this->create_response('Logout Successful');
+        return $this->create_response(__('customValidations.logout.successfull'),);
     }
 
 
