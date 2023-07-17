@@ -213,6 +213,8 @@ class AuthController extends Controller
                 'email_verified_at' => $user->email_verified_at,
                 'phone'             => $user->phone,
                 'status'            => $user->status,
+                'role'              => $user->getRoleNames(),
+                'permissions'       => $user->getPermissionNames()
             ],
             200
         );
