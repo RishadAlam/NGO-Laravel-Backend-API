@@ -46,7 +46,7 @@ Route::group(['middleware' => 'LangCheck'], function () {
  * Here is where you can hit Aithenticate routes. All of them are protected 
  * by auth Sanctum middleware and email verified
  */
-Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck']], function () {
+Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeUser']], function () {
     /**
      * -------------------------------------------------------------------------
      * Authorzation Routes

@@ -20,6 +20,7 @@ return [
 
     'common' => [
         'somethingWentWrong' => 'Something went wrong!',
+        'activeUserMiddleware' => 'Your account is temporarily inactive and you have been logged out.',
     ],
 
     /*
@@ -31,7 +32,7 @@ return [
         'successfull' => 'login Successful',
         'incorrectEmail' => 'The email is incorrect.',
         'incorrectPassword' => 'The password is incorrect.',
-        'accDeactivate' => 'Your Account is temporary deactivate!',
+        'accDeactivate' => 'Your Account is temporary inactive!',
     ],
 
     /*

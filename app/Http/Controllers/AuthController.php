@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\UsersVerify;
-use Hamcrest\Type\IsNumeric;
-use Illuminate\Http\Request;
 use App\Mail\EmailVerifyMail;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
@@ -229,7 +227,7 @@ class AuthController extends Controller
     public function logout()
     {
         auth::user()->currentAccessToken()->delete();
-        return $this->create_response(__('customValidations.logout.successfull'),);
+        return $this->create_response(__('customValidations.logout.successfull'));
     }
 
 
