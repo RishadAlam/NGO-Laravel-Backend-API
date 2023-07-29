@@ -291,6 +291,7 @@ class AuthController extends Controller
             [
                 'success'       => true,
                 'message'       => __('customValidations.forgotPassword.successfull'),
+                'id'        => $user->id
             ]
         );
     }
@@ -360,8 +361,7 @@ class AuthController extends Controller
         return response(
             [
                 'success'       => true,
-                'message'       => __('customValidations.otp.successfull'),
-                'userId'        => $userOtp->user_id
+                'message'       => __('customValidations.otp.successfull')
             ]
         );
     }
