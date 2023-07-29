@@ -16,6 +16,7 @@ use App\Http\Requests\RegistrationRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgetPasswordRequest;
+use App\Http\Requests\OtpResendRequest;
 use App\Http\Requests\OTPVerificationRequest;
 
 class AuthController extends Controller
@@ -290,6 +291,40 @@ class AuthController extends Controller
             [
                 'success'       => true,
                 'message'       => __('customValidations.forgotPassword.successfull'),
+            ]
+        );
+    }
+
+    /**
+     * Forget Password
+     *
+     * @param App\Http\Requests\OtpResendRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function otp_resend($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return $this->create_validation_error_response(
+                'message',
+                __('customValidations.forgotPassword.accountNotFound'),
+                404
+            );
+        } elseif ($user && !$user->status) {
+            return $this->create_validation_error_response(
+                'message',
+                __('customValidations.login.accDeactivate'),
+                202
+            );
+        }
+
+        $otpResponse = self::createOTP($user->id);
+        self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
+        return response(
+            [
+                'success'       => true,
+                'message'       => __('customValidations.otp.otpResend'),
             ]
         );
     }

@@ -71,7 +71,8 @@ return [
     */
     'otp' => [
         'successfull' => 'Account Verified Successfully',
-        'otpSent' => 'আপনাকে আপনার ইমেল ঠিকানা যাচাই করতে হবে। আমরা ইতিমধ্যেই আপনার ইমেল ঠিকানায় একটি OTP পাঠিয়েছি। আপনার ইমেল ইনবক্স বা স্প্যাম ফোল্ডার চেক করুন।',
+        'otpSent' => 'You need to verify your email address. We have already sent an OTP to your email address. Please Check your email inbox or spam folder.',
+        'otpResend' => 'Again sent an OTP to your email address. Check your email inbox or spam folder.',
         'otpIsInvalid' => 'OTP is Invalid!',
         'otpIsExpired' => 'OTP is Expired!',
     ],

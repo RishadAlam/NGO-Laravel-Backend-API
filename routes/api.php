@@ -32,6 +32,7 @@ Route::group(['middleware' => 'LangCheck'], function () {
      */
     Route::POST('/login', [AuthController::class, 'login']);
     Route::POST('/forget-password', [AuthController::class, 'forget_password']);
+    Route::GET('/otp-resend/{id}', [AuthController::class, 'otp_resend']);
     Route::POST('/account-verification', [AuthController::class, 'otp_verification']);
     Route::PUT('/reset-password', [AuthController::class, 'reset_password']);
 });
