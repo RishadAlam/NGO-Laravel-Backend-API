@@ -303,7 +303,7 @@ class AuthController extends Controller
     public function otp_verification(OTPVerificationRequest $request)
     {
         $data = (object) $request->validated();
-        $userOtp = UsersVerify::where('otp', $data->otp)->latest()->first();
+        $userOtp = UsersVerify::where('otp', $data->otp)->latest()->first(['id', 'user_id', 'expired_at']);
 
         if (!$userOtp) {
             return $this->create_validation_error_response(
@@ -326,6 +326,7 @@ class AuthController extends Controller
             [
                 'success'       => true,
                 'message'       => __('customValidations.otp.successfull'),
+                'userId'        => $userOtp->user_id
             ]
         );
     }
@@ -339,7 +340,7 @@ class AuthController extends Controller
     public function reset_password(ResetPasswordRequest $request)
     {
         $data = (object) $request->validated();
-        $user = User::where('email', $data->email)->first();
+        $user = User::find($data->user_id);
         $user->update(['password' => bcrypt($request->new_password)]);
         $user->tokens()->delete();
 
