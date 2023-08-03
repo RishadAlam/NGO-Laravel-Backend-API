@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Authorzation Routes
      * -------------------------------------------------------------------------
      */
+    Route::GET('/authorization', [AuthController::class, 'authorization']);
     Route::POST('/registration', [AuthController::class, 'registration']);
     Route::POST('/logout', [AuthController::class, 'logout']);
     Route::PUT('/change-password', [AuthController::class, 'change_password']);

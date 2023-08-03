@@ -119,6 +119,33 @@ class AuthController extends Controller
     }
 
     /**
+     * User authorization
+     *
+     * @return Illuminate\Http\Response
+     */
+    public function authorization()
+    {
+        $userData = Auth::user();
+
+        // return $this->create_response('Registration Successful');
+        return response(
+            [
+                'success'           => true,
+                'message'           => __('customValidations.authorize.successfull'),
+                'id'                => $userData->id,
+                'name'              => $userData->name,
+                'email'             => $userData->email,
+                'email_verified_at' => $userData->email_verified_at,
+                'phone'             => $userData->phone,
+                'status'            => $userData->status,
+                'role'              => $userData->getRoleNames(),
+                'permissions'       => $userData->getPermissionNames()
+            ],
+            200
+        );;
+    }
+
+    /**
      * User Registration
      *
      * @param App\Http\Requests\RegistrationRequest
