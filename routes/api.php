@@ -19,7 +19,7 @@ use App\Http\Controllers\AuthController;
  * ------------------------------------------------------------------------
  * Public Routes
  * ------------------------------------------------------------------------
- * 
+ *
  * All routes are protected by LangCheck middleware
  */
 Route::group(['middleware' => 'LangCheck'], function () {
@@ -27,7 +27,7 @@ Route::group(['middleware' => 'LangCheck'], function () {
      * -------------------------------------------------------------------------
      * unAuthenticated Routes
      * -------------------------------------------------------------------------
-     * 
+     *
      * Here is where you can hit unAuthenticated routes
      */
     Route::POST('/login', [AuthController::class, 'login']);
@@ -43,8 +43,8 @@ Route::group(['middleware' => 'LangCheck'], function () {
  * -------------------------------------------------------------------------
  * Protected Routes
  * -------------------------------------------------------------------------
- * 
- * Here is where you can hit Aithenticate routes. All of them are protected 
+ *
+ * Here is where you can hit Aithenticate routes. All of them are protected
  * by auth Sanctum middleware and email verified
  */
 Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeUser']], function () {
@@ -57,4 +57,13 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::POST('/registration', [AuthController::class, 'registration']);
     Route::POST('/logout', [AuthController::class, 'logout']);
     Route::PUT('/change-password', [AuthController::class, 'change_password']);
+    Route::GET('/app-config', function () {
+        return response(
+            [
+                'success'           => true,
+                'message'           => __('customValidations.authorize.successfull')
+            ],
+            200
+        );
+    });
 });

@@ -59,7 +59,7 @@ class AuthController extends Controller
 
     /**
      * Send Otp Mail
-     * 
+     *
      * @param $email
      * @return boolean
      */
@@ -78,7 +78,7 @@ class AuthController extends Controller
 
     /**
      * Send Login Credentrials
-     * 
+     *
      * @param $email
      * @return boolean
      */
@@ -96,7 +96,7 @@ class AuthController extends Controller
 
     /**
      * Create OTP
-     * 
+     *
      * @param $userId
      * @return array
      */
@@ -142,7 +142,7 @@ class AuthController extends Controller
                 'permissions'       => $userData->getPermissionNames()
             ],
             200
-        );;
+        );
     }
 
     /**
