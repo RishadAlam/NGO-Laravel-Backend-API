@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\staffs;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
-class UserController extends Controller
+class RoleController extends Controller
 {
     /**
      * Instantiate a new controller instance.
      */
     public function __construct()
     {
-        $this->middleware('can:staff_list_view')->only('index');
+        // $this->middleware('can:staff_list_view')->only('index');
         $this->middleware('can:staff_permissions_view')->only('show');
         $this->middleware('can:staff_registration')->only('store');
         $this->middleware('can:staff_data_update')->only('update');
@@ -25,24 +25,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('roles:id,name')->get(['id', 'name', 'email', 'phone', 'email_verified_at as verified_at', 'status']);
-        $responseData = [];
-        foreach ($users as $key => $user) {
-            $responseData[$key] = (object)[
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'verified_at' => $user->verified_at,
-                'status' => $user->status,
-                'role' => $user->roles->map->only(['id', 'name']),
-            ];
-        }
+        $roles = Role::all(['id', 'name']);
 
         return response(
             [
                 'success'   => true,
                 'message'   => __('customValidations.authorize.successfull'),
-                'data'      => $responseData
+                'data'      => $roles
             ],
             200
         );

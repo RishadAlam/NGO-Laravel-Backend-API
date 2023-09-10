@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
 
 /*
@@ -65,7 +66,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * -------------------------------------------------------------------------
      */
     Route::apiResources([
-        'users' => UserController::class
+        'users' => UserController::class,
+        'roles' => RoleController::class,
     ]);
 
     Route::GET('/app-config', function () {
