@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\staffs\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,16 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::POST('/registration', [AuthController::class, 'registration']);
     Route::POST('/logout', [AuthController::class, 'logout']);
     Route::PUT('/change-password', [AuthController::class, 'change_password']);
+
+    /**
+     * -------------------------------------------------------------------------
+     * Api Resources Controllers & Routes
+     * -------------------------------------------------------------------------
+     */
+    Route::apiResources([
+        'users' => UserController::class
+    ]);
+
     Route::GET('/app-config', function () {
         return response(
             [
