@@ -68,7 +68,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResources([
         'users' => UserController::class,
         'roles' => RoleController::class,
-    ]);
+    ], ['except' => 'show']);
 
     Route::GET('/app-config', function () {
         return response(
