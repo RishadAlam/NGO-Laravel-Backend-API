@@ -66,6 +66,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * -------------------------------------------------------------------------
      */
     Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
+    Route::GET('/users/permissions/{id}', [UserController::class, 'get_user_permissions']);
 
     /**
      * -------------------------------------------------------------------------

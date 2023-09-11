@@ -77,6 +77,29 @@ class UserController extends Controller
     }
 
     /**
+     * Display a list of user permissions
+     */
+    public function get_user_permissions(string $id)
+    {
+        $collectionOfPermissions = User::find($id)->permissions;
+        $permissions             = [];
+        foreach ($collectionOfPermissions as $permission) {
+            $permissions[] = (object) [
+                'id' => $permission->id,
+                'name' => $permission->name,
+                'group_name' => $permission->group_name
+            ];
+        }
+        return response(
+            [
+                'success'   => true,
+                'data'      => $permissions
+            ],
+            200
+        );
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
