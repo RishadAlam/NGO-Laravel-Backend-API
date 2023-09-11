@@ -97,6 +97,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Staff Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'staff' => [
+        'successfull'   => 'The staff has been successfully registered.',
+        'delete'        => 'The staff has been successfully deleted.',
+        'update'        => 'The staff has been successfully updated.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Role Custom Message
     |--------------------------------------------------------------------------
     */

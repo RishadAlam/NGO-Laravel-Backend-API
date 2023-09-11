@@ -25,7 +25,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('roles:id,name')->get(['id', 'name', 'email', 'phone', 'image', 'image_uri', 'email_verified_at as verified_at', 'status']);
+        $users = User::with('roles:id,name')
+            ->get(['id', 'name', 'email', 'phone', 'image', 'image_uri', 'email_verified_at as verified_at', 'status']);
         $responseData = [];
         foreach ($users as $key => $user) {
             $responseData[$key] = (object) [
@@ -80,6 +81,13 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        User::find($id)->delete();
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.staff.delete')
+            ],
+            200
+        );
     }
 }
