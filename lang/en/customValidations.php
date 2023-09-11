@@ -101,7 +101,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'role' => [
-        'successfull' => 'The role has been successfully registered.',
+        'successfull'   => 'The role has been successfully registered.',
+        'delete'        => 'The role has been successfully deleted.',
     ]
 
 ];

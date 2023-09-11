@@ -76,6 +76,14 @@ class RoleController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Role::find($id)->delete();
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.role.delete')
+            ],
+            200
+        );
     }
 }
