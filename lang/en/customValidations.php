@@ -103,6 +103,7 @@ return [
     'role' => [
         'successfull'   => 'The role has been successfully registered.',
         'delete'        => 'The role has been successfully deleted.',
+        'update'        => 'The role has been successfully updated.',
     ]
 
 ];

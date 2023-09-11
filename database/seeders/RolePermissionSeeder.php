@@ -43,6 +43,16 @@ class RolePermissionSeeder extends Seeder
                     'staff_soft_delete',
                     'staff_permanently_delete',
                 ]
+            ],
+            // Staffs
+            [
+                'groupName'     => 'role',
+                'permissions'   => [
+                    'role_list_view',
+                    'role_registration',
+                    'role_update',
+                    'role_delete',
+                ]
             ]
         ];
 
