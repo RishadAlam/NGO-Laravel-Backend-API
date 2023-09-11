@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('status')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
