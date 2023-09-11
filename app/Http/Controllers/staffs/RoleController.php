@@ -25,12 +25,11 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::all(['id', 'name']);
+        $roles = Role::all(['id', 'name', 'is_default']);
 
         return response(
             [
                 'success'   => true,
-                'message'   => __('customValidations.authorize.successfull'),
                 'data'      => $roles
             ],
             200

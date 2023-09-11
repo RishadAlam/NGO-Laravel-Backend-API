@@ -17,12 +17,14 @@ class UserSeeder extends Seeder
         $email = User::where('email', 'sazzadullalamrishad@yahoo.com')->first();
 
         if (is_null($email)) {
-            $user           = new User();
-            $user->name     = "Rishad Alam";
-            $user->email    = "sazzadullalamrishad@yahoo.com";
-            $user->phone    = "01876637965";
-            $user->password = Hash::make('Rishad@bitcode786');
-            $user->status   = 1;
+            $user               = new User();
+            $user->name         = "Rishad Alam";
+            $user->email        = "sazzadullalamrishad@yahoo.com";
+            $user->phone        = "01876637965";
+            $user->image        = "Dummy";
+            $user->image_uri    = "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg";
+            $user->password     = Hash::make('Rishad@bitcode786');
+            $user->status       = 1;
             $user->save();
         }
 
