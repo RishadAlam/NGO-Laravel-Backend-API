@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\staffs;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\staffs\StoreRoleRequest;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
@@ -39,9 +40,19 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        //
+        $role = Role::create(['name' => $request->name]);
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.role.successfull'),
+                'id'        => $role->id,
+                'name'      => $role->name,
+            ],
+            200
+        );
     }
 
     /**

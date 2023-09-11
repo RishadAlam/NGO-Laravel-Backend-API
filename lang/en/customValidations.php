@@ -93,6 +93,15 @@ return [
     */
     'resetPassword' => [
         'successfull' => 'Password reset Successfully',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Role Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'role' => [
+        'successfull' => 'The role has been successfully registered.',
     ]
 
 ];
