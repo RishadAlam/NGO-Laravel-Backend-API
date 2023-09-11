@@ -62,6 +62,13 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     /**
      * -------------------------------------------------------------------------
+     * Api Resources Additional Routes
+     * -------------------------------------------------------------------------
+     */
+    Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
+
+    /**
+     * -------------------------------------------------------------------------
      * Api Resources Controllers & Routes
      * -------------------------------------------------------------------------
      */

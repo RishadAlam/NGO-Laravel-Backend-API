@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\staffs;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\staffs\ChangeStatusRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -58,6 +59,21 @@ class UserController extends Controller
     public function store(Request $request)
     {
         //
+    }
+
+    /**
+     * Change Status the specified user
+     */
+    public function change_status(ChangeStatusRequest $request, string $id)
+    {
+        $id = User::find($id)->update(['status' => $request->validated()['status']]);
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.staff.status')
+            ],
+            200
+        );
     }
 
     /**
