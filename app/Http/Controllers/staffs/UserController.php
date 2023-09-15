@@ -5,6 +5,7 @@ namespace App\Http\Controllers\staffs;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\staffs\ChangeStatusRequest;
 use App\Http\Requests\StaffStoreRequest;
+use App\Http\Requests\StaffUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -120,9 +121,27 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StaffUpdateRequest $request, string $id)
     {
-        //
+        $staffData = (object) $request->validated();
+        $staff = User::with('roles:id')->find($id);
+        $staff->update([
+            'name' => $staffData->name,
+            'email' => $staffData->email,
+            'phone' => $request->phone
+        ]);
+        if ($staffData->role !== $staff->roles[0]->id) {
+            $staff->syncRoles($staff->roles[0]->id, $staffData->role);
+        }
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.staff.successful'),
+                'id'        => $staff->id
+            ],
+            200
+        );
     }
 
     /**
