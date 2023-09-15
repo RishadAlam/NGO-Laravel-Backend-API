@@ -101,7 +101,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'staff' => [
-        'successfull'   => 'The staff has been successfully registered.',
+        'successful'   => 'The staff has been successfully registered.',
         'delete'        => 'The staff has been successfully deleted.',
         'update'        => 'The staff has been successfully updated.',
         'status'        => 'The staff status has been successfully updated.',
@@ -113,7 +113,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'role' => [
-        'successfull'   => 'The role has been successfully registered.',
+        'successful'   => 'The role has been successfully registered.',
         'delete'        => 'The role has been successfully deleted.',
         'update'        => 'The role has been successfully updated.',
     ]

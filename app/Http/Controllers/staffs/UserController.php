@@ -4,8 +4,10 @@ namespace App\Http\Controllers\staffs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\staffs\ChangeStatusRequest;
+use App\Http\Requests\StaffStoreRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -56,9 +58,25 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StaffStoreRequest $request)
     {
-        //
+        $staffData = (object) $request->validated();
+        $staff = User::create([
+            'name' => $staffData->name,
+            'email' => $staffData->email,
+            'phone' => $request->phone,
+            'password' => Hash::make(123)
+        ]);
+        $staff->assignRole($staffData->role);
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.staff.successful'),
+                'id'        => $staff->id
+            ],
+            200
+        );
     }
 
     /**
