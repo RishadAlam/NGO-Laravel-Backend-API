@@ -24,6 +24,7 @@ class StaffUpdateRequest extends FormRequest
         return [
             'name'  => 'required|string|max:100',
             'email' => 'required|email',
+            "phone" => 'nullable|phone:BD',
             'role'  => 'required|integer'
         ];
     }

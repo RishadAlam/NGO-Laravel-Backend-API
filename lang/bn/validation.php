@@ -36,6 +36,7 @@ return [
     'confirmed' => ':attribute ক্ষেত্র নিশ্চিতকরণ মেলে না।',
     'current_password' => 'পাসওয়ার্ডটি ভূল।',
     'date' => ':attribute ক্ষেত্রটি অবশ্যই একটি বৈধ তারিখ হতে হবে।',
+    'phone' => ':attribute ক্ষেত্রটি অবশ্যই একটি বৈধ ফোন নাম্বার হতে হবে।',
     'date_equals' => ':attribute ক্ষেত্র অবশ্যই একটি তারিখ হতে হবে :date এর সমান।',
     'date_format' => ':attribute ক্ষেত্রটি অবশ্যই :format এর সাথে মিলতে হবে।',
     'decimal' => ':attribute ক্ষেত্রে অবশ্যই :decimal দশমিক স্থান থাকতে হবে।',

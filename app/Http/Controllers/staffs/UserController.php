@@ -30,6 +30,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('roles:id,name')
+            ->with('permissions:id,name,group_name')
             ->get(['id', 'name', 'email', 'phone', 'image', 'image_uri', 'email_verified_at as verified_at', 'status']);
         $responseData = [];
         foreach ($users as $key => $user) {
@@ -44,6 +45,7 @@ class UserController extends Controller
                 'status'        => $user->status,
                 'role_id'       => $user->roles[0]->id ?? null,
                 'role_name'     => $user->roles[0]->name ?? null,
+                'permissions'   => $user->permissions
             ];
         }
 
@@ -65,7 +67,7 @@ class UserController extends Controller
         $staff = User::create([
             'name' => $staffData->name,
             'email' => $staffData->email,
-            'phone' => $request->phone,
+            'phone' => $staffData->phone,
             'password' => Hash::make(123)
         ]);
         $staff->assignRole($staffData->role);
@@ -128,7 +130,7 @@ class UserController extends Controller
         $staff->update([
             'name' => $staffData->name,
             'email' => $staffData->email,
-            'phone' => $request->phone
+            'phone' => $staffData->phone
         ]);
         if ($staffData->role !== $staff->roles[0]->id) {
             $staff->syncRoles($staff->roles[0]->id, $staffData->role);
@@ -137,7 +139,7 @@ class UserController extends Controller
         return response(
             [
                 'success'   => true,
-                'message'   => __('customValidations.staff.successful'),
+                'message'   => __('customValidations.staff.update'),
                 'id'        => $staff->id
             ],
             200

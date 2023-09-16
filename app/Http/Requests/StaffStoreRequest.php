@@ -24,6 +24,7 @@ class StaffStoreRequest extends FormRequest
         return [
             'name'  => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
+            "phone" => 'nullable|phone:BD',
             'role'  => 'required|integer'
         ];
     }
