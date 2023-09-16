@@ -11,12 +11,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\OtpResendRequest;
 use App\Mail\RegistrationGreetingsMail;
 use App\Http\Requests\RegistrationRequest;
+use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgetPasswordRequest;
-use App\Http\Requests\OtpResendRequest;
 use App\Http\Requests\OTPVerificationRequest;
 
 class AuthController extends Controller
@@ -119,6 +120,30 @@ class AuthController extends Controller
     }
 
     /**
+     * Create Authorized Response
+     *
+     * @param $userData
+     * @return array
+     */
+    public static function createAuthorizedRes($userData, $message)
+    {
+        return [
+            'success'           => true,
+            'message'           => $message,
+            'id'                => $userData->id,
+            'name'              => $userData->name,
+            'email'             => $userData->email,
+            'email_verified_at' => $userData->email_verified_at,
+            'phone'             => $userData->phone,
+            'image'             => $userData->image,
+            'image_uri'         => $userData->image_uri,
+            'status'            => $userData->status,
+            'role'              => $userData->getRoleNames(),
+            'permissions'       => $userData->getPermissionNames()
+        ];
+    }
+
+    /**
      * User authorization
      *
      * @return Illuminate\Http\Response
@@ -126,21 +151,8 @@ class AuthController extends Controller
     public function authorization()
     {
         $userData = Auth::user();
-
-        // return $this->create_response('Registration Successful');
         return response(
-            [
-                'success'           => true,
-                'message'           => __('customValidations.authorize.successfull'),
-                'id'                => $userData->id,
-                'name'              => $userData->name,
-                'email'             => $userData->email,
-                'email_verified_at' => $userData->email_verified_at,
-                'phone'             => $userData->phone,
-                'status'            => $userData->status,
-                'role'              => $userData->getRoleNames(),
-                'permissions'       => $userData->getPermissionNames()
-            ],
+            self::createAuthorizedRes(auth()->user(), __('customValidations.authorize.successfull')),
             200
         );
     }
@@ -238,6 +250,8 @@ class AuthController extends Controller
                 'email'             => $user->email,
                 'email_verified_at' => $user->email_verified_at,
                 'phone'             => $user->phone,
+                'image'             => $user->image,
+                'image_uri'         => $user->image_uri,
                 'status'            => $user->status,
                 'role'              => $user->getRoleNames(),
                 'permissions'       => $user->getPermissionNames()
@@ -389,7 +403,8 @@ class AuthController extends Controller
             [
                 'success'       => true,
                 'message'       => __('customValidations.otp.successfull')
-            ]
+            ],
+            200
         );
     }
 
@@ -407,5 +422,43 @@ class AuthController extends Controller
         $user->tokens()->delete();
 
         return $this->create_response(__('customValidations.resetPassword.successfull'));
+    }
+
+    /**
+     * Profile Update
+     *
+     * @param App\Http\Requests\ProfileUpdateRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function profile_update(ProfileUpdateRequest $request)
+    {
+        $data = (object) $request->validated();
+        if (!empty($data->image)) {
+            // if (auth()->user()->image) {
+            //     $path = public_path('storage/staff/' . auth()->user()->image . '');
+            //     unlink($path);
+            // }
+            $extension  = $data->image->extension();
+            $imgName    = 'staff_' . time() . '.' . $extension;
+            $imagePath  = $data->image->move(public_path() . '/storage/staff/', $imgName);
+
+            User::find(auth()->user()->id)
+                ->update(
+                    [
+                        'image'     => $imgName,
+                        'image_uri' => $imagePath,
+                    ]
+                );
+        }
+
+        User::find(auth()->user()->id)
+            ->update(
+                [
+                    'name'  => $data->name,
+                    'phone' => $data->phone
+                ]
+            );
+
+        return response(self::createAuthorizedRes(auth()->user(), __('customValidations.staff.profile_update')), 200);
     }
 }
