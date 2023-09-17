@@ -42,7 +42,7 @@ class RoleController extends Controller
     public function store(StoreRoleRequest $request)
     {
         $roleData   = (object) $request->validated();
-        $role       = Role::create(['name' => $roleData->name]);
+        $role       = Role::create(['name' => $roleData->name, 'guard_name' => 'web']);
         return response(
             [
                 'success'   => true,

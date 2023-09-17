@@ -17,11 +17,11 @@ class UserController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:staff_list_view')->only('index');
-        $this->middleware('can:staff_permissions_view')->only('show');
-        $this->middleware('can:staff_registration')->only('store');
-        $this->middleware('can:staff_data_update')->only('update');
-        $this->middleware('can:staff_soft_delete')->only('destroy');
+        // $this->middleware('can:staff_list_view')->only('index');
+        // $this->middleware('can:staff_permissions_view')->only('show');
+        // $this->middleware('can:staff_registration')->only('store');
+        // $this->middleware('can:staff_data_update')->only('update');
+        // $this->middleware('can:staff_soft_delete')->only('destroy');
     }
 
     /**
@@ -29,23 +29,24 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('roles:id,name')
+        $users = User::with('roles:id,name,is_default')
             ->with('permissions:id,name,group_name')
             ->get(['id', 'name', 'email', 'phone', 'image', 'image_uri', 'email_verified_at as verified_at', 'status']);
         $responseData = [];
         foreach ($users as $key => $user) {
             $responseData[$key] = (object) [
-                'id'            => $user->id,
-                'name'          => $user->name,
-                'email'         => $user->email,
-                'phone'         => $user->phone,
-                'image'         => $user->image,
-                'image_uri'     => $user->image_uri,
-                'verified_at'   => $user->verified_at,
-                'status'        => $user->status,
-                'role_id'       => $user->roles[0]->id ?? null,
-                'role_name'     => $user->roles[0]->name ?? null,
-                'permissions'   => $user->permissions
+                'id'                => $user->id,
+                'name'              => $user->name,
+                'email'             => $user->email,
+                'phone'             => $user->phone,
+                'image'             => $user->image,
+                'image_uri'         => $user->image_uri,
+                'verified_at'       => $user->verified_at,
+                'status'            => $user->status,
+                'role_id'           => $user->roles[0]->id ?? null,
+                'role_name'         => $user->roles[0]->name ?? null,
+                'role_is_default'   => $user->roles[0]->is_default ?? false,
+                'permissions'       => $user->permissions
             ];
         }
 
@@ -132,8 +133,12 @@ class UserController extends Controller
             'email' => $staffData->email,
             'phone' => $staffData->phone
         ]);
-        if ($staffData->role !== $staff->roles[0]->id) {
-            $staff->syncRoles($staff->roles[0]->id, $staffData->role);
+        if (isset($staff->roles[0]->id)) {
+            if ($staffData->role !== $staff->roles[0]->id) {
+                $staff->syncRoles($staff->roles[0]->id, $staffData->role);
+            }
+        } else {
+            $staff->assignRole($staffData->role);
         }
 
         return response(

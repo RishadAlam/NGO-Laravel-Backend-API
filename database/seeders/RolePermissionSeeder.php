@@ -17,11 +17,11 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         //Create Role
-        $roleDeveloper  = Role::create(['name' => 'Developer', 'is_default' => true]);
-        $roleSuperAdmin = Role::create(['name' => 'Super Admin', 'is_default' => true]);
-        $roleAdmin      = Role::create(['name' => 'Admin', 'is_default' => true]);
-        $roleManager    = Role::create(['name' => 'Manager', 'is_default' => true]);
-        $roleUser       = Role::create(['name' => 'Field Officer', 'is_default' => true]);
+        $roleDeveloper  = Role::create(['name' => 'developer', 'is_default' => true]);
+        $roleSuperAdmin = Role::create(['name' => 'super_admin', 'is_default' => true]);
+        $roleAdmin      = Role::create(['name' => 'admin', 'is_default' => true]);
+        $roleManager    = Role::create(['name' => 'manager', 'is_default' => true]);
+        $roleUser       = Role::create(['name' => 'field_officer', 'is_default' => true]);
 
         // Permission
         $permissions = [
