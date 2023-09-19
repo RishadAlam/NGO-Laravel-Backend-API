@@ -29,7 +29,7 @@ class RolePermissionSeeder extends Seeder
             [
                 'groupName'     => 'dashboard',
                 'permissions'   => [
-                    'dashboardAsAdmin'
+                    'view_dashboard_as_admin'
                 ]
             ],
             // Staffs
@@ -46,7 +46,7 @@ class RolePermissionSeeder extends Seeder
             ],
             // Staffs
             [
-                'groupName'     => 'role',
+                'groupName'     => 'staff_role',
                 'permissions'   => [
                     'role_list_view',
                     'role_registration',
