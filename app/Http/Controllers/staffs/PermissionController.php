@@ -20,7 +20,7 @@ class PermissionController extends Controller
             ->distinct()
             ->orderBy('group_name')
             ->get();
-        $user_permissions = User::find($id)
+        $userPermissions = User::find($id)
             ->getPermissionNames();
 
         return response(
@@ -29,7 +29,7 @@ class PermissionController extends Controller
                 'data'      => [
                     'allGroups'         => $allGroups,
                     'allPermissions'    => $allPermissions,
-                    'user_permissions'  => $user_permissions
+                    'userPermissions'   => $userPermissions
                 ]
             ],
             200
@@ -41,6 +41,13 @@ class PermissionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        User::find($id)->syncPermissions($request->permissions);
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.permission.update')
+            ],
+            200
+        );
     }
 }
