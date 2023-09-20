@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
 
@@ -69,15 +70,17 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
     Route::GET('/users/permissions/{id}', [UserController::class, 'get_user_permissions']);
 
+    //Permissions Index
+    Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');
+
     /**
      * -------------------------------------------------------------------------
      * Api Resources Controllers & Routes
      * -------------------------------------------------------------------------
      */
-    Route::apiResources([
-        'users' => UserController::class,
-        'roles' => RoleController::class,
-    ], ['except' => 'show']);
+    Route::apiResource('users', UserController::class)->except('show');
+    Route::apiResource('roles', RoleController::class)->except('show');
+    Route::apiResource('permissions', PermissionController::class)->except(['show', 'index', 'store', 'destroy']);
 
     Route::GET('/app-config', function () {
         return response(
