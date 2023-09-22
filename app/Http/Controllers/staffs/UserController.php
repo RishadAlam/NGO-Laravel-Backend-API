@@ -7,6 +7,7 @@ use App\Http\Requests\staffs\ChangeStatusRequest;
 use App\Http\Requests\StaffStoreRequest;
 use App\Http\Requests\StaffUpdateRequest;
 use App\Models\User;
+use App\Models\UserActionHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -31,7 +32,9 @@ class UserController extends Controller
     {
         $users = User::with('roles:id,name,is_default')
             ->with('permissions:id,name,group_name')
+            ->with(['UserActionHistory', 'UserActionHistory.Author:id,name,image_uri'])
             ->get(['id', 'name', 'email', 'phone', 'image', 'image_uri', 'email_verified_at as verified_at', 'status']);
+
         $responseData = [];
         foreach ($users as $key => $user) {
             $responseData[$key] = (object) [
@@ -46,7 +49,8 @@ class UserController extends Controller
                 'role_id'           => $user->roles[0]->id ?? null,
                 'role_name'         => $user->roles[0]->name ?? null,
                 'role_is_default'   => $user->roles[0]->is_default ?? false,
-                'permissions'       => $user->permissions
+                'permissions'       => $user->permissions,
+                'action_history'    => $user->UserActionHistory
             ];
         }
 
@@ -157,6 +161,15 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         User::find($id)->delete();
+        UserActionHistory::create([
+            "user_id" => $id,
+            "author_id" => auth()->user()->id,
+            "name" => auth()->user()->name,
+            "image_uri" => auth()->user()->image_uri,
+            "action_type" => 'delete',
+            "action_details" => json_encode([]),
+        ]);
+
         return response(
             [
                 'success'   => true,

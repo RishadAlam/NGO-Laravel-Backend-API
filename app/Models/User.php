@@ -49,4 +49,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Relation with UserActionHistory Table
+     */
+    public function UserActionHistory()
+    {
+        return $this->hasMany(UserActionHistory::class);
+    }
 }
