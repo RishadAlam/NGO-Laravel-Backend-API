@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
+use Spatie\Permission\Models\Permission;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +84,23 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('permissions', PermissionController::class)->except(['show', 'index', 'store', 'destroy']);
 
     Route::GET('/app-config', function () {
+        return response(
+            [
+                'success'           => true,
+                'message'           => __('customValidations.authorize.successfull')
+            ],
+            200
+        );
+    });
+    Route::POST('/add-permission', function (Request $request) {
+        $permission = Permission::create(
+            [
+                'name'          => $request->name,
+                'group_name'    => $request->group_name,
+                'guard_name'    => 'web'
+            ]
+        );
+        auth()->user()->givePermissionTo($permission);
         return response(
             [
                 'success'           => true,
