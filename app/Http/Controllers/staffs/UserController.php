@@ -94,7 +94,21 @@ class UserController extends Controller
      */
     public function change_status(ChangeStatusRequest $request, string $id)
     {
-        $id = User::find($id)->update(['status' => $request->validated()['status']]);
+        $status = $request->validated()['status'];
+        DB::transaction(
+            function () use ($id, $status) {
+                User::find($id)->update(['status' => $status]);
+                UserActionHistory::create([
+                    "user_id" => $id,
+                    "author_id" => auth()->user()->id,
+                    "name" => auth()->user()->name,
+                    "image_uri" => auth()->user()->image_uri,
+                    "action_type" => 'delete',
+                    "action_details" => json_encode([$status ? 'Deactive => Active' : 'Active => Deactive']),
+                ]);
+            }
+        );
+
         return response(
             [
                 'success'   => true,
