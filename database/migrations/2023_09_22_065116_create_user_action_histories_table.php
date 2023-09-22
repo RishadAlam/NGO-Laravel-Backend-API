@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('author_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate()->nullOnDelete();
             $table->string('name');
             $table->string('image_uri');
-            $table->enum('action_type', ['update', 'delete']);
+            $table->enum('action_type', ['update', 'delete', 'restore']);
             $table->json('action_details');
             $table->timestamps();
         });
