@@ -73,7 +73,8 @@ class RolePermissionSeeder extends Seeder
                 $permission = Permission::create(
                     [
                         'name'          => $permission,
-                        'group_name'    => $groupName
+                        'group_name'    => $groupName,
+                        'guard_name'    => 'web'
                     ]
                 );
                 $user->givePermissionTo($permission);
