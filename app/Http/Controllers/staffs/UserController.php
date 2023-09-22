@@ -9,7 +9,9 @@ use App\Http\Requests\StaffUpdateRequest;
 use App\Models\User;
 use App\Models\UserActionHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -18,11 +20,11 @@ class UserController extends Controller
      */
     public function __construct()
     {
-        // $this->middleware('can:staff_list_view')->only('index');
-        // $this->middleware('can:staff_permissions_view')->only('show');
-        // $this->middleware('can:staff_registration')->only('store');
-        // $this->middleware('can:staff_data_update')->only('update');
-        // $this->middleware('can:staff_soft_delete')->only('destroy');
+        $this->middleware('can:staff_list_view')->only('index');
+        $this->middleware('can:staff_permissions_view')->only('show');
+        $this->middleware('can:staff_registration')->only('store');
+        $this->middleware('can:staff_data_update')->only('update');
+        $this->middleware('can:staff_soft_delete')->only('destroy');
     }
 
     /**
@@ -131,19 +133,42 @@ class UserController extends Controller
     public function update(StaffUpdateRequest $request, string $id)
     {
         $staffData = (object) $request->validated();
-        $staff = User::with('roles:id')->find($id);
-        $staff->update([
-            'name' => $staffData->name,
-            'email' => $staffData->email,
-            'phone' => $staffData->phone
-        ]);
-        if (isset($staff->roles[0]->id)) {
-            if ($staffData->role !== $staff->roles[0]->id) {
-                $staff->syncRoles($staff->roles[0]->id, $staffData->role);
-            }
-        } else {
-            $staff->assignRole($staffData->role);
+        $staff = User::with('roles:id,name')->find($id);
+        $histData = [
+            $staff->name !== $staffData->name ? "{$staff->name} => {$staffData->name}" : '',
+            $staff->email !== $staffData->email ? "{$staff->email} => {$staffData->email}" : '',
+            $staff->phone !== $staffData->phone ? "{$staff->phone} => {$staffData->phone}" : '',
+        ];
+
+        if ($staff->roles[0]->id !== $staffData->role) {
+            $role = Role::find($staffData->role, ['id', 'name']);
+            $histData[] = "{$staff->roles[0]->name} => {$role->name}";
         }
+
+        DB::transaction(function () use ($id, $staffData, $staff, $histData) {
+            $staff->update([
+                'name' => $staffData->name,
+                'email' => $staffData->email,
+                'phone' => $staffData->phone
+            ]);
+
+            if (isset($staff->roles[0]->id)) {
+                if ($staffData->role !== $staff->roles[0]->id) {
+                    $staff->syncRoles($staff->roles[0]->id, $staffData->role);
+                }
+            } else {
+                $staff->assignRole($staffData->role);
+            }
+
+            UserActionHistory::create([
+                "user_id" => $id,
+                "author_id" => auth()->user()->id,
+                "name" => auth()->user()->name,
+                "image_uri" => auth()->user()->image_uri,
+                "action_type" => 'update',
+                "action_details" => json_encode($histData),
+            ]);
+        });
 
         return response(
             [
@@ -160,15 +185,17 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        User::find($id)->delete();
-        UserActionHistory::create([
-            "user_id" => $id,
-            "author_id" => auth()->user()->id,
-            "name" => auth()->user()->name,
-            "image_uri" => auth()->user()->image_uri,
-            "action_type" => 'delete',
-            "action_details" => json_encode([]),
-        ]);
+        DB::transaction(function () use ($id) {
+            User::find($id)->delete();
+            UserActionHistory::create([
+                "user_id" => $id,
+                "author_id" => auth()->user()->id,
+                "name" => auth()->user()->name,
+                "image_uri" => auth()->user()->image_uri,
+                "action_type" => 'delete',
+                "action_details" => json_encode([]),
+            ]);
+        });
 
         return response(
             [
