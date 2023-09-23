@@ -103,7 +103,7 @@ class UserController extends Controller
                     "author_id" => auth()->user()->id,
                     "name" => auth()->user()->name,
                     "image_uri" => auth()->user()->image_uri,
-                    "action_type" => 'delete',
+                    "action_type" => 'update',
                     "action_details" => json_encode([$status ? 'Deactive => Active' : 'Active => Deactive']),
                 ]);
             }
