@@ -150,7 +150,6 @@ class AuthController extends Controller
      */
     public function authorization()
     {
-        $userData = Auth::user();
         return response(
             self::createAuthorizedRes(auth()->user(), __('customValidations.authorize.successfull')),
             200

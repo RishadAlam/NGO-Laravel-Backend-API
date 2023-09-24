@@ -3,21 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\config\AppConfigController;
 use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
 use Spatie\Permission\Models\Permission;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 /**
  * ------------------------------------------------------------------------
@@ -48,13 +38,13 @@ Route::group(['middleware' => 'LangCheck'], function () {
  * Protected Routes
  * -------------------------------------------------------------------------
  *
- * Here is where you can hit Aithenticate routes. All of them are protected
+ * Here is where you can hit Authenticate routes. All of them are protected
  * by auth Sanctum middleware and email verified
  */
 Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeUser']], function () {
     /**
      * -------------------------------------------------------------------------
-     * Authorzation Routes
+     * Authorization Routes
      * -------------------------------------------------------------------------
      */
     Route::GET('/authorization', [AuthController::class, 'authorization']);
@@ -67,31 +57,31 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * -------------------------------------------------------------------------
      * Api Resources Additional Routes
      * -------------------------------------------------------------------------
+     *
+     * Here you can see all the API routes that have been additionally added to
+     * the resource controller
      */
     Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
     Route::GET('/users/permissions/{id}', [UserController::class, 'get_user_permissions']);
 
-    //Permissions Index
+    // Permissions Index
     Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');
 
     /**
      * -------------------------------------------------------------------------
      * Api Resources Controllers & Routes
      * -------------------------------------------------------------------------
+     *
+     * Here you can see all of the api resource routes and controllers with their
+     * methods that should controller applied
      */
+    Route::apiResource('app-config', AppConfigController::class)->only(['index', 'update']);
+
+    // Staff Routes Controller
     Route::apiResource('users', UserController::class)->except('show');
     Route::apiResource('roles', RoleController::class)->except('show');
-    Route::apiResource('permissions', PermissionController::class)->except(['show', 'index', 'store', 'destroy']);
+    Route::apiResource('permissions', PermissionController::class)->only('update');
 
-    Route::GET('/app-config', function () {
-        return response(
-            [
-                'success'           => true,
-                'message'           => __('customValidations.authorize.successfull')
-            ],
-            200
-        );
-    });
     Route::POST('/add-permission', function (Request $request) {
         $permission = Permission::create(
             [

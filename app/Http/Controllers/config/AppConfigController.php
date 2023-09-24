@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\config;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppConfig;
 use Illuminate\Http\Request;
 
 class AppConfigController extends Controller
@@ -12,53 +13,20 @@ class AppConfigController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        $configuration = AppConfig::firstOrFail();
+        return response(
+            [
+                "success"   => true,
+                "data"      => $configuration
+            ],
+            200
+        );
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
     {
         //
     }
