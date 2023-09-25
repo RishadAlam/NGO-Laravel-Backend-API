@@ -457,7 +457,8 @@ class AuthController extends Controller
                     'phone' => $data->phone
                 ]
             );
+        $userData = User::findOrFail(auth()->user()->id);
 
-        return response(self::createAuthorizedRes(auth()->user(), __('customValidations.staff.profile_update')), 200);
+        return response(self::createAuthorizedRes($userData, __('customValidations.staff.profile_update')), 200);
     }
 }
