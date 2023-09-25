@@ -75,8 +75,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Here you can see all of the api resource routes and controllers with their
      * methods that should controller applied
      */
-    Route::apiResource('app-config', AppConfigController::class)->only(['index', 'update']);
-
     // Staff Routes Controller
     Route::apiResource('users', UserController::class)->except('show');
     Route::apiResource('roles', RoleController::class)->except('show');
