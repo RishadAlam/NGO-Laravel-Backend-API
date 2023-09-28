@@ -48,6 +48,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * -------------------------------------------------------------------------
      */
     Route::GET('/authorization', [AuthController::class, 'authorization']);
+    Route::GET('/app-settings', [AppConfigController::class, 'index']);
     Route::POST('/registration', [AuthController::class, 'registration']);
     Route::POST('/logout', [AuthController::class, 'logout']);
     Route::PUT('/change-password', [AuthController::class, 'change_password']);
@@ -80,6 +81,15 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('roles', RoleController::class)->except('show');
     Route::apiResource('permissions', PermissionController::class)->only('update');
 
+    /**
+     * -------------------------------------------------------------------------
+     * Api Independent Controllers & Routes
+     * -------------------------------------------------------------------------
+     *
+     * Here you can see all of the api independent routes and controllers
+     */
+    // App Config Routes
+
     Route::POST('/add-permission', function (Request $request) {
         $permission = Permission::create(
             [
@@ -89,6 +99,16 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
             ]
         );
         auth()->user()->givePermissionTo($permission);
+        return response(
+            [
+                'success'           => true,
+                'message'           => __('customValidations.authorize.successfull')
+            ],
+            200
+        );
+    });
+
+    Route::GET('/app-config', function () {
         return response(
             [
                 'success'           => true,

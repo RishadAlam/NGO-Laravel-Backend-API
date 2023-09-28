@@ -29,7 +29,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'authorize' => [
-        'successfull' => 'Authorization was successful.',
+        'successful' => 'Authorization was successful.',
     ],
 
     /*
@@ -38,7 +38,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'login' => [
-        'successfull' => 'login Successful',
+        'successful' => 'login Successful',
         'incorrectEmail' => 'The email is incorrect.',
         'incorrectPassword' => 'The password is incorrect.',
         'accDeactivate' => 'Your Account is temporary inactive!',
@@ -50,7 +50,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'logout' => [
-        'successfull' => 'Logout Successful',
+        'successful' => 'Logout Successful',
     ],
 
     /*
@@ -59,7 +59,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'passwordChange' => [
-        'successfull' => 'Password changed Successful',
+        'successful' => 'Password changed Successful',
         'notMatch' => 'Current password did not match.',
     ],
 
@@ -69,7 +69,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'forgotPassword' => [
-        'successfull' => 'OTP Send into your Email Address. Please Check your Email inbox or spam folder.',
+        'successful' => 'OTP Send into your Email Address. Please Check your Email inbox or spam folder.',
         'accountNotFound' => 'Account not found!',
     ],
 
@@ -79,7 +79,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'otp' => [
-        'successfull' => 'Account Verified Successfully',
+        'successful' => 'Account Verified Successfully',
         'otpSent' => 'You need to verify your email address. We have already sent an OTP to your email address. Please Check your email inbox or spam folder.',
         'otpResend' => 'Again sent an OTP to your email address. Check your email inbox or spam folder.',
         'otpIsInvalid' => 'OTP is Invalid!',
@@ -92,7 +92,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'resetPassword' => [
-        'successfull' => 'Password reset Successfully',
+        'successful' => 'Password reset Successfully',
     ],
 
     /*
@@ -125,6 +125,10 @@ return [
     */
     'permission' => [
         'update'        => 'The staff permission has been successfully updated.',
-    ]
-
+    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Permission Custom Message
+    |--------------------------------------------------------------------------
+    */
 ];

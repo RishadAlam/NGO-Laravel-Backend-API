@@ -151,7 +151,7 @@ class AuthController extends Controller
     public function authorization()
     {
         return response(
-            self::createAuthorizedRes(auth()->user(), __('customValidations.authorize.successfull')),
+            self::createAuthorizedRes(auth()->user(), __('customValidations.authorize.successful')),
             200
         );
     }
@@ -241,7 +241,7 @@ class AuthController extends Controller
         return response(
             [
                 'success'           => true,
-                'message'           => __('customValidations.login.successfull'),
+                'message'           => __('customValidations.login.successful'),
                 'access_token'      => $token,
                 'token_type'        => "Bearer",
                 'id'                => $user->id,
@@ -268,7 +268,7 @@ class AuthController extends Controller
     public function logout()
     {
         auth::user()->currentAccessToken()->delete();
-        return $this->create_response(__('customValidations.logout.successfull'));
+        return $this->create_response(__('customValidations.logout.successful'));
     }
 
 
@@ -296,7 +296,7 @@ class AuthController extends Controller
             );
 
         return $this->create_response(
-            __('customValidations.passwordChange.successfull')
+            __('customValidations.passwordChange.successful')
         );
     }
 
@@ -330,7 +330,7 @@ class AuthController extends Controller
         return response(
             [
                 'success'       => true,
-                'message'       => __('customValidations.forgotPassword.successfull'),
+                'message'       => __('customValidations.forgotPassword.successful'),
                 'id'        => $user->id
             ]
         );
@@ -401,7 +401,7 @@ class AuthController extends Controller
         return response(
             [
                 'success'       => true,
-                'message'       => __('customValidations.otp.successfull')
+                'message'       => __('customValidations.otp.successful')
             ],
             200
         );
@@ -420,7 +420,7 @@ class AuthController extends Controller
         $user->update(['password' => bcrypt($request->new_password)]);
         $user->tokens()->delete();
 
-        return $this->create_response(__('customValidations.resetPassword.successfull'));
+        return $this->create_response(__('customValidations.resetPassword.successful'));
     }
 
     /**
