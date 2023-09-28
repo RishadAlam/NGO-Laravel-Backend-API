@@ -9,6 +9,12 @@ class AppConfig extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = ['meta_key', 'meta_value',];
 
     /**
      * Mutator for App Config json Data

@@ -89,6 +89,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Here you can see all of the api independent routes and controllers
      */
     // App Config Routes
+    Route::PUT('/app-settings-update', [AppConfigController::class, 'app_settings_update']);
 
     Route::POST('/add-permission', function (Request $request) {
         $permission = Permission::create(

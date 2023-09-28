@@ -433,10 +433,10 @@ class AuthController extends Controller
     {
         $data = (object) $request->validated();
         if (!empty($data->image)) {
-            // if (auth()->user()->image) {
-            //     $path = public_path('storage/staff/' . auth()->user()->image . '');
-            //     unlink($path);
-            // }
+            if (auth()->user()->image) {
+                $path = public_path('storage/staff/' . auth()->user()->image . '');
+                unlink($path);
+            }
             $extension  = $data->image->extension();
             $imgName    = 'staff_' . time() . '.' . $extension;
             $imagePath  = $data->image->move(public_path() . '/storage/staff/', $imgName);

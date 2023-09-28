@@ -128,7 +128,10 @@ return [
     ],
     /*
     |--------------------------------------------------------------------------
-    | Permission Custom Message
+    | App Config Custom Message
     |--------------------------------------------------------------------------
     */
+    'app_config' => [
+        'app_settings_update' => 'The app settings has been successfully updated.',
+    ]
 ];
