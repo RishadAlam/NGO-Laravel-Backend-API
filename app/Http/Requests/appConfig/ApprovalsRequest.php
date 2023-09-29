@@ -22,7 +22,7 @@ class ApprovalsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "approvals" => "required"
         ];
     }
 }

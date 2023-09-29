@@ -115,32 +115,20 @@ class AppConfigController extends Controller
     public function approvals_update(ApprovalsRequest $request)
     {
         $data = (object) $request->validated();
-        return $data;
-        die;
-
-
-        AppConfig::where('meta_key', 'company_details')
-            ->first()
-            ->update(
-                [
-                    'meta_value'  => [
-                        "company_name"          => $data->company_name,
-                        "company_short_name"    => $data->company_short_name,
-                        "company_address"       => $data->company_address,
-                        "company_logo"          => $data->company_logo,
-                        "company_logo_uri"      => $data->company_logo_uri
-                    ],
-                ]
-            );
-
-        $appSettings = AppConfig::where('meta_key', 'company_details')
-            ->value('meta_value');
+        foreach ($data->approvals as $approval) {
+            $approval = (object) $approval;
+            AppConfig::find($approval->id)
+                ->update(
+                    [
+                        'meta_value'  => $approval->meta_value,
+                    ]
+                );
+        }
 
         return response(
             [
                 'success'   => true,
-                'message'   => __('customValidations.app_config.app_settings_update'),
-                'data'      => $appSettings,
+                'message'   => __('customValidations.app_config.approval_configuration_update')
             ],
             200
         );

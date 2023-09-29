@@ -134,6 +134,7 @@ return [
     */
     'app_config' => [
         'app_settings_update' => 'অ্যাপ সেটিংস সফলভাবে পরিবর্তন করা হয়েছে।',
+        'approval_configuration_update' => 'অনুমোদন সফলভাবে আপডেট করা হয়েছে।',
     ]
 
 ];

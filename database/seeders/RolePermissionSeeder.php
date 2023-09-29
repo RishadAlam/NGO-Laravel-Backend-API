@@ -55,6 +55,14 @@ class RolePermissionSeeder extends Seeder
                     'role_update',
                     'role_delete',
                 ]
+            ],
+            // App Config
+            [
+                'groupName'     => 'settings_and_privacy',
+                'permissions'   => [
+                    'app_settings',
+                    'approvals_config',
+                ]
             ]
         ];
 

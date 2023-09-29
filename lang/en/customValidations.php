@@ -133,5 +133,6 @@ return [
     */
     'app_config' => [
         'app_settings_update' => 'The app settings has been successfully updated.',
+        'approval_configuration_update' => 'The Approvals has been successfully updated.',
     ]
 ];
