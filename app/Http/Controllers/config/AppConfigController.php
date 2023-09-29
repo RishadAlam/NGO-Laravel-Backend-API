@@ -67,7 +67,7 @@ class AppConfigController extends Controller
         $data = (object) $request->validated();
         $imgUri = $data->company_logo_uri;
         if (!empty($data->company_logo)) {
-            if (!empty($data->company_old_logo)) {
+            if ($data->company_old_logo !== 'null') {
                 $path = public_path('storage/config/' . $data->company_old_logo . '');
                 unlink($path);
             }
