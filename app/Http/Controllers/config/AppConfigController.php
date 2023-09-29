@@ -4,9 +4,10 @@ namespace App\Http\Controllers\config;
 
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\appConfig\AppSettingsRequest;
 use Illuminate\Support\Facades\URL;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\appConfig\ApprovalsRequest;
+use App\Http\Requests\appConfig\AppSettingsRequest;
 
 class AppConfigController extends Controller
 {
@@ -55,7 +56,6 @@ class AppConfigController extends Controller
         );
     }
 
-
     /**
      * App Setting Update Update
      *
@@ -78,6 +78,46 @@ class AppConfigController extends Controller
             $data->company_logo     = $imgName;
             $data->company_logo_uri = URL::to('/storage/config/', $data->company_logo);
         }
+
+        AppConfig::where('meta_key', 'company_details')
+            ->first()
+            ->update(
+                [
+                    'meta_value'  => [
+                        "company_name"          => $data->company_name,
+                        "company_short_name"    => $data->company_short_name,
+                        "company_address"       => $data->company_address,
+                        "company_logo"          => $data->company_logo,
+                        "company_logo_uri"      => $data->company_logo_uri
+                    ],
+                ]
+            );
+
+        $appSettings = AppConfig::where('meta_key', 'company_details')
+            ->value('meta_value');
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.app_config.app_settings_update'),
+                'data'      => $appSettings,
+            ],
+            200
+        );
+    }
+
+    /**
+     * App Setting Update Update
+     *
+     * @param App\Http\Requests\ApprovalsRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function approvals_update(ApprovalsRequest $request)
+    {
+        $data = (object) $request->validated();
+        return $data;
+        die;
+
 
         AppConfig::where('meta_key', 'company_details')
             ->first()
