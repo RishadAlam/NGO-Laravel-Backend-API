@@ -19,6 +19,7 @@ use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgetPasswordRequest;
 use App\Http\Requests\OTPVerificationRequest;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
@@ -433,19 +434,19 @@ class AuthController extends Controller
     {
         $data = (object) $request->validated();
         if (!empty($data->image)) {
-            if (auth()->user()->image) {
+            if (!empty(auth()->user()->image)) {
                 $path = public_path('storage/staff/' . auth()->user()->image . '');
                 unlink($path);
             }
             $extension  = $data->image->extension();
             $imgName    = 'staff_' . time() . '.' . $extension;
-            $imagePath  = $data->image->move(public_path() . '/storage/staff/', $imgName);
+            $data->image->move(public_path() . '/storage/staff/', $imgName);
 
             User::find(auth()->user()->id)
                 ->update(
                     [
                         'image'     => $imgName,
-                        'image_uri' => $imagePath,
+                        'image_uri' => URL::to('/storage/staff/', $imgName),
                     ]
                 );
         }

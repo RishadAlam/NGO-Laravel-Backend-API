@@ -41,15 +41,16 @@ class AppConfigController extends Controller
         $data = (object) $request->validated();
         $imgUri = $data->company_logo_uri;
         if (!empty($data->company_logo)) {
-            if ($data->company_old_logo !== 'null') {
+            if (!empty($data->company_old_logo)) {
                 $path = public_path('storage/config/' . $data->company_old_logo . '');
                 unlink($path);
             }
+
             $extension  = $data->company_logo->extension();
             $imgName    = 'logo_' . time() . '.' . $extension;
             $data->company_logo->move(public_path() . '/storage/config/', $imgName);
-            $data->company_logo = $imgName;
-            $imgUri             = URL::to('/storage/config/', $data->company_logo);
+            $data->company_logo     = $imgName;
+            $data->company_logo_uri = URL::to('/storage/config/', $data->company_logo);
         }
 
         AppConfig::where('meta_key', 'company_details')
@@ -61,7 +62,7 @@ class AppConfigController extends Controller
                         "company_short_name"    => $data->company_short_name,
                         "company_address"       => $data->company_address,
                         "company_logo"          => $data->company_logo,
-                        "company_logo_uri"      => $imgUri
+                        "company_logo_uri"      => $data->company_logo_uri
                     ],
                 ]
             );
