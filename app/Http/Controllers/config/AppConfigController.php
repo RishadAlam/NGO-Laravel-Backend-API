@@ -28,6 +28,32 @@ class AppConfigController extends Controller
             200
         );
     }
+    /**
+     * Approvals Configuration Data
+     *
+     * @return Illuminate\Http\Response
+     */
+    public function get_all_approvals()
+    {
+        $appSettings = AppConfig::whereIn('meta_key', [
+            'saving_collection_approval',
+            'loan_collection_approval',
+            'money_exchange_approval',
+            'money_withdrawal_approval',
+            'saving_account_registration_approval',
+            'saving_account_closing_approval',
+            'loan_account_registration_approval',
+            'loan_account_closing_approval',
+        ])->get(['id', 'meta_key', 'meta_value']);
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $appSettings,
+            ],
+            200
+        );
+    }
 
 
     /**

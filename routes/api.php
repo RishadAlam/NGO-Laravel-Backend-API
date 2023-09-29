@@ -90,6 +90,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      */
     // App Config Routes
     Route::PUT('/app-settings-update', [AppConfigController::class, 'app_settings_update']);
+    Route::GET('/approvals-config', [AppConfigController::class, 'get_all_approvals']);
 
     Route::POST('/add-permission', function (Request $request) {
         $permission = Permission::create(
@@ -103,7 +104,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         return response(
             [
                 'success'           => true,
-                'message'           => __('customValidations.authorize.successfull')
+                'message'           => __('customValidations.authorize.successful')
             ],
             200
         );
