@@ -69,6 +69,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     // Permissions Index
     Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');
 
+    // Field Change Status
+    Route::PUT('/fields/change-status/{id}', [FieldController::class, 'change_status']);
+
     /**
      * -------------------------------------------------------------------------
      * Api Resources Controllers & Routes

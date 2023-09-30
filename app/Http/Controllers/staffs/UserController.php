@@ -95,8 +95,9 @@ class UserController extends Controller
     public function change_status(ChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
+        $changeStatus = $status ? 'Deactive to Active.' : 'Active to Deactive.';
         DB::transaction(
-            function () use ($id, $status) {
+            function () use ($id, $status, $changeStatus) {
                 User::find($id)->update(['status' => $status]);
                 UserActionHistory::create([
                     "user_id" => $id,
@@ -104,7 +105,7 @@ class UserController extends Controller
                     "name" => auth()->user()->name,
                     "image_uri" => auth()->user()->image_uri,
                     "action_type" => 'update',
-                    "action_details" => json_encode([$status ? 'Deactive => Active' : 'Active => Deactive']),
+                    "action_details" => json_encode(["Staff Status has been successfully changed from {$changeStatus}"]),
                 ]);
             }
         );

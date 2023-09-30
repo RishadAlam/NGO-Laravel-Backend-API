@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\field;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\field\FieldChangeStatusRequest;
 use App\Http\Requests\field\FieldStoreRequest;
 use App\Models\field\Field;
 use App\Models\field\FieldActionHistory;
@@ -81,6 +82,36 @@ class FieldController extends Controller
             [
                 'success'   => true,
                 'message'   => __('customValidations.field.delete')
+            ],
+            200
+        );
+    }
+
+    /**
+     * Change Status the specified user
+     */
+    public function change_status(FieldChangeStatusRequest $request, string $id)
+    {
+        $status = $request->validated()['status'];
+        $changeStatus = $status ? 'Deactive to Active.' : 'Active to Deactive.';
+        DB::transaction(
+            function () use ($id, $status, $changeStatus) {
+                Field::find($id)->update(['status' => $status]);
+                FieldActionHistory::create([
+                    "field_id" => $id,
+                    "author_id" => auth()->id(),
+                    "name" => auth()->user()->name,
+                    "image_uri" => auth()->user()->image_uri,
+                    "action_type" => 'update',
+                    "action_details" => json_encode(["Field Status has been successfully changed from {$changeStatus}"]),
+                ]);
+            }
+        );
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.field.status')
             ],
             200
         );
