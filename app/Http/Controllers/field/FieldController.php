@@ -5,7 +5,9 @@ namespace App\Http\Controllers\field;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\field\FieldStoreRequest;
 use App\Models\field\Field;
+use App\Models\field\FieldActionHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FieldController extends Controller
 {
@@ -63,6 +65,24 @@ class FieldController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        DB::transaction(function () use ($id) {
+            Field::find($id)->delete();
+            FieldActionHistory::create([
+                "field_id" => $id,
+                "author_id" => auth()->id(),
+                "name" => auth()->user()->name,
+                "image_uri" => auth()->user()->image_uri,
+                "action_type" => 'delete',
+                "action_details" => json_encode([]),
+            ]);
+        });
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.field.delete')
+            ],
+            200
+        );
     }
 }
