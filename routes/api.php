@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\config\AppConfigController;
+use App\Http\Controllers\field\FieldController;
 use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
@@ -77,9 +78,10 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * methods that should controller applied
      */
     // Staff Routes Controller
+    Route::apiResource('permissions', PermissionController::class)->only('update');
     Route::apiResource('users', UserController::class)->except('show');
     Route::apiResource('roles', RoleController::class)->except('show');
-    Route::apiResource('permissions', PermissionController::class)->only('update');
+    Route::apiResource('fields', FieldController::class)->except('show');
 
     /**
      * -------------------------------------------------------------------------
