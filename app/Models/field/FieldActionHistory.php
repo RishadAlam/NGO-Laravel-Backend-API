@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\field;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserActionHistory extends Model
+class FieldActionHistory extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,7 @@ class UserActionHistory extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
+        'field_id',
         'author_id',
         'name',
         'image_uri',
@@ -28,9 +28,9 @@ class UserActionHistory extends Model
      *
      * @return response()
      */
-    public function User()
+    public function Field()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Field::class);
     }
 
     /**

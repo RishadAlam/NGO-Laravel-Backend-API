@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
                 UserSeeder::class,
                 RolePermissionSeeder::class,
                 AppConfigSeeder::class,
+                FieldSeeder::class,
             ]
         );
     }
