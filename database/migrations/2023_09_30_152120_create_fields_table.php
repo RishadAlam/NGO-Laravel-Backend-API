@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('fields', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('description')->nullable();
+            $table->mediumText('description')->nullable();
             $table->boolean('status')->default(true);
             $table->foreignId('created_by')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->timestamps();
