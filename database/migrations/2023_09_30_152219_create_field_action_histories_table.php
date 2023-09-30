@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('field_action_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('field_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('author_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate()->nullOnDelete();
+            $table->foreignId('field_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
+            $table->foreignId('author_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->string('name');
             $table->string('image_uri');
             $table->enum('action_type', ['update', 'delete', 'restore']);
