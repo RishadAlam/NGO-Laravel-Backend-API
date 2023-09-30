@@ -100,6 +100,18 @@ return [
     | Staff Custom Message
     |--------------------------------------------------------------------------
     */
+    'field' => [
+        'successful'        => 'The field has been successfully registered.',
+        'delete'            => 'The field has been successfully deleted.',
+        'update'            => 'The field has been successfully updated.',
+        'status'            => 'The field status has been successfully updated.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Staff Custom Message
+    |--------------------------------------------------------------------------
+    */
     'staff' => [
         'successful'        => 'The staff has been successfully registered.',
         'delete'            => 'The staff has been successfully deleted.',

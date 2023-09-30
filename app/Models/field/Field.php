@@ -17,7 +17,8 @@ class Field extends Model
     protected $fillable = [
         'name',
         'description',
-        'status'
+        'status',
+        'created_by'
     ];
 
     /**

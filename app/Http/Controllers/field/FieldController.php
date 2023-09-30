@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\field;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\field\FieldStoreRequest;
 use App\Models\field\Field;
 use Illuminate\Http\Request;
 
@@ -29,9 +30,24 @@ class FieldController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(FieldStoreRequest $request)
     {
-        //
+        $data = (object) $request->validated();
+        Field::create(
+            [
+                'name'          => $data->name,
+                'description'   => $data->description,
+                'created_by'    => auth()->id(),
+            ]
+        );
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.field.successful'),
+            ],
+            200
+        );
     }
 
     /**
