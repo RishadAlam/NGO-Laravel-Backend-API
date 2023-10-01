@@ -95,7 +95,7 @@ class UserController extends Controller
     public function change_status(ChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
-        $changeStatus = $status ? 'Deactive to Active.' : 'Active to Deactive.';
+        $changeStatus = $status ? 'Deactive => Active.' : 'Active => Deactive.';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 User::find($id)->update(['status' => $status]);
@@ -105,7 +105,7 @@ class UserController extends Controller
                     "name" => auth()->user()->name,
                     "image_uri" => auth()->user()->image_uri,
                     "action_type" => 'update',
-                    "action_details" => json_encode(["Staff Status has been successfully changed from {$changeStatus}"]),
+                    "action_details" => json_encode(['status' => $changeStatus]),
                 ]);
             }
         );
@@ -147,13 +147,12 @@ class UserController extends Controller
      */
     public function update(StaffUpdateRequest $request, string $id)
     {
-        $staffData = (object) $request->validated();
-        $staff = User::with('roles:id,name')->find($id);
-        $histData = [
-            $staff->name    !== $staffData->name ? "{$staff->name} => {$staffData->name}" : '',
-            $staff->email   !== $staffData->email ? "{$staff->email} => {$staffData->email}" : '',
-            $staff->phone   !== $staffData->phone ? "{$staff->phone} => {$staffData->phone}" : '',
-        ];
+        $staffData  = (object) $request->validated();
+        $staff      = User::with('roles:id,name')->find($id);
+        $histData   = [];
+        $staff->name    !== $staffData->name ? $histData['name'] = "{$staff->name} => {$staffData->name}" : '';
+        $staff->email   !== $staffData->email ?$histData['email'] = "{$staff->email} => {$staffData->email}" : '';
+        $staff->phone   !== $staffData->phone ?$histData['phone'] = "{$staff->phone} => {$staffData->phone}" : '';
 
         if ($staff->roles[0]->id !== $staffData->role) {
             $role       = Role::find($staffData->role, ['id', 'name']);

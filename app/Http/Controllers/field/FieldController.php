@@ -123,7 +123,7 @@ class FieldController extends Controller
     public function change_status(FieldChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
-        $changeStatus = $status ? 'Deactive to Active.' : 'Active to Deactive.';
+        $changeStatus = $status ? 'Deactive => Active.' : 'Active => Deactive.';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 Field::find($id)->update(['status' => $status]);
@@ -133,7 +133,7 @@ class FieldController extends Controller
                     "name"              => auth()->user()->name,
                     "image_uri"         => auth()->user()->image_uri,
                     "action_type"       => 'update',
-                    "action_details"    => json_encode(["Field Status has been successfully changed from {$changeStatus}"]),
+                    "action_details"    => json_encode(['status' => $changeStatus]),
                 ]);
             }
         );
