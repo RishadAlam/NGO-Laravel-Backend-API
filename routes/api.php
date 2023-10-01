@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\center\CenterController;
 use App\Http\Controllers\config\AppConfigController;
 use App\Http\Controllers\field\FieldController;
 use App\Http\Controllers\staffs\PermissionController;
@@ -63,14 +64,15 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Here you can see all the API routes that have been additionally added to
      * the resource controller
      */
-    Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
     Route::GET('/users/permissions/{id}', [UserController::class, 'get_user_permissions']);
 
     // Permissions Index
     Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');
 
-    // Field Change Status
+    // Change Status Routes
+    Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
     Route::PUT('/fields/change-status/{id}', [FieldController::class, 'change_status']);
+    Route::PUT('/centers/change-status/{id}', [CenterController::class, 'change_status']);
 
     /**
      * -------------------------------------------------------------------------
@@ -85,6 +87,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('users', UserController::class)->except('show');
     Route::apiResource('roles', RoleController::class)->except('show');
     Route::apiResource('fields', FieldController::class)->except('show');
+    Route::apiResource('centers', CenterController::class)->except('show');
 
     /**
      * -------------------------------------------------------------------------

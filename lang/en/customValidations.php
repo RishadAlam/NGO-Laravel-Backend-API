@@ -97,7 +97,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Staff Custom Message
+    | Field Custom Message
     |--------------------------------------------------------------------------
     */
     'field' => [
@@ -105,6 +105,18 @@ return [
         'delete'            => 'The field has been successfully deleted.',
         'update'            => 'The field has been successfully updated.',
         'status'            => 'The field status has been successfully updated.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Center Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'center' => [
+        'successful'        => 'The center has been successfully registered.',
+        'delete'            => 'The center has been successfully deleted.',
+        'update'            => 'The center has been successfully updated.',
+        'status'            => 'The center status has been successfully updated.',
     ],
 
     /*
