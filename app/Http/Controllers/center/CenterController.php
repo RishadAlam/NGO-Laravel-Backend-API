@@ -4,7 +4,9 @@ namespace App\Http\Controllers\center;
 
 use App\Http\Controllers\Controller;
 use App\Models\center\Center;
+use App\Models\center\CenterActionHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CenterController extends Controller
 {
@@ -35,14 +37,6 @@ class CenterController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
@@ -55,6 +49,24 @@ class CenterController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        DB::transaction(function () use ($id) {
+            Center::find($id)->delete();
+            CenterActionHistory::create([
+                "center_id"          => $id,
+                "author_id"         => auth()->id(),
+                "name"              => auth()->user()->name,
+                "image_uri"         => auth()->user()->image_uri,
+                "action_type"       => 'delete',
+                "action_details"    => [],
+            ]);
+        });
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.center.delete')
+            ],
+            200
+        );
     }
 }
