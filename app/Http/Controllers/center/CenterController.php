@@ -5,9 +5,9 @@ namespace App\Http\Controllers\center;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\center\CenterChangeStatusRequest;
 use App\Http\Requests\center\CenterStoreRequest;
+use App\Http\Requests\center\CenterUpdateRequest;
 use App\Models\center\Center;
 use App\Models\center\CenterActionHistory;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CenterController extends Controller
@@ -56,9 +56,38 @@ class CenterController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CenterUpdateRequest $request, string $id)
     {
-        //
+        $data       = (object) $request->validated();
+        $center      = Center::find($id);
+        $histData   = [];
+
+        $center->name        !== $data->name ? $histData['name'] = "{$center->name} => {$data->name}" : '';
+        $center->description !== $data->description ? $histData['description'] = "{$center->description} => {$data->description}" : '';
+
+        DB::transaction(function () use ($id, $data, $center, $histData) {
+            $center->update([
+                'name'          => $data->name,
+                'description'   => $data->description,
+            ]);
+
+            CenterActionHistory::create([
+                "center_id"         => $id,
+                "author_id"         => auth()->id(),
+                "name"              => auth()->user()->name,
+                "image_uri"         => auth()->user()->image_uri,
+                "action_type"       => 'update',
+                "action_details"    => $histData,
+            ]);
+        });
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.center.update')
+            ],
+            200
+        );
     }
 
     /**

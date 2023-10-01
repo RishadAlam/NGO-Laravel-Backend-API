@@ -8,7 +8,6 @@ use App\Http\Requests\StaffStoreRequest;
 use App\Http\Requests\StaffUpdateRequest;
 use App\Models\User;
 use App\Models\UserActionHistory;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -105,7 +104,7 @@ class UserController extends Controller
                     "name" => auth()->user()->name,
                     "image_uri" => auth()->user()->image_uri,
                     "action_type" => 'update',
-                    "action_details" => json_encode(['status' => $changeStatus]),
+                    "action_details" => ['status' => $changeStatus],
                 ]);
             }
         );
@@ -180,7 +179,7 @@ class UserController extends Controller
                 "name"              => auth()->user()->name,
                 "image_uri"         => auth()->user()->image_uri,
                 "action_type"       => 'update',
-                "action_details"    => json_encode($histData),
+                "action_details"    => $histData,
             ]);
         });
 
@@ -207,7 +206,7 @@ class UserController extends Controller
                 "name"              => auth()->user()->name,
                 "image_uri"         => auth()->user()->image_uri,
                 "action_type"       => 'delete',
-                "action_details"    => json_encode([]),
+                "action_details"    => [],
             ]);
         });
 

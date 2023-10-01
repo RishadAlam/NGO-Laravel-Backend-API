@@ -8,7 +8,6 @@ use App\Http\Requests\field\FieldStoreRequest;
 use App\Http\Requests\field\FieldUpdateRequest;
 use App\Models\field\Field;
 use App\Models\field\FieldActionHistory;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class FieldController extends Controller
@@ -78,7 +77,7 @@ class FieldController extends Controller
                 "name"              => auth()->user()->name,
                 "image_uri"         => auth()->user()->image_uri,
                 "action_type"       => 'update',
-                "action_details"    => json_encode($histData),
+                "action_details"    => $histData,
             ]);
         });
 
@@ -104,7 +103,7 @@ class FieldController extends Controller
                 "name"              => auth()->user()->name,
                 "image_uri"         => auth()->user()->image_uri,
                 "action_type"       => 'delete',
-                "action_details"    => json_encode([]),
+                "action_details"    => [],
             ]);
         });
 
@@ -133,7 +132,7 @@ class FieldController extends Controller
                     "name"              => auth()->user()->name,
                     "image_uri"         => auth()->user()->image_uri,
                     "action_type"       => 'update',
-                    "action_details"    => json_encode(['status' => $changeStatus]),
+                    "action_details"    => ['status' => $changeStatus],
                 ]);
             }
         );
