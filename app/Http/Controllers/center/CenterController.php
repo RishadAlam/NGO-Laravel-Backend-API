@@ -4,6 +4,7 @@ namespace App\Http\Controllers\center;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\center\CenterChangeStatusRequest;
+use App\Http\Requests\center\CenterStoreRequest;
 use App\Models\center\Center;
 use App\Models\center\CenterActionHistory;
 use Illuminate\Http\Request;
@@ -32,9 +33,24 @@ class CenterController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CenterStoreRequest $request)
     {
-        //
+        $data = (object) $request->validated();
+        Center::create(
+            [
+                'name'          => $data->name,
+                'description'   => $data->description,
+                'created_by'    => auth()->id(),
+            ]
+        );
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.center.successful'),
+            ],
+            200
+        );
     }
 
     /**
