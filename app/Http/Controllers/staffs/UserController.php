@@ -52,7 +52,8 @@ class UserController extends Controller
                 'role_name'         => $user->roles[0]->name ?? null,
                 'role_is_default'   => $user->roles[0]->is_default ?? false,
                 'permissions'       => $user->permissions,
-                'action_history'    => $user->UserActionHistory
+                'action_history'    => $user->UserActionHistory,
+                'action_details'    => isset($user->UserActionHistory[1]) ? json_decode($user->UserActionHistory[1]->action_details) : ''
             ];
         }
 
