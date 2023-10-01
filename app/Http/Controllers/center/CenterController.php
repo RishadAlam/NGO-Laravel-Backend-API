@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\center;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\center\CenterChangeStatusRequest;
 use App\Models\center\Center;
 use App\Models\center\CenterActionHistory;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class CenterController extends Controller
         DB::transaction(function () use ($id) {
             Center::find($id)->delete();
             CenterActionHistory::create([
-                "center_id"          => $id,
+                "center_id"         => $id,
                 "author_id"         => auth()->id(),
                 "name"              => auth()->user()->name,
                 "image_uri"         => auth()->user()->image_uri,
@@ -65,6 +66,37 @@ class CenterController extends Controller
             [
                 'success'   => true,
                 'message'   => __('customValidations.center.delete')
+            ],
+            200
+        );
+    }
+
+
+    /**
+     * Change Status the specified user
+     */
+    public function change_status(CenterChangeStatusRequest $request, string $id)
+    {
+        $status = $request->validated()['status'];
+        $changeStatus = $status ? 'Deactive => Active.' : 'Active => Deactive.';
+        DB::transaction(
+            function () use ($id, $status, $changeStatus) {
+                Center::find($id)->update(['status' => $status]);
+                CenterActionHistory::create([
+                    "center_id"         => $id,
+                    "author_id"         => auth()->id(),
+                    "name"              => auth()->user()->name,
+                    "image_uri"         => auth()->user()->image_uri,
+                    "action_type"       => 'update',
+                    "action_details"    => ['status' => $changeStatus],
+                ]);
+            }
+        );
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.field.status')
             ],
             200
         );

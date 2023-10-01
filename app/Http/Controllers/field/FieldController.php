@@ -141,7 +141,7 @@ class FieldController extends Controller
         return response(
             [
                 'success'   => true,
-                'message'   => __('customValidations.field.status')
+                'message'   => __('customValidations.center.status')
             ],
             200
         );
