@@ -61,10 +61,10 @@ class FieldController extends Controller
     {
         $data       = (object) $request->validated();
         $field      = Field::find($id);
-        $histData   = [
-            $field->name        !== $data->name ? "{$field->name} => {$data->name}" : '',
-            $field->description !== $data->description ? "{$field->description} => {$data->description}" : '',
-        ];
+        $histData   = [];
+
+        $field->name        !== $data->name ? $histData['name'] = "{$field->name} => {$data->name}" : '';
+        $field->description !== $data->description ? $histData['description'] = "{$field->description} => {$data->description}" : '';
 
         DB::transaction(function () use ($id, $data, $field, $histData) {
             $field->update([
