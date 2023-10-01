@@ -124,13 +124,13 @@ class UserController extends Controller
      */
     public function get_user_permissions(string $id)
     {
-        $collectionOfPermissions = User::find($id)->permissions;
         $permissions             = [];
+        $collectionOfPermissions = User::find($id)->permissions;
         foreach ($collectionOfPermissions as $permission) {
             $permissions[] = (object) [
-                'id' => $permission->id,
-                'name' => $permission->name,
-                'group_name' => $permission->group_name
+                'id'            => $permission->id,
+                'name'          => $permission->name,
+                'group_name'    => $permission->group_name
             ];
         }
         return response(
@@ -150,19 +150,19 @@ class UserController extends Controller
         $staffData = (object) $request->validated();
         $staff = User::with('roles:id,name')->find($id);
         $histData = [
-            $staff->name !== $staffData->name ? "{$staff->name} => {$staffData->name}" : '',
-            $staff->email !== $staffData->email ? "{$staff->email} => {$staffData->email}" : '',
-            $staff->phone !== $staffData->phone ? "{$staff->phone} => {$staffData->phone}" : '',
+            $staff->name    !== $staffData->name ? "{$staff->name} => {$staffData->name}" : '',
+            $staff->email   !== $staffData->email ? "{$staff->email} => {$staffData->email}" : '',
+            $staff->phone   !== $staffData->phone ? "{$staff->phone} => {$staffData->phone}" : '',
         ];
 
         if ($staff->roles[0]->id !== $staffData->role) {
-            $role = Role::find($staffData->role, ['id', 'name']);
+            $role       = Role::find($staffData->role, ['id', 'name']);
             $histData[] = "{$staff->roles[0]->name} => {$role->name}";
         }
 
         DB::transaction(function () use ($id, $staffData, $staff, $histData) {
             $staff->update([
-                'name' => $staffData->name,
+                'name'  => $staffData->name,
                 'email' => $staffData->email,
                 'phone' => $staffData->phone
             ]);
@@ -176,12 +176,12 @@ class UserController extends Controller
             }
 
             UserActionHistory::create([
-                "user_id" => $id,
-                "author_id" => auth()->user()->id,
-                "name" => auth()->user()->name,
-                "image_uri" => auth()->user()->image_uri,
-                "action_type" => 'update',
-                "action_details" => json_encode($histData),
+                "user_id"           => $id,
+                "author_id"         => auth()->user()->id,
+                "name"              => auth()->user()->name,
+                "image_uri"         => auth()->user()->image_uri,
+                "action_type"       => 'update',
+                "action_details"    => json_encode($histData),
             ]);
         });
 
@@ -203,12 +203,12 @@ class UserController extends Controller
         DB::transaction(function () use ($id) {
             User::find($id)->delete();
             UserActionHistory::create([
-                "user_id" => $id,
-                "author_id" => auth()->user()->id,
-                "name" => auth()->user()->name,
-                "image_uri" => auth()->user()->image_uri,
-                "action_type" => 'delete',
-                "action_details" => json_encode([]),
+                "user_id"           => $id,
+                "author_id"         => auth()->user()->id,
+                "name"              => auth()->user()->name,
+                "image_uri"         => auth()->user()->image_uri,
+                "action_type"       => 'delete',
+                "action_details"    => json_encode([]),
             ]);
         });
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\field;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\field\FieldChangeStatusRequest;
 use App\Http\Requests\field\FieldStoreRequest;
+use App\Http\Requests\field\FieldUpdateRequest;
 use App\Models\field\Field;
 use App\Models\field\FieldActionHistory;
 use Illuminate\Http\Request;
@@ -56,9 +57,38 @@ class FieldController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(FieldUpdateRequest $request, string $id)
     {
-        //
+        $data       = (object) $request->validated();
+        $field      = Field::find($id);
+        $histData   = [
+            $field->name        !== $data->name ? "{$field->name} => {$data->name}" : '',
+            $field->description !== $data->description ? "{$field->description} => {$data->description}" : '',
+        ];
+
+        DB::transaction(function () use ($id, $data, $field, $histData) {
+            $field->update([
+                'name'          => $data->name,
+                'description'   => $data->description,
+            ]);
+
+            FieldActionHistory::create([
+                "field_id"          => $id,
+                "author_id"         => auth()->id(),
+                "name"              => auth()->user()->name,
+                "image_uri"         => auth()->user()->image_uri,
+                "action_type"       => 'update',
+                "action_details"    => json_encode($histData),
+            ]);
+        });
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.field.update')
+            ],
+            200
+        );
     }
 
     /**
@@ -69,12 +99,12 @@ class FieldController extends Controller
         DB::transaction(function () use ($id) {
             Field::find($id)->delete();
             FieldActionHistory::create([
-                "field_id" => $id,
-                "author_id" => auth()->id(),
-                "name" => auth()->user()->name,
-                "image_uri" => auth()->user()->image_uri,
-                "action_type" => 'delete',
-                "action_details" => json_encode([]),
+                "field_id"          => $id,
+                "author_id"         => auth()->id(),
+                "name"              => auth()->user()->name,
+                "image_uri"         => auth()->user()->image_uri,
+                "action_type"       => 'delete',
+                "action_details"    => json_encode([]),
             ]);
         });
 
@@ -98,12 +128,12 @@ class FieldController extends Controller
             function () use ($id, $status, $changeStatus) {
                 Field::find($id)->update(['status' => $status]);
                 FieldActionHistory::create([
-                    "field_id" => $id,
-                    "author_id" => auth()->id(),
-                    "name" => auth()->user()->name,
-                    "image_uri" => auth()->user()->image_uri,
-                    "action_type" => 'update',
-                    "action_details" => json_encode(["Field Status has been successfully changed from {$changeStatus}"]),
+                    "field_id"          => $id,
+                    "author_id"         => auth()->id(),
+                    "name"              => auth()->user()->name,
+                    "image_uri"         => auth()->user()->image_uri,
+                    "action_type"       => 'update',
+                    "action_details"    => json_encode(["Field Status has been successfully changed from {$changeStatus}"]),
                 ]);
             }
         );
