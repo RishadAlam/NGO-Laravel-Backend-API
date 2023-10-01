@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models\field;
+namespace App\Models\center;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Field extends Model
+class Center extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -32,10 +32,10 @@ class Field extends Model
     }
 
     /**
-     * Relation with FieldActionHistory Table
+     * Relation with CenterActionHistory Table
      */
-    public function FieldActionHistory()
+    public function CenterActionHistory()
     {
-        return $this->hasMany(FieldActionHistory::class);
+        return $this->hasMany(CenterActionHistory::class);
     }
 }
