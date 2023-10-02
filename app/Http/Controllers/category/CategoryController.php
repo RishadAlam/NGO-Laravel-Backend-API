@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\category;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\category\CategoryChangeStatusRequest;
 use App\Http\Requests\category\CategoryStoreRequest;
 use App\Models\category\Category;
 use App\Models\category\CategoryActionHistory;
@@ -83,6 +84,36 @@ class CategoryController extends Controller
             [
                 'success'   => true,
                 'message'   => __('customValidations.category.delete')
+            ],
+            200
+        );
+    }
+
+    /**
+     * Change Status the specified user
+     */
+    public function change_status(CategoryChangeStatusRequest $request, string $id)
+    {
+        $status = $request->validated()['status'];
+        $changeStatus = $status ? 'Deactive => Active' : 'Active => Deactive';
+        DB::transaction(
+            function () use ($id, $status, $changeStatus) {
+                Category::find($id)->update(['status' => $status]);
+                CategoryActionHistory::create([
+                    "category_id"       => $id,
+                    "author_id"         => auth()->id(),
+                    "name"              => auth()->user()->name,
+                    "image_uri"         => auth()->user()->image_uri,
+                    "action_type"       => 'update',
+                    "action_details"    => ['status' => $changeStatus],
+                ]);
+            }
+        );
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.category.status')
             ],
             200
         );

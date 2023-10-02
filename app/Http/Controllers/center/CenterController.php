@@ -116,14 +116,13 @@ class CenterController extends Controller
         );
     }
 
-
     /**
      * Change Status the specified user
      */
     public function change_status(CenterChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
-        $changeStatus = $status ? 'Deactive => Active.' : 'Active => Deactive.';
+        $changeStatus = $status ? 'Deactive => Active' : 'Active => Deactive';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 Center::find($id)->update(['status' => $status]);
@@ -141,7 +140,7 @@ class CenterController extends Controller
         return response(
             [
                 'success'   => true,
-                'message'   => __('customValidations.field.status')
+                'message'   => __('customValidations.center.status')
             ],
             200
         );

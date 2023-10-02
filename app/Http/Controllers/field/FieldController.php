@@ -122,7 +122,7 @@ class FieldController extends Controller
     public function change_status(FieldChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
-        $changeStatus = $status ? 'Deactive => Active.' : 'Active => Deactive.';
+        $changeStatus = $status ? 'Deactive => Active' : 'Active => Deactive';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 Field::find($id)->update(['status' => $status]);
