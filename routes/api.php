@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\category\CategoryController;
 use App\Http\Controllers\center\CenterController;
 use App\Http\Controllers\config\AppConfigController;
 use App\Http\Controllers\field\FieldController;
@@ -73,6 +74,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
     Route::PUT('/fields/change-status/{id}', [FieldController::class, 'change_status']);
     Route::PUT('/centers/change-status/{id}', [CenterController::class, 'change_status']);
+    Route::PUT('/categories/change-status/{id}', [CategoryController::class, 'change_status']);
 
     /**
      * -------------------------------------------------------------------------
@@ -88,6 +90,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('roles', RoleController::class)->except('show');
     Route::apiResource('fields', FieldController::class)->except('show');
     Route::apiResource('centers', CenterController::class)->except('show');
+    Route::apiResource('categories', CategoryController::class)->except('show');
 
     /**
      * -------------------------------------------------------------------------

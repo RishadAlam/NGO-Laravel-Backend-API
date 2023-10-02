@@ -2,6 +2,7 @@
 
 namespace App\Models\category;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,8 +37,8 @@ class Category extends Model
     /**
      * Relation with CenterActionHistory Table
      */
-    public function CenterActionHistory()
+    public function CategoryActionHistory()
     {
-        return $this->hasMany(CenterActionHistory::class);
+        return $this->hasMany(CategoryActionHistory::class);
     }
 }

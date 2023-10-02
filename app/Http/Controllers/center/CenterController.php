@@ -17,14 +17,14 @@ class CenterController extends Controller
      */
     public function index()
     {
-        $fields = Center::with('Author:id,name')
+        $centers = Center::with('Author:id,name')
             ->with(['CenterActionHistory:id,center_id,author_id,name,image_uri,action_type,action_details', 'CenterActionHistory.Author:id,name,image_uri'])
-            ->get(['id', 'name', 'description', 'status', 'created_by', 'created_at', 'updated_at']);
+            ->get(['id', 'name', 'description', 'status', 'creator_id', 'created_at', 'updated_at']);
 
         return response(
             [
                 'success'   => true,
-                'data'      => $fields
+                'data'      => $centers
             ],
             200
         );
@@ -40,7 +40,7 @@ class CenterController extends Controller
             [
                 'name'          => $data->name,
                 'description'   => $data->description,
-                'created_by'    => auth()->id(),
+                'creator_id'    => auth()->id(),
             ]
         );
 
