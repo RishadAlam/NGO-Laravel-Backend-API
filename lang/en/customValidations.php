@@ -121,6 +121,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Category Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'category' => [
+        'successful'        => 'The category has been successfully registered.',
+        'delete'            => 'The category has been successfully deleted.',
+        'update'            => 'The category has been successfully updated.',
+        'status'            => 'The category status has been successfully updated.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Staff Custom Message
     |--------------------------------------------------------------------------
     */

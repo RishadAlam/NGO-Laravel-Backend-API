@@ -39,7 +39,7 @@ class CenterController extends Controller
         Center::create(
             [
                 'name'          => $data->name,
-                'description'   => $data->description,
+                'description'   => $data->description ?? null,
                 'creator_id'    => auth()->id(),
             ]
         );
@@ -68,7 +68,7 @@ class CenterController extends Controller
         DB::transaction(function () use ($id, $data, $center, $histData) {
             $center->update([
                 'name'          => $data->name,
-                'description'   => $data->description,
+                'description'   => $data->description ?? null,
             ]);
 
             CenterActionHistory::create([

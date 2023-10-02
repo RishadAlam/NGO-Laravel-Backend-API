@@ -39,7 +39,7 @@ class FieldController extends Controller
         Field::create(
             [
                 'name'          => $data->name,
-                'description'   => $data->description,
+                'description'   => $data->description ?? null,
                 'creator_id'    => auth()->id(),
             ]
         );
@@ -68,7 +68,7 @@ class FieldController extends Controller
         DB::transaction(function () use ($id, $data, $field, $histData) {
             $field->update([
                 'name'          => $data->name,
-                'description'   => $data->description,
+                'description'   => $data->description ?? null,
             ]);
 
             FieldActionHistory::create([

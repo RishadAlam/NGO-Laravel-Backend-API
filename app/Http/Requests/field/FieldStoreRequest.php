@@ -22,7 +22,7 @@ class FieldStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name"          => "required|max:50|unique:fields,name",
+            "name"          => "required|max:100|unique:fields,name",
             "description"   => "nullable",
         ];
     }

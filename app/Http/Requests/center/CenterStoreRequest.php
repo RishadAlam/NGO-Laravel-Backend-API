@@ -22,7 +22,7 @@ class CenterStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name"          => "required|max:50|unique:centers,name",
+            "name"          => "required|max:100|unique:centers,name",
             "description"   => "nullable",
         ];
     }

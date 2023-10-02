@@ -22,7 +22,7 @@ class CenterUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name"          => "required|max:50|unique:centers,name,{$this->center}",
+            "name"          => "required|max:100|unique:centers,name,{$this->center}",
             "description"   => "nullable",
         ];
     }

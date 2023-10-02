@@ -22,7 +22,7 @@ class FieldUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name"          => "required|max:50|unique:fields,name,{$this->field}",
+            "name"          => "required|max:100|unique:fields,name,{$this->field}",
             "description"   => "nullable",
         ];
     }
