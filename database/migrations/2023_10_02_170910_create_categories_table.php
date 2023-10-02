@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fields', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->mediumText('description')->nullable();
+            $table->boolean('saving')->default(false);
+            $table->boolean('loan')->default(false);
             $table->boolean('status')->default(true);
+            $table->boolean('is_default')->default(false);
             $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fields');
+        Schema::dropIfExists('categories');
     }
 };

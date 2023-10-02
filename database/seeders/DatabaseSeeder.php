@@ -20,11 +20,12 @@ class DatabaseSeeder extends Seeder
 
         $this->call(
             [
-                UserSeeder::class,
-                RolePermissionSeeder::class,
-                AppConfigSeeder::class,
-                FieldSeeder::class,
-                CenterSeeder::class,
+                // UserSeeder::class,
+                // RolePermissionSeeder::class,
+                // AppConfigSeeder::class,
+                // FieldSeeder::class,
+                // CenterSeeder::class,
+                CategorySeeder::class,
             ]
         );
     }

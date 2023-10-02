@@ -18,7 +18,7 @@ class Center extends Model
         'name',
         'description',
         'status',
-        'created_by'
+        'creator_id'
     ];
 
     /**
@@ -28,7 +28,7 @@ class Center extends Model
      */
     public function Author()
     {
-        return $this->belongsTo(User::class, 'created_by', 'id');
+        return $this->belongsTo(User::class, 'creator_id', 'id');
     }
 
     /**

@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Models\field;
+namespace App\Models\category;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Field extends Model
+class Category extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -17,7 +16,10 @@ class Field extends Model
     protected $fillable = [
         'name',
         'description',
+        'saving',
+        'loan',
         'status',
+        'is_default',
         'creator_id'
     ];
 
@@ -32,10 +34,10 @@ class Field extends Model
     }
 
     /**
-     * Relation with FieldActionHistory Table
+     * Relation with CenterActionHistory Table
      */
-    public function FieldActionHistory()
+    public function CenterActionHistory()
     {
-        return $this->hasMany(FieldActionHistory::class);
+        return $this->hasMany(CenterActionHistory::class);
     }
 }
