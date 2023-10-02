@@ -117,7 +117,7 @@ class CenterController extends Controller
     }
 
     /**
-     * Change Status the specified user
+     * Change Status the specified Center
      */
     public function change_status(CenterChangeStatusRequest $request, string $id)
     {

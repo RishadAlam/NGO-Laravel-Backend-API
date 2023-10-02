@@ -117,7 +117,7 @@ class FieldController extends Controller
     }
 
     /**
-     * Change Status the specified user
+     * Change Status the specified Field
      */
     public function change_status(FieldChangeStatusRequest $request, string $id)
     {
