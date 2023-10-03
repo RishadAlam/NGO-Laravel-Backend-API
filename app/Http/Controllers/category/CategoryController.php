@@ -14,6 +14,17 @@ use Illuminate\Support\Facades\DB;
 class CategoryController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:category_list_view')->only('index');
+        $this->middleware('can:category_registration')->only('store');
+        $this->middleware('can:category_data_update')->only(['update', 'change_status']);
+        $this->middleware('can:category_soft_delete')->only('destroy');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()

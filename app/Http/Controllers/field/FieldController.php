@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\DB;
 class FieldController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:field_list_view')->only('index');
+        $this->middleware('can:field_registration')->only('store');
+        $this->middleware('can:field_data_update')->only(['update', 'change_status']);
+        $this->middleware('can:field_soft_delete')->only('destroy');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()

@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\DB;
 class CenterController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:center_list_view')->only('index');
+        $this->middleware('can:center_registration')->only('store');
+        $this->middleware('can:center_data_update')->only(['update', 'change_status']);
+        $this->middleware('can:center_soft_delete')->only('destroy');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()

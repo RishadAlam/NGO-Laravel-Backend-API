@@ -32,6 +32,42 @@ class RolePermissionSeeder extends Seeder
                     'view_dashboard_as_admin'
                 ]
             ],
+            // Field
+            [
+                'groupName'     => 'field',
+                'permissions'   => [
+                    'field_list_view',
+                    'field_registration',
+                    'field_data_update',
+                    'field_soft_delete',
+                    'field_action_history',
+                    'field_permanently_delete',
+                ]
+            ],
+            // Center
+            [
+                'groupName'     => 'center',
+                'permissions'   => [
+                    'center_list_view',
+                    'center_registration',
+                    'center_data_update',
+                    'center_soft_delete',
+                    'center_action_history',
+                    'center_permanently_delete',
+                ]
+            ],
+            // Category
+            [
+                'groupName'     => 'category',
+                'permissions'   => [
+                    'category_list_view',
+                    'category_registration',
+                    'category_data_update',
+                    'category_soft_delete',
+                    'category_action_history',
+                    'category_permanently_delete',
+                ]
+            ],
             // Staffs
             [
                 'groupName'     => 'staff',
@@ -46,7 +82,7 @@ class RolePermissionSeeder extends Seeder
                     'staff_permanently_delete',
                 ]
             ],
-            // Staffs
+            // Staffs Role
             [
                 'groupName'     => 'staff_role',
                 'permissions'   => [
