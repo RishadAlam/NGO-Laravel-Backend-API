@@ -29,7 +29,7 @@ class FieldController extends Controller
     public function index()
     {
         $fields = Field::with('Author:id,name')
-            ->with(['FieldActionHistory:id,field_id,author_id,name,image_uri,action_type,action_details', 'FieldActionHistory.Author:id,name,image_uri'])
+            ->with(['FieldActionHistory', 'FieldActionHistory.Author:id,name,image_uri'])
             ->get(['id', 'name', 'description', 'status', 'creator_id', 'created_at', 'updated_at']);
 
         return response(
@@ -151,7 +151,7 @@ class FieldController extends Controller
         return response(
             [
                 'success'   => true,
-                'message'   => __('customValidations.center.status')
+                'message'   => __('customValidations.field.status')
             ],
             200
         );

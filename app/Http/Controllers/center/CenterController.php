@@ -29,7 +29,7 @@ class CenterController extends Controller
     public function index()
     {
         $centers = Center::with('Author:id,name')
-            ->with(['CenterActionHistory:id,center_id,author_id,name,image_uri,action_type,action_details', 'CenterActionHistory.Author:id,name,image_uri'])
+            ->with(['CenterActionHistory', 'CenterActionHistory.Author:id,name,image_uri'])
             ->get(['id', 'name', 'description', 'status', 'creator_id', 'created_at', 'updated_at']);
 
         return response(

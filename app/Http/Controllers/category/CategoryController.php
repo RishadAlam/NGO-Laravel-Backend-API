@@ -30,7 +30,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::with('Author:id,name')
-            ->with(['CategoryActionHistory:id,category_id,author_id,name,image_uri,action_type,action_details', 'CategoryActionHistory.Author:id,name,image_uri'])
+            ->with(['CategoryActionHistory', 'CategoryActionHistory.Author:id,name,image_uri'])
             ->get(['id', 'name', 'description', 'saving', 'loan', 'status', 'is_default', 'creator_id', 'created_at', 'updated_at']);
 
         return response(
