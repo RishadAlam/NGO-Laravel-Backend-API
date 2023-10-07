@@ -78,15 +78,15 @@ class CategoryController extends Controller
         $check      = "&#x2611;";
         $cross      = "&#10060;";
 
-        $category->name !== $data->name ? $histData['name'] = "{$category->name} => {$data->name}" : '';
+        $category->name !== $data->name ? $histData['name'] = "<p class='text-danger'>{$category->name}</p><p class='text-success'>{$data->name}</p>" : '';
         if (isset($data->description)) {
-            $category->description !== $data->description ? $histData['description'] = "{$category->description} => {$data->description}" : '';
+            $category->description !== $data->description ? $histData['description'] = "<p class='text-danger'>{$category->description}</p><p class='text-success'>{$data->description}</p>" : '';
         }
         if (isset($data->saving)) {
-            $category->saving !== $data->saving ?? false ? $histData['saving'] = $data->saving ?? false ? "{$cross} => {$check}" : "{$check} => {$cross}" : '';
+            $category->saving !== $data->saving ?? false ? $histData['saving'] = $data->saving ?? false ? "<p class='text-danger'>UnChecked</p><p class='text-danger'>Checked</p>" : "<p class='text-danger'>Checked</p><p class='text-danger'>UnChecked</p>" : '';
         }
         if (isset($data->loan)) {
-            $category->loan !== $data->loan ?? false ? $histData['loan'] = $data->loan ?? false ? "{$cross} => {$check}" : "{$check} => {$cross}" : '';
+            $category->loan !== $data->loan ?? false ? $histData['loan'] = $data->loan ?? false ? "<p class='text-danger'>UnChecked</p><p class='text-danger'>Checked</p>" : "<p class='text-danger'>Checked</p><p class='text-danger'>UnChecked</p>" : '';
         }
 
         DB::transaction(function () use ($id, $data, $category, $histData) {
@@ -148,7 +148,7 @@ class CategoryController extends Controller
     public function change_status(CategoryChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
-        $changeStatus = $status ? 'Deactive => Active' : 'Active => Deactive';
+        $changeStatus = $status ? '<p class="text-danger">Deactive</p><p class="text-success">Active</p>' : '<p class="text-danger">Active</p><p class="text-success">Deactive</p>';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 Category::find($id)->update(['status' => $status]);

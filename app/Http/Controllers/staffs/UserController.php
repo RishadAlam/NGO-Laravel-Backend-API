@@ -94,7 +94,7 @@ class UserController extends Controller
     public function change_status(ChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
-        $changeStatus = $status ? 'Deactive => Active.' : 'Active => Deactive.';
+        $changeStatus = $status ? '<p class="text-danger">Deactive</p><p class="text-success">Active</p>' : '<p class="text-danger">Active</p><p class="text-success">Deactive</p>';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 User::find($id)->update(['status' => $status]);
@@ -149,13 +149,13 @@ class UserController extends Controller
         $staffData  = (object) $request->validated();
         $staff      = User::with('roles:id,name')->find($id);
         $histData   = [];
-        $staff->name    !== $staffData->name ? $histData['name'] = "{$staff->name} => {$staffData->name}" : '';
-        $staff->email   !== $staffData->email ?$histData['email'] = "{$staff->email} => {$staffData->email}" : '';
-        $staff->phone   !== $staffData->phone ?$histData['phone'] = "{$staff->phone} => {$staffData->phone}" : '';
+        $staff->name    !== $staffData->name ? $histData['name'] = "<p class='text-danger'>{$staff->name}</p><p class='text-success'>{$staffData->name}</p>" : '';
+        $staff->email   !== $staffData->email ?$histData['email'] = "<p class='text-danger'>{$staff->email}</p><p class='text-success'>{$staffData->email}</p>" : '';
+        $staff->phone   !== $staffData->phone ?$histData['phone'] = "<p class='text-danger'>{$staff->phone}</p><p class='text-success'>{$staffData->phone}</p>" : '';
 
         if ($staff->roles[0]->id !== $staffData->role) {
             $role       = Role::find($staffData->role, ['id', 'name']);
-            $histData[] = "{$staff->roles[0]->name} => {$role->name}";
+            $histData[] = "<p class='text-danger'>{$staff->roles[0]->name}</p><p class='text-success'>{$role->name}</p>";
         }
 
         DB::transaction(function () use ($id, $staffData, $staff, $histData) {

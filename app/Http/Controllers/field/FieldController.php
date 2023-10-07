@@ -73,8 +73,8 @@ class FieldController extends Controller
         $field      = Field::find($id);
         $histData   = [];
 
-        $field->name        !== $data->name ? $histData['name'] = "{$field->name} => {$data->name}" : '';
-        $field->description !== $data->description ? $histData['description'] = "{$field->description} => {$data->description}" : '';
+        $field->name        !== $data->name ? $histData['name'] = "<p class='text-danger'>{$field->name}</p><p class='text-success'>{$data->name}</p>" : '';
+        $field->description !== $data->description ? $histData['description'] = "<p class='text-danger'>{$field->description}</p><p class='text-success'>{$data->description}</p>" : '';
 
         DB::transaction(function () use ($id, $data, $field, $histData) {
             $field->update([
@@ -133,7 +133,7 @@ class FieldController extends Controller
     public function change_status(FieldChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
-        $changeStatus = $status ? 'Deactive => Active' : 'Active => Deactive';
+        $changeStatus = $status ? '<p class="text-danger">Deactive</p><p class="text-success">Active</p>' : '<p class="text-danger">Active</p><p class="text-success">Deactive</p>';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 Field::find($id)->update(['status' => $status]);

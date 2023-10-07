@@ -70,11 +70,11 @@ class CenterController extends Controller
     public function update(CenterUpdateRequest $request, string $id)
     {
         $data       = (object) $request->validated();
-        $center      = Center::find($id);
+        $center     = Center::find($id);
         $histData   = [];
 
-        $center->name        !== $data->name ? $histData['name'] = "{$center->name} => {$data->name}" : '';
-        $center->description !== $data->description ? $histData['description'] = "{$center->description} => {$data->description}" : '';
+        $center->name        !== $data->name ? $histData['name'] = "<p class='text-danger'>{$center->name}</p><p class='text-success'>{$data->name}</p>" : '';
+        $center->description !== $data->description ? $histData['description'] = "<p class='text-danger'>{$center->description}</p><p class='text-success'>{$data->description}</p>" : '';
 
         DB::transaction(function () use ($id, $data, $center, $histData) {
             $center->update([
@@ -133,7 +133,7 @@ class CenterController extends Controller
     public function change_status(CenterChangeStatusRequest $request, string $id)
     {
         $status = $request->validated()['status'];
-        $changeStatus = $status ? 'Deactive => Active' : 'Active => Deactive';
+        $changeStatus = $status ? '<p class="text-danger">Deactive</p><p class="text-success">Active</p>' : '<p class="text-danger">Active</p><p class="text-success">Deactive</p>';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 Center::find($id)->update(['status' => $status]);
