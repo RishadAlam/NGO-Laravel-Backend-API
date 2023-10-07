@@ -125,6 +125,9 @@ class AppConfigSeeder extends Seeder
                 "meta_key"      => "money_withdrawal_approval",
                 "meta_value"    => json_encode(true)
             ], [
+                "meta_key"      => "client_registration_approval",
+                "meta_value"    => json_encode(true)
+            ],[
                 "meta_key"      => "saving_account_registration_approval",
                 "meta_value"    => json_encode(true)
             ], [
