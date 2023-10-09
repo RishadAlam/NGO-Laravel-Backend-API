@@ -10,7 +10,36 @@ use App\Http\Controllers\field\FieldController;
 use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
+use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
+
+/**
+ * ------------------------------------------------------------------------
+ * Artisan Call Routes
+ * ------------------------------------------------------------------------
+ *
+ * All routes are used by Artisan call
+ */
+Route::get('cache-clear', function () {
+    Artisan::call('cache:clear');
+    return response("Cache is cleared");
+});
+Route::get('config-clear', function () {
+    Artisan::call('config:clear');
+    return response("Cache is cleared");
+});
+Route::get('route-clear', function () {
+    Artisan::call('route:clear');
+    return response("Cache is cleared");
+});
+Route::get('optimize-clear', function () {
+    Artisan::call('optimize:clear');
+    return response("Cache is cleared");
+});
+Route::get('storage-link', function () {
+    Artisan::call('storage:link');
+    return response("Cache is cleared");
+});
 
 /**
  * ------------------------------------------------------------------------
@@ -104,6 +133,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::PUT('/app-settings-update', [AppConfigController::class, 'app_settings_update']);
     Route::PUT('/approvals-config-update', [AppConfigController::class, 'approvals_update']);
 
+
+    // Temp Routes
     Route::POST('/add-permission', function (Request $request) {
         $permission = Permission::create(
             [
@@ -117,16 +148,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
             [
                 'success'           => true,
                 'message'           => __('customValidations.authorize.successful')
-            ],
-            200
-        );
-    });
-
-    Route::GET('/app-config', function () {
-        return response(
-            [
-                'success'           => true,
-                'message'           => __('customValidations.authorize.successfull')
             ],
             200
         );
