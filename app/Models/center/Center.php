@@ -2,6 +2,7 @@
 
 namespace App\Models\center;
 
+use App\Models\field\Field;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +30,16 @@ class Center extends Model
     public function Author()
     {
         return $this->belongsTo(User::class, 'creator_id', 'id');
+    }
+
+    /**
+     * Relationship belongs to Field model
+     *
+     * @return response()
+     */
+    public function Field()
+    {
+        return $this->belongsTo(Field::class);
     }
 
     /**

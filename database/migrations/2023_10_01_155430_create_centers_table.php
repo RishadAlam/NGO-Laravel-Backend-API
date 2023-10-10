@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('centers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('field_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->string('name')->unique();
             $table->mediumText('description')->nullable();
             $table->boolean('status')->default(true);
