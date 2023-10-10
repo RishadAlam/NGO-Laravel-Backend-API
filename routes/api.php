@@ -20,23 +20,23 @@ use Spatie\Permission\Models\Permission;
  *
  * All routes are used by Artisan call
  */
-Route::get('cache-clear', function () {
+Route::GET('/cache-clear', function () {
     Artisan::call('cache:clear');
     return response("Cache is cleared");
 });
-Route::get('config-clear', function () {
+Route::GET('/config-clear', function () {
     Artisan::call('config:clear');
     return response("Cache is cleared");
 });
-Route::get('route-clear', function () {
+Route::GET('/route-clear', function () {
     Artisan::call('route:clear');
     return response("Cache is cleared");
 });
-Route::get('optimize-clear', function () {
+Route::GET('/optimize-clear', function () {
     Artisan::call('optimize:clear');
     return response("Cache is cleared");
 });
-Route::get('storage-link', function () {
+Route::GET('/storage-link', function () {
     Artisan::call('storage:link');
     return response("Cache is cleared");
 });
