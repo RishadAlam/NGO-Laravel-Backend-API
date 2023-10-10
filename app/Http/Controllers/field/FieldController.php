@@ -156,4 +156,21 @@ class FieldController extends Controller
             200
         );
     }
+
+    /**
+     * Get all active fields
+     */
+    public function get_active_fields()
+    {
+        $fields = Field::where('status', true)
+            ->get(['id', 'name']);
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $fields
+            ],
+            200
+        );
+    }
 }
