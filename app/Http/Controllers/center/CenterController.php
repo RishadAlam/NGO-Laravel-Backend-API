@@ -51,6 +51,7 @@ class CenterController extends Controller
         Center::create(
             [
                 'name'          => $data->name,
+                'field_id'      => $data->field_id,
                 'description'   => $data->description ?? null,
                 'creator_id'    => auth()->id(),
             ]
@@ -71,15 +72,17 @@ class CenterController extends Controller
     public function update(CenterUpdateRequest $request, string $id)
     {
         $data       = (object) $request->validated();
-        $center     = Center::find($id);
+        $center     = Center::with('Field:id,name')->find($id);
         $histData   = [];
 
         $center->name        !== $data->name ? $histData['name'] = "<p class='text-danger'>{$center->name}</p><p class='text-success'>{$data->name}</p>" : '';
+        $center->field_id    !== $data->field_id ? $histData['field'] = "<p class='text-danger'>{$center->field->name}</p><p class='text-success'>{$request->field['name']}</p>" : '';
         $center->description !== $data->description ? $histData['description'] = "<p class='text-danger'>{$center->description}</p><p class='text-success'>{$data->description}</p>" : '';
 
         DB::transaction(function () use ($id, $data, $center, $histData) {
             $center->update([
                 'name'          => $data->name,
+                'field_id'      => $data->field_id,
                 'description'   => $data->description ?? null,
             ]);
 

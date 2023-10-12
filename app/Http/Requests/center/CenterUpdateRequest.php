@@ -23,6 +23,7 @@ class CenterUpdateRequest extends FormRequest
     {
         return [
             "name"          => "required|max:100|unique:centers,name,{$this->center}",
+            "field_id"      => "required|integer",
             "description"   => "nullable",
         ];
     }

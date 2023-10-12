@@ -17,6 +17,7 @@ class Center extends Model
      */
     protected $fillable = [
         'name',
+        'field_id',
         'description',
         'status',
         'creator_id'

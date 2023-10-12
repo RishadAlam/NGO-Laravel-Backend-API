@@ -23,6 +23,7 @@ class CenterStoreRequest extends FormRequest
     {
         return [
             "name"          => "required|max:100|unique:centers,name",
+            "field_id"      => "required|integer",
             "description"   => "nullable",
         ];
     }
