@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->string('group');
             $table->mediumText('description')->nullable();
             $table->boolean('saving')->default(false);
             $table->boolean('loan')->default(false);

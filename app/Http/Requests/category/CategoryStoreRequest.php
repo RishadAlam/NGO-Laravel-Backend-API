@@ -23,6 +23,7 @@ class CategoryStoreRequest extends FormRequest
     {
         return [
             "name"          => "required|max:100|unique:categories,name",
+            "group"         => "required|max:50",
             "description"   => "nullable",
             "saving"        => "required_without:loan|required_if:loan,false|boolean",
             "loan"          => "required_without:saving|required_if:saving,false|boolean",

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\category\Category;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 class CategorySeeder extends Seeder
 {
@@ -17,6 +18,7 @@ class CategorySeeder extends Seeder
             Category::create(
                 [
                     'name'          => fake()->unique()->name(),
+                    'group'         => Arr::random(['Daily', 'Weekly', 'Half Month', 'Monthly', 'Yearly']),
                     'description'   => fake()->paragraph(),
                     'saving'        => fake()->numberBetween(0,1),
                     'loan'          => fake()->numberBetween(0,1),

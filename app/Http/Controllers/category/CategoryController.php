@@ -31,7 +31,7 @@ class CategoryController extends Controller
     {
         $categories = Category::with('Author:id,name')
             ->with(['CategoryActionHistory', 'CategoryActionHistory.Author:id,name,image_uri'])
-            ->get(['id', 'name', 'description', 'saving', 'loan', 'status', 'is_default', 'creator_id', 'created_at', 'updated_at']);
+            ->get(['id', 'name', 'group', 'description', 'saving', 'loan', 'status', 'is_default', 'creator_id', 'created_at', 'updated_at']);
 
         return response(
             [
@@ -51,6 +51,7 @@ class CategoryController extends Controller
         Category::create(
             [
                 'name'          => $data->name,
+                'group'         => $data->group,
                 'description'   => $data->description ?? null,
                 'saving'        => $data->saving ?? false,
                 'loan'          => $data->loan ?? false,
@@ -75,10 +76,9 @@ class CategoryController extends Controller
         $data       = (object) $request->validated();
         $category   = Category::find($id);
         $histData   = [];
-        $check      = "&#x2611;";
-        $cross      = "&#10060;";
 
-        $category->name !== $data->name ? $histData['name'] = "<p class='text-danger'>{$category->name}</p><p class='text-success'>{$data->name}</p>" : '';
+        $category->name     !== $data->name ? $histData['name'] = "<p class='text-danger'>{$category->name}</p><p class='text-success'>{$data->name}</p>" : '';
+        $category->group    !== $data->group ? $histData['group'] = "<p class='text-danger'>{$category->group}</p><p class='text-success'>{$data->group}</p>" : '';
         if (isset($data->description)) {
             $category->description !== $data->description ? $histData['description'] = "<p class='text-danger'>{$category->description}</p><p class='text-success'>{$data->description}</p>" : '';
         }
@@ -92,6 +92,7 @@ class CategoryController extends Controller
         DB::transaction(function () use ($id, $data, $category, $histData) {
             $category->update([
                 'name'          => $data->name,
+                'group'         => $data->group,
                 'description'   => $data->description ?? null,
                 'saving'        => $data->saving ?? false,
                 'loan'          => $data->loan ?? false,
