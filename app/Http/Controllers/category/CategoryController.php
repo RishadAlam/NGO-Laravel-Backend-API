@@ -172,4 +172,20 @@ class CategoryController extends Controller
             200
         );
     }
+
+    /**
+     * Get all category groups
+     */
+    public function get_category_groups()
+    {
+        $groups = Category::distinct('group')->orderBy('group', 'asc')->pluck('group');
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $groups
+            ],
+            200
+        );
+    }
 }

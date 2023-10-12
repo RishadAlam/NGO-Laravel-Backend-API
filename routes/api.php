@@ -99,6 +99,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');
     // Get all active fields
     Route::GET('/fields/active', [FieldController::class, 'get_active_fields']);
+    // Get all Category Groups
+    Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);
 
     // Change Status Routes
     Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
