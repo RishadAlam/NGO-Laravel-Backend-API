@@ -42,4 +42,12 @@ class Category extends Model
     {
         return $this->hasMany(CategoryActionHistory::class);
     }
+
+    /**
+     * Relation with Category Config Table
+     */
+    public function CategoryConfig()
+    {
+        return $this->hasMany(CategoryConfig::class);
+    }
 }

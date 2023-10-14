@@ -13,88 +13,6 @@ class AppConfigSeeder extends Seeder
      */
     public function run(): void
     {
-        // $config = [
-        //     [
-        //         "meta_key"      => "company_name",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "company_short_name",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "company_address",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "company_logo",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "company_logo_uri",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "has_collection_time_is_enabled",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "collection_start_time",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "collection_end_time",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "saving_collection_approval",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "loan_collection_approval",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "money_exchange_approval",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "money_withdrawal_approval",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "saving_account_registration_approval",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "saving_account_closing_approval",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "loan_account_registration_approval",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "loan_account_closing_approval",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "saving_account_registration_fee",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "saving_account_closing_fee",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "loan_account_registration_fee",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "loan_account_closing_fee",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "withdrawal_fee",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "money_exchange_transaction_fee",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "saving_account_check_time_period",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "loan_account_check_time_period",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "saving_account_disable_time_period",
-        //         "meta_value"    => json_encode("")
-        //     ], [
-        //         "meta_key"      => "loan_account_disable_time_period",
-        //         "meta_value"    => json_encode("")
-        //     ],
-        // ];
-
         $configurations = [
             [
                 "meta_key"      => "company_details",
@@ -102,8 +20,8 @@ class AppConfigSeeder extends Seeder
                     "company_name"          => "Jonokollan kormojibi co-oparetive society ltd",
                     "company_short_name"    => "Jonokollan",
                     "company_address"       => "",
-                    "company_logo"          => "",
-                    "company_logo_uri"      => "",
+                    "company_logo"          => "logo_1695993860.png",
+                    "company_logo_uri"      => "http:\/\/127.0.0.1:8000\/storage\/config\/\/logo_1695993860.png",
                 ])
             ], [
                 "meta_key"      => "collection_time",
@@ -127,7 +45,7 @@ class AppConfigSeeder extends Seeder
             ], [
                 "meta_key"      => "client_registration_approval",
                 "meta_value"    => json_encode(true)
-            ],[
+            ], [
                 "meta_key"      => "saving_account_registration_approval",
                 "meta_value"    => json_encode(true)
             ], [
@@ -140,35 +58,21 @@ class AppConfigSeeder extends Seeder
                 "meta_key"      => "loan_account_closing_approval",
                 "meta_value"    => json_encode(true)
             ], [
-                "meta_key"      => "saving_account_registration_fee",
-                "meta_value"    => json_encode([])
-            ], [
-                "meta_key"      => "saving_account_closing_fee",
-                "meta_value"    => json_encode([])
-            ], [
-                "meta_key"      => "loan_account_registration_fee",
-                "meta_value"    => json_encode([])
-            ], [
-                "meta_key"      => "loan_account_closing_fee",
-                "meta_value"    => json_encode([])
-            ], [
-                "meta_key"      => "withdrawal_fee",
-                "meta_value"    => json_encode(0)
-            ], [
                 "meta_key"      => "money_exchange_transaction_fee",
-                "meta_value"    => json_encode(0)
+                "meta_value"    => json_encode([
+                    "saving_to_saving"              => 0,
+                    "saving_to_loan_saving"         => 0,
+                    "loan_saving_to_loan_saving"    => 0,
+                    "loan_saving_to_saving"         => 0,
+                ])
             ], [
-                "meta_key"      => "saving_account_check_time_period",
-                "meta_value"    => json_encode([])
-            ], [
-                "meta_key"      => "loan_account_check_time_period",
-                "meta_value"    => json_encode([])
-            ], [
-                "meta_key"      => "saving_account_disable_time_period",
-                "meta_value"    => json_encode([])
-            ], [
-                "meta_key"      => "loan_account_disable_time_period",
-                "meta_value"    => json_encode([])
+                "meta_key"      => "money_exchange_transaction_limit",
+                "meta_value"    => json_encode([
+                    "saving_to_saving"              => ["min" => 0, "max" => 0],
+                    "saving_to_loan_saving"         => ["min" => 0, "max" => 0],
+                    "loan_saving_to_loan_saving"    => ["min" => 0, "max" => 0],
+                    "loan_saving_to_saving"         => ["min" => 0, "max" => 0],
+                ])
             ]
         ];
 

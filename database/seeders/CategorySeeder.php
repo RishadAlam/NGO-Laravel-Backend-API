@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\category\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Seeder;
+use App\Models\category\Category;
+use App\Models\category\CategoryConfig;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class CategorySeeder extends Seeder
 {
@@ -14,17 +15,19 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i=0; $i < 10; $i++) {
-            Category::create(
+        for ($i = 0; $i < 10; $i++) {
+            $category = Category::create(
                 [
                     'name'          => fake()->unique()->name(),
                     'group'         => Arr::random(['Daily', 'Weekly', 'Half Month', 'Monthly', 'Yearly']),
                     'description'   => fake()->paragraph(),
-                    'saving'        => fake()->numberBetween(0,1),
-                    'loan'          => fake()->numberBetween(0,1),
-                    'status'        => fake()->numberBetween(0,1)
+                    'saving'        => fake()->numberBetween(0, 1),
+                    'loan'          => fake()->numberBetween(0, 1),
+                    'status'        => fake()->numberBetween(0, 1)
                 ]
             );
+
+            CategoryConfig::create(['category_id' => $category->id]);
         }
     }
 }
