@@ -8,6 +8,7 @@ use App\Http\Requests\category\CategoryStoreRequest;
 use App\Http\Requests\category\CategoryUpdateRequest;
 use App\Models\category\Category;
 use App\Models\category\CategoryActionHistory;
+use App\Models\category\CategoryConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -48,7 +49,7 @@ class CategoryController extends Controller
     public function store(CategoryStoreRequest $request)
     {
         $data = (object) $request->validated();
-        Category::create(
+        $category = Category::create(
             [
                 'name'          => $data->name,
                 'group'         => $data->group,
@@ -59,6 +60,7 @@ class CategoryController extends Controller
             ]
         );
 
+        CategoryConfig::create(['category_id' => $category->id]);
         return response(
             [
                 'success'   => true,
@@ -124,6 +126,7 @@ class CategoryController extends Controller
     {
         DB::transaction(function () use ($id) {
             Category::find($id)->delete();
+            CategoryConfig::where('category_id', $id)->delete();
             CategoryActionHistory::create([
                 "category_id"       => $id,
                 "author_id"         => auth()->id(),

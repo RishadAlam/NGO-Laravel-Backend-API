@@ -31,6 +31,7 @@ return new class extends Migration
             $table->smallInteger('inactive_saving_acc_disable_time_period')->default(0);
             $table->smallInteger('inactive_loan_acc_disable_time_period')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
