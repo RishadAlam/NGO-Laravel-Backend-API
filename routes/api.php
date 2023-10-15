@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\category\CategoryController;
 use App\Http\Controllers\center\CenterController;
 use App\Http\Controllers\config\AppConfigController;
+use App\Http\Controllers\config\CategoryConfigController;
 use App\Http\Controllers\field\FieldController;
 use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\staffs\RoleController;
@@ -133,6 +134,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      */
     // App Config Routes
     Route::GET('/approvals-config', [AppConfigController::class, 'get_all_approvals']);
+    Route::GET('/categories-config', [CategoryConfigController::class, 'get_all_categories_config']);
     Route::PUT('/app-settings-update', [AppConfigController::class, 'app_settings_update']);
     Route::PUT('/approvals-config-update', [AppConfigController::class, 'approvals_update']);
 
