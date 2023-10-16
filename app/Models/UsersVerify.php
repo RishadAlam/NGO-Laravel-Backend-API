@@ -23,11 +23,11 @@ class UsersVerify extends Model
 
     /**
      * Relationship belongs to User model
-     * 
+     *
      * @return response()
      */
     public function User()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 }

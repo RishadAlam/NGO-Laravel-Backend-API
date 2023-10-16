@@ -98,6 +98,7 @@ class RolePermissionSeeder extends Seeder
                 'permissions'   => [
                     'app_settings',
                     'approvals_config',
+                    'categories_config'
                 ]
             ]
         ];

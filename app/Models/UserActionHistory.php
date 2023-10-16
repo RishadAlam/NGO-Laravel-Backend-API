@@ -30,7 +30,7 @@ class UserActionHistory extends Model
      */
     public function User()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     /**
@@ -40,7 +40,7 @@ class UserActionHistory extends Model
      */
     public function Author()
     {
-        return $this->belongsTo(User::class, 'author_id', 'id');
+        return $this->belongsTo(User::class, 'author_id', 'id')->withTrashed();
     }
 
     /**

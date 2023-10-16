@@ -31,7 +31,7 @@ class FieldActionHistory extends Model
      */
     public function Field()
     {
-        return $this->belongsTo(Field::class);
+        return $this->belongsTo(Field::class)->withTrashed();
     }
 
     /**
@@ -41,7 +41,7 @@ class FieldActionHistory extends Model
      */
     public function Author()
     {
-        return $this->belongsTo(User::class, 'author_id', 'id');
+        return $this->belongsTo(User::class, 'author_id', 'id')->withTrashed();
     }
 
     /**

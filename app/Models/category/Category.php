@@ -32,7 +32,7 @@ class Category extends Model
      */
     public function Author()
     {
-        return $this->belongsTo(User::class, 'creator_id', 'id');
+        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
     }
 
     /**
@@ -48,6 +48,6 @@ class Category extends Model
      */
     public function CategoryConfig()
     {
-        return $this->hasMany(CategoryConfig::class);
+        return $this->hasMany(CategoryConfig::class)->withTrashed();
     }
 }

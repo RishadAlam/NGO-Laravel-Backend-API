@@ -31,7 +31,7 @@ class CenterActionHistory extends Model
      */
     public function Center()
     {
-        return $this->belongsTo(Center::class);
+        return $this->belongsTo(Center::class)->withTrashed();
     }
 
     /**
@@ -41,7 +41,7 @@ class CenterActionHistory extends Model
      */
     public function Author()
     {
-        return $this->belongsTo(User::class, 'author_id', 'id');
+        return $this->belongsTo(User::class, 'author_id', 'id')->withTrashed();
     }
 
     /**

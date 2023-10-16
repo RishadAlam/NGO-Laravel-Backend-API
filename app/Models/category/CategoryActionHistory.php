@@ -31,7 +31,7 @@ class CategoryActionHistory extends Model
      */
     public function Category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class)->withTrashed();
     }
 
     /**
@@ -41,7 +41,7 @@ class CategoryActionHistory extends Model
      */
     public function Author()
     {
-        return $this->belongsTo(User::class, 'author_id', 'id');
+        return $this->belongsTo(User::class, 'author_id', 'id')->withTrashed();
     }
 
     /**

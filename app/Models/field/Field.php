@@ -28,7 +28,7 @@ class Field extends Model
      */
     public function Author()
     {
-        return $this->belongsTo(User::class, 'creator_id', 'id');
+        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
     }
 
     /**
