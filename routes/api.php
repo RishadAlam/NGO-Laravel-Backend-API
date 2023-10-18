@@ -137,6 +137,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('/categories-config', [CategoryConfigController::class, 'get_all_categories_config']);
     Route::PUT('/app-settings-update', [AppConfigController::class, 'app_settings_update']);
     Route::PUT('/approvals-config-update', [AppConfigController::class, 'approvals_update']);
+    Route::PUT('/categories-config-update', [CategoryConfigController::class, 'config_update']);
 
 
     // Temp Routes
