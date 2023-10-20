@@ -70,7 +70,7 @@ class RolePermissionSeeder extends Seeder
             ],
             // Account
             [
-                'groupName'     => 'account',
+                'groupName'     => 'account_management',
                 'permissions'   => [
                     'account_list_view',
                     'account_registration',
