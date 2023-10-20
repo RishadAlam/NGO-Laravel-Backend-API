@@ -15,10 +15,10 @@ class RoleController extends Controller
      */
     public function __construct()
     {
-        // $this->middleware('can:role_list_view')->only('index');
-        // $this->middleware('can:role_registration')->only('store');
-        // $this->middleware('can:role_update')->only('update');
-        // $this->middleware('can:role_delete')->only('destroy');
+        $this->middleware('can:role_list_view')->only('index');
+        $this->middleware('can:role_registration')->only('store');
+        $this->middleware('can:role_update')->only('update');
+        $this->middleware('can:role_delete')->only('destroy');
     }
 
     /**

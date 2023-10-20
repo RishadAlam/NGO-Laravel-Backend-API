@@ -10,6 +10,14 @@ use App\Http\Requests\appConfig\CategoriesConfigUpdateRequest;
 class CategoryConfigController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:categories_config')->only(['get_all_categories_config', 'config_update']);
+    }
+
+    /**
      * Get all categories configuration
      */
     public function get_all_categories_config()

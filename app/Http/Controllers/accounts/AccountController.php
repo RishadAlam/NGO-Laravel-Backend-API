@@ -14,6 +14,17 @@ use App\Models\accounts\AccountActionHistory;
 class AccountController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:account_list_view')->only('index');
+        $this->middleware('can:account_registration')->only('store');
+        $this->middleware('can:account_data_update')->only(['update', 'change_status']);
+        $this->middleware('can:account_soft_delete')->only('destroy');
+    }
+
+    /**
      * AccountActionHistory Common Function
      */
     private static function setActionHistory($id, $action, $histData){

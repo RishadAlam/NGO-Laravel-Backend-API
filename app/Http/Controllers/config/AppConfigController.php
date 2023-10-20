@@ -12,6 +12,15 @@ use App\Http\Requests\appConfig\AppSettingsRequest;
 class AppConfigController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:app_settings')->only(['index', 'app_settings_update']);
+        $this->middleware('can:approvals_config')->only(['get_all_approvals', 'approvals_update']);
+    }
+
+    /**
      * App Setting Data
      *
      * @return Illuminate\Http\Response

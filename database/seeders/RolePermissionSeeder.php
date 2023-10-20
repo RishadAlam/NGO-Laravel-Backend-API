@@ -68,6 +68,18 @@ class RolePermissionSeeder extends Seeder
                     'category_permanently_delete',
                 ]
             ],
+            // Account
+            [
+                'groupName'     => 'account',
+                'permissions'   => [
+                    'account_list_view',
+                    'account_registration',
+                    'account_data_update',
+                    'account_soft_delete',
+                    'account_action_history',
+                    'account_permanently_delete',
+                ]
+            ],
             // Staffs
             [
                 'groupName'     => 'staff',
