@@ -97,13 +97,10 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Here you can see all the API routes that have been additionally added to
      * the resource controller
      */
-    Route::GET('/users/permissions/{id}', [UserController::class, 'get_user_permissions']);
-    // Permissions Index
-    Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');
-    // Get all active fields
-    Route::GET('/fields/active', [FieldController::class, 'get_active_fields']);
-    // Get all Category Groups
-    Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);
+    Route::GET('/users/permissions/{id}', [UserController::class, 'get_user_permissions']);             // Get Specified users permissions
+    Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');  // Permissions Index
+    Route::GET('/fields/active', [FieldController::class, 'get_active_fields']);                        // Get all active fields
+    Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);               // Get all Category Groups
 
     // Change Status Routes
     Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);

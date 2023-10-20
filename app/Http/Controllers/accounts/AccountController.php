@@ -7,10 +7,26 @@ use App\Models\accounts\Account;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\accounts\AccountChangeStatusRequest;
+use App\Http\Requests\accounts\AccountStoreRequest;
+use App\Http\Requests\accounts\AccountUpdateRequest;
 use App\Models\accounts\AccountActionHistory;
 
 class AccountController extends Controller
 {
+    /**
+     * AccountActionHistory Common Function
+     */
+    private static function setActionHistory($id, $action, $histData){
+        return [
+            "account_id"        => $id,
+            "author_id"         => auth()->id(),
+            "name"              => auth()->user()->name,
+            "image_uri"         => auth()->user()->image_uri,
+            "action_type"       => $action,
+            "action_details"    => $histData,
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -32,25 +48,57 @@ class AccountController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(AccountStoreRequest $request)
     {
-        //
-    }
+        $data = (object) $request->validated();
+        Account::create(
+            [
+                'name'          => $data->name,
+                'acc_no'        => $data->acc_no,
+                'acc_details'   => $data->acc_details
+            ]
+        );
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.accounts.successful'),
+            ],
+            200
+        );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(AccountUpdateRequest $request, string $id)
     {
-        //
+        $data       = (object) $request->validated();
+        $account    = Account::find($id);
+        $histData   = [];
+
+        $account->name          !== $data->name ? $histData['name'] = "<p class='text-danger'>{$account->name}</p><p class='text-success'>{$data->name}</p>" : '';
+        $account->acc_no        !== $data->acc_no ? $histData['acc_no'] = "<p class='text-danger'>{$account->acc_no}</p><p class='text-success'>{$data->acc_no}</p>" : '';
+        $account->acc_details   !== $data->acc_details ? $histData['acc_details'] = "<p class='text-danger'>{$account->acc_details}</p><p class='text-success'>{$data->acc_details}</p>" : '';
+
+        DB::transaction(function () use ($id, $data, $account, $histData) {
+            $account->update(
+                [
+                    'name'          => $data->name,
+                    'acc_no'        => $data->acc_no,
+                    'acc_details'   => $data->acc_details
+                ]
+            );
+            AccountActionHistory::create(self::setActionHistory($id, 'update', $histData));
+        });
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.accounts.update')
+            ],
+            200
+        );
     }
 
     /**
@@ -60,14 +108,7 @@ class AccountController extends Controller
     {
         DB::transaction(function () use ($id) {
             Account::find($id)->delete();
-            AccountActionHistory::create([
-                "account_id"        => $id,
-                "author_id"         => auth()->id(),
-                "name"              => auth()->user()->name,
-                "image_uri"         => auth()->user()->image_uri,
-                "action_type"       => 'delete',
-                "action_details"    => [],
-            ]);
+            AccountActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
         return response(
@@ -89,14 +130,7 @@ class AccountController extends Controller
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 Account::find($id)->update(['status' => $status]);
-                AccountActionHistory::create([
-                    "account_id"        => $id,
-                    "author_id"         => auth()->id(),
-                    "name"              => auth()->user()->name,
-                    "image_uri"         => auth()->user()->image_uri,
-                    "action_type"       => 'update',
-                    "action_details"    => ['status' => $changeStatus],
-                ]);
+                AccountActionHistory::create(self::setActionHistory($id, 'update', ['status' => $changeStatus]));
             }
         );
 
