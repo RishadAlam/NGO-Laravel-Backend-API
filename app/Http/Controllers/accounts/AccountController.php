@@ -66,7 +66,8 @@ class AccountController extends Controller
             [
                 'name'          => $data->name,
                 'acc_no'        => $data->acc_no,
-                'acc_details'   => $data->acc_details
+                'acc_details'   => $data->acc_details,
+                'creator_id'    => auth()->id()
             ]
         );
 
