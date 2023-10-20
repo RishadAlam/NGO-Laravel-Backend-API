@@ -171,5 +171,16 @@ return [
         'app_settings_update' => 'The app settings has been successfully updated.',
         'approval_configuration_update' => 'The Approvals has been successfully updated.',
         'categories_configuration_update' => 'The Categories Configuration has been successfully updated.',
+    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Account Management Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'accounts' => [
+        'successful'        => 'The account has been successfully registered.',
+        'delete'            => 'The account has been successfully deleted.',
+        'update'            => 'The account has been successfully updated.',
+        'status'            => 'The account status has been successfully updated.',
     ]
 ];

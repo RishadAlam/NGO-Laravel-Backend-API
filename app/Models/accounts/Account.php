@@ -2,6 +2,7 @@
 
 namespace App\Models\accounts;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\accounts\AccountActionHistory;
 use Illuminate\Database\Eloquent\SoftDeletes;
