@@ -12,6 +12,17 @@ use Illuminate\Http\Request;
 class ExpenseCategoryController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:income_category_list_view')->only('index');
+        $this->middleware('can:income_category_registration')->only('store');
+        $this->middleware('can:income_category_data_update')->only(['update', 'change_status']);
+        $this->middleware('can:income_category_soft_delete')->only('destroy');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
