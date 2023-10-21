@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\accounts\AccountController;
+use App\Http\Controllers\accounts\ExpenseCategoryController;
+use App\Http\Controllers\accounts\IncomeCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -97,10 +99,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Here you can see all the API routes that have been additionally added to
      * the resource controller
      */
-    Route::GET('/users/permissions/{id}', [UserController::class, 'get_user_permissions']);             // Get Specified users permissions
-    Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');  // Permissions Index
-    Route::GET('/fields/active', [FieldController::class, 'get_active_fields']);                        // Get all active fields
-    Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);               // Get all Category Groups
+    Route::GET('/users/permissions/{id}', [UserController::class, 'get_user_permissions']);                                     // Get Specified users permissions
+    Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');                          // Permissions Index
+    Route::GET('/fields/active', [FieldController::class, 'get_active_fields']);                                                // Get all active fields
+    Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);                                       // Get all Category Groups
+    Route::GET('/income-categories/active', [IncomeCategoryController::class, 'get_active_categories']);                        // Get all active income Categories
+    Route::GET('/expense-categories/active', [ExpenseCategoryController::class, 'get_active_categories']);                      // Get all active expense Categories
 
     // Change Status Routes
     Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status']);
@@ -108,6 +112,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::PUT('/centers/change-status/{id}', [CenterController::class, 'change_status']);
     Route::PUT('/categories/change-status/{id}', [CategoryController::class, 'change_status']);
     Route::PUT('/accounts/change-status/{id}', [AccountController::class, 'change_status']);
+    Route::PUT('/income-categories/change-status/{id}', [IncomeCategoryController::class, 'change_status']);
+    Route::PUT('/expense-categories/change-status/{id}', [ExpenseCategoryController::class, 'change_status']);
 
     /**
      * -------------------------------------------------------------------------
@@ -125,6 +131,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('centers', CenterController::class)->except('show');
     Route::apiResource('categories', CategoryController::class)->except('show');
     Route::apiResource('accounts', AccountController::class)->except('show');
+    Route::apiResource('income-categories', IncomeCategoryController::class)->except('show');
+    Route::apiResource('expense-categories', ExpenseCategoryController::class)->except('show');
 
     /**
      * -------------------------------------------------------------------------
