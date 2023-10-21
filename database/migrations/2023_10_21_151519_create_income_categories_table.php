@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('income_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->boolean('status')->default(true);
             $table->boolean('is_default')->default(false);
             $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();

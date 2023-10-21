@@ -182,5 +182,29 @@ return [
         'delete'            => 'The account has been successfully deleted.',
         'update'            => 'The account has been successfully updated.',
         'status'            => 'The account status has been successfully updated.',
-    ]
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Income Categories Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'income_categories' => [
+        'successful'        => 'The income category has been successfully registered.',
+        'delete'            => 'The income category has been successfully deleted.',
+        'update'            => 'The income category has been successfully updated.',
+        'status'            => 'The income category status has been successfully updated.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expense Categories Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'expense_categories' => [
+        'successful'        => 'The expense category has been successfully registered.',
+        'delete'            => 'The expense category has been successfully deleted.',
+        'update'            => 'The expense category has been successfully updated.',
+        'status'            => 'The expense category status has been successfully updated.',
+    ],
 ];
