@@ -189,7 +189,7 @@ return [
     | Income Categories Custom Message
     |--------------------------------------------------------------------------
     */
-    'income_categories' => [
+    'income_category' => [
         'successful'        => 'The income category has been successfully registered.',
         'delete'            => 'The income category has been successfully deleted.',
         'update'            => 'The income category has been successfully updated.',
@@ -201,7 +201,7 @@ return [
     | Expense Categories Custom Message
     |--------------------------------------------------------------------------
     */
-    'expense_categories' => [
+    'expense_category' => [
         'successful'        => 'The expense category has been successfully registered.',
         'delete'            => 'The expense category has been successfully deleted.',
         'update'            => 'The expense category has been successfully updated.',

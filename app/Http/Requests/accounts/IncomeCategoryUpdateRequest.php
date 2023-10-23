@@ -22,7 +22,7 @@ class IncomeCategoryUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name"          => "required|max:100|unique:income_categories,name,{$this->IncomeCategory}",
+            "name"          => "required|max:100|unique:income_categories,name,{$this->id}",
             "description"   => "nullable",
         ];
     }

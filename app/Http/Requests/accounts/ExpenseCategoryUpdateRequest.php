@@ -22,7 +22,7 @@ class ExpenseCategoryUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name"          => "required|max:100|unique:expense_categories,name,{$this->ExpenseCategory}",
+            "name"          => "required|max:100|unique:expense_categories,name,{$this->id}",
             "description"   => "nullable",
         ];
     }

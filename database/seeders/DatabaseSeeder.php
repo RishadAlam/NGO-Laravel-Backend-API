@@ -21,8 +21,10 @@ class DatabaseSeeder extends Seeder
                 // CenterSeeder::class,
                 // CategorySeeder::class,
                 // AccountSeeder::class,
-                IncomeCategorySeeder::class,
-                ExpenseCategorySeeder::class,
+                // IncomeCategorySeeder::class,
+                // ExpenseCategorySeeder::class,
+                IncomeSeeder::class,
+                ExpenseSeeder::class
             ]
         );
     }
