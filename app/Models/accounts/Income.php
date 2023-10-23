@@ -25,6 +25,16 @@ class Income extends Model
     ];
 
     /**
+     * Relationship belongs to Income Category model
+     *
+     * @return response()
+     */
+    public function IncomeCategory()
+    {
+        return $this->belongsTo(IncomeCategory::class)->withTrashed();
+    }
+
+    /**
      * Relationship belongs to User model
      *
      * @return response()

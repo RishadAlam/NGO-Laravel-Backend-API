@@ -1,22 +1,24 @@
 <?php
 
-use App\Http\Controllers\accounts\AccountController;
-use App\Http\Controllers\accounts\ExpenseCategoryController;
-use App\Http\Controllers\accounts\IncomeCategoryController;
 use Illuminate\Http\Request;
+use App\Models\accounts\Account;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\category\CategoryController;
-use App\Http\Controllers\center\CenterController;
-use App\Http\Controllers\config\AppConfigController;
-use App\Http\Controllers\config\CategoryConfigController;
+use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\field\FieldController;
-use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
-use App\Models\accounts\Account;
-use Illuminate\Support\Facades\Artisan;
-use Spatie\Permission\Models\Permission;
+use App\Http\Controllers\center\CenterController;
+use App\Http\Controllers\accounts\IncomeController;
+use App\Http\Controllers\accounts\AccountController;
+use App\Http\Controllers\accounts\ExpenseController;
+use App\Http\Controllers\config\AppConfigController;
+use App\Http\Controllers\category\CategoryController;
+use App\Http\Controllers\staffs\PermissionController;
+use App\Http\Controllers\config\CategoryConfigController;
+use App\Http\Controllers\accounts\IncomeCategoryController;
+use App\Http\Controllers\accounts\ExpenseCategoryController;
 
 /**
  * ------------------------------------------------------------------------
@@ -133,6 +135,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('accounts', AccountController::class)->except('show');
     Route::apiResource('income-categories', IncomeCategoryController::class)->except('show');
     Route::apiResource('expense-categories', ExpenseCategoryController::class)->except('show');
+    Route::apiResource('incomes', IncomeController::class)->except('show');
+    Route::apiResource('expenses', ExpenseController::class)->except('show');
 
     /**
      * -------------------------------------------------------------------------

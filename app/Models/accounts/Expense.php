@@ -4,6 +4,7 @@ namespace App\Models\accounts;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\accounts\ExpenseCategory;
 use App\Models\accounts\AccountActionHistory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,6 +25,17 @@ class Expense extends Model
         'date',
         'creator_id'
     ];
+
+    /**
+     * Relationship belongs to Expense Category model
+     *
+     * @return response()
+     */
+    public function ExpenseCategory()
+    {
+        return $this->belongsTo(ExpenseCategory::class)->withTrashed();
+    }
+
 
     /**
      * Relationship belongs to User model

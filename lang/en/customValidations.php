@@ -198,6 +198,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Income Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'income' => [
+        'successful'        => 'The income has been successfully registered.',
+        'delete'            => 'The income has been successfully deleted.',
+        'update'            => 'The income has been successfully updated.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Expense Categories Custom Message
     |--------------------------------------------------------------------------
     */
@@ -206,5 +217,16 @@ return [
         'delete'            => 'The expense category has been successfully deleted.',
         'update'            => 'The expense category has been successfully updated.',
         'status'            => 'The expense category status has been successfully updated.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expense Categories Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'expense' => [
+        'successful'        => 'The expense has been successfully registered.',
+        'delete'            => 'The expense has been successfully deleted.',
+        'update'            => 'The expense has been successfully updated.',
     ],
 ];
