@@ -24,6 +24,8 @@ class IncomeUpdateRequest extends FormRequest
         return [
             'income_category_id'    => 'required',
             'amount'                => 'required|numeric',
+            'previous_balance'      => 'required|numeric',
+            'balance'               => 'required|numeric',
             'description'           => 'nullable',
             'date'                  => 'nullable'
         ];

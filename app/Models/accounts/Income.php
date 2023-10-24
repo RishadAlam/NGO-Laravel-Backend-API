@@ -3,6 +3,7 @@
 namespace App\Models\accounts;
 
 use App\Models\User;
+use App\Models\accounts\Account;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,12 +18,25 @@ class Income extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'account_id',
         'income_category_id',
         'amount',
+        'previous_balance',
+        'balance',
         'description',
         'date',
         'creator_id'
     ];
+
+    /**
+     * Relationship belongs to Account model
+     *
+     * @return response()
+     */
+    public function Account()
+    {
+        return $this->belongsTo(Account::class)->withTrashed();
+    }
 
     /**
      * Relationship belongs to Income Category model

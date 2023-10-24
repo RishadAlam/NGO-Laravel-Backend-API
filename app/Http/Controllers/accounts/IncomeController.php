@@ -5,6 +5,7 @@ namespace App\Http\Controllers\accounts;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\accounts\IncomeStoreRequest;
 use App\Http\Requests\accounts\IncomeUpdateRequest;
+use App\Models\accounts\Account;
 use App\Models\accounts\Income;
 use App\Models\accounts\IncomeActionHistory;
 use Illuminate\Http\Request;
@@ -32,7 +33,8 @@ class IncomeController extends Controller
      */
     public function index()
     {
-        $incomes = Income::with('IncomeCategory:id,name')
+        $incomes = Income::with('IncomeCategory:id,name,is_default')
+            ->with('Account:id,name,is_default')
             ->with('Author:id,name')
             ->with(['IncomeActionHistory', 'IncomeActionHistory.Author:id,name,image_uri'])
             ->get();
@@ -54,8 +56,10 @@ class IncomeController extends Controller
         $data = (object) $request->validated();
         Income::create(
             [
+                'account_id'            => $data->account_id,
                 'income_category_id'    => $data->income_category_id,
                 'amount'                => $data->amount,
+                'previous_balance'      => $data->previous_balance,
                 'description'           => $data->description ?? null,
                 'date'                  => $data->date,
                 'creator_id'            => auth()->id()
@@ -89,6 +93,7 @@ class IncomeController extends Controller
                 [
                     'income_category_id'    => $data->income_category_id,
                     'amount'                => $data->amount,
+                    'previous_balance'      => $data->previous_balance,
                     'description'           => $data->description ?? null,
                     'date'                  => $data->date,
                 ]

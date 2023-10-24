@@ -22,8 +22,11 @@ class ExpenseStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'account_id'            => 'required',
             'expense_category_id'   => 'required',
             'amount'                => 'required|numeric',
+            'previous_balance'      => 'required|numeric',
+            'balance'               => 'required|numeric',
             'description'           => 'nullable',
             'date'                  => 'nullable'
         ];

@@ -2,6 +2,7 @@
 
 namespace Database\Factories\accounts;
 
+use App\Models\accounts\Account;
 use App\Models\accounts\Expense;
 use App\Models\accounts\ExpenseCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,10 +26,15 @@ class ExpenseFactory extends Factory
      */
     public function definition(): array
     {
-        $cat_id = ExpenseCategory::inRandomOrder()->first()->id;
+        $account    = Account::inRandomOrder()->first();
+        $cat_id     = ExpenseCategory::inRandomOrder()->first()->id;
+        $amount     = fake()->numberBetween(100,1000);
+        $account->update(['total_withdrawal' => $amount]);
         return [
+            'account_id'            => $account->id,
             'expense_category_id'   => $cat_id,
-            'amount'                => fake()->numberBetween(100,1000),
+            'amount'                => $amount,
+            'previous_balance'      => $account->balance,
             'description'           => fake()->text(),
             'creator_id'            => fake()->numberBetween(1,5)
         ];

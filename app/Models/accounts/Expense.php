@@ -19,12 +19,25 @@ class Expense extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'account_id',
         'expense_category_id',
         'amount',
+        'previous_balance',
+        'balance',
         'description',
         'date',
         'creator_id'
     ];
+
+    /**
+     * Relationship belongs to Account model
+     *
+     * @return response()
+     */
+    public function Account()
+    {
+        return $this->belongsTo(Account::class)->withTrashed();
+    }
 
     /**
      * Relationship belongs to Expense Category model

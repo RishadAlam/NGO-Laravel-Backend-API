@@ -32,7 +32,8 @@ class ExpenseController extends Controller
      */
     public function index()
     {
-        $expenses = Expense::with('ExpenseCategory:id,name')
+        $expenses = Expense::with('ExpenseCategory:id,name,is_default')
+            ->with('Account:id,name,is_default')
             ->with('Author:id,name')
             ->with(['ExpenseActionHistory', 'ExpenseActionHistory.Author:id,name,image_uri'])
             ->get();
@@ -54,8 +55,11 @@ class ExpenseController extends Controller
         $data = (object) $request->validated();
         Expense::create(
             [
+                'account_id'            => $data->account_id,
                 'expense_category_id'   => $data->expense_category_id,
                 'amount'                => $data->amount,
+                'amount'                => $data->amount,
+                'previous_balance'      => $data->previous_balance,
                 'description'           => $data->description ?? null,
                 'date'                  => $data->date,
                 'creator_id'            => auth()->id()
@@ -89,6 +93,7 @@ class ExpenseController extends Controller
                 [
                     'expense_category_id'   => $data->expense_category_id,
                     'amount'                => $data->amount,
+                    'previous_balance'      => $data->previous_balance,
                     'description'           => $data->description ?? null,
                     'date'                  => $data->date,
                 ]
