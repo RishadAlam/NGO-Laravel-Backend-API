@@ -80,6 +80,18 @@ class RolePermissionSeeder extends Seeder
                     'account_permanently_delete',
                 ]
             ],
+            // Income
+            [
+                'groupName'     => 'income',
+                'permissions'   => [
+                    'income_list_view',
+                    'income_registration',
+                    'income_data_update',
+                    'income_soft_delete',
+                    'income_action_history',
+                    'income_permanently_delete',
+                ]
+            ],
             // Income Categories
             [
                 'groupName'     => 'income_category',
@@ -88,6 +100,18 @@ class RolePermissionSeeder extends Seeder
                     'income_category_registration',
                     'income_category_data_update',
                     'income_category_soft_delete',
+                ]
+            ],
+            // Expense
+            [
+                'groupName'     => 'expense',
+                'permissions'   => [
+                    'expense_list_view',
+                    'expense_registration',
+                    'expense_data_update',
+                    'expense_soft_delete',
+                    'expense_action_history',
+                    'expense_permanently_delete',
                 ]
             ],
             // Expense Categories
