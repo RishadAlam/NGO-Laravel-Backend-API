@@ -105,6 +105,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');                          // Permissions Index
     Route::GET('/fields/active', [FieldController::class, 'get_active_fields']);                                                // Get all active fields
     Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);                                       // Get all Category Groups
+    Route::GET('/accounts/active', [AccountController::class, 'get_active_accounts']);                                       // Get all Category Groups
     Route::GET('/income-categories/active', [IncomeCategoryController::class, 'get_active_categories']);                        // Get all active income Categories
     Route::GET('/expense-categories/active', [ExpenseCategoryController::class, 'get_active_categories']);                      // Get all active expense Categories
 

@@ -30,6 +30,15 @@ class Expense extends Model
     ];
 
     /**
+     * Mutator for Date
+     */
+    public function setDateAttribute($value)
+    {
+        $this->attributes['date'] =  date('Y-m-d h:m:s', strtotime($value));
+    }
+
+
+    /**
      * Relationship belongs to Account model
      *
      * @return response()

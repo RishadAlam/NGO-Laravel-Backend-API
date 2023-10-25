@@ -81,19 +81,23 @@ class IncomeController extends Controller
     public function update(IncomeUpdateRequest $request, string $id)
     {
         $data       = (object) $request->validated();
-        $income     = Income::find($id);
+        $income     = Income::with('IncomeCategory:id,name')->find($id);
         $histData   = [];
+        $incomeDate = date('d-m-y', strtotime($income->date));
+        $newDate    = date('d-m-y', strtotime($data->date));
 
-        $income->amount         !== $data->amount ? $histData['amount'] = "<p class='text-danger'>{$income->amount}</p><p class='text-success'>{$data->amount}</p>" : '';
-        $income->description    !== $data->description ? $histData['description'] = "<p class='text-danger'>{$income->description}</p><p class='text-success'>{$data->description}</p>" : '';
-        $income->date           !== $data->date ? $histData['date'] = "<p class='text-danger'>{$income->date}</p><p class='text-success'>{$data->date}</p>" : '';
+        $income->income_category_id !== $data->income_category_id ? $histData['category'] = "<p class='text-danger'>{$income->income_category->name}</p><p class='text-success'>{$data->category->name}</p>" : '';
+        $income->amount             !== $data->amount ? $histData['amount'] = "<p class='text-danger'>{$income->amount}</p><p class='text-success'>{$data->amount}</p>" : '';
+        $income->previous_balance   !== $data->previous_balance ? $histData['previous_balance'] = "<p class='text-danger'>{$income->previous_balance}</p><p class='text-success'>{$data->previous_balance}</p>" : '';
+        $income->balance            !== $data->balance ? $histData['balance'] = "<p class='text-danger'>{$income->balance}</p><p class='text-success'>{$data->balance}</p>" : '';
+        $income->description        !== $data->description ? $histData['description'] = "<p class='text-danger'>{$income->description}</p><p class='text-success'>{$data->description}</p>" : '';
+        $incomeDate                 !== $newDate ? $histData['date'] = "<p class='text-danger'>{$incomeDate}</p><p class='text-success'>{$newDate}</p>" : '';
 
         DB::transaction(function () use ($id, $data, $income, $histData) {
             $income->update(
                 [
                     'income_category_id'    => $data->income_category_id,
                     'amount'                => $data->amount,
-                    'previous_balance'      => $data->previous_balance,
                     'description'           => $data->description ?? null,
                     'date'                  => $data->date,
                 ]

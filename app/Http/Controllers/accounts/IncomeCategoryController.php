@@ -121,7 +121,7 @@ class IncomeCategoryController extends Controller
     public function get_active_categories()
     {
         $categories = IncomeCategory::where('status', true)
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'is_default']);
 
         return response(
             [

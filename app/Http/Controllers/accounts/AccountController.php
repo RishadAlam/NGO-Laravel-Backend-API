@@ -154,4 +154,21 @@ class AccountController extends Controller
             200
         );
     }
+
+    /**
+     * Get all active Account
+     */
+    public function get_active_accounts()
+    {
+        $accounts = Account::where('status', true)
+            ->get(['id', 'name', 'balance', 'is_default']);
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $accounts
+            ],
+            200
+        );
+    }
 }
