@@ -107,6 +107,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);                                       // Get all Category Groups
     Route::GET('/accounts/active', [AccountController::class, 'get_active_accounts']);                                          // Get all Category Groups
     Route::GET('/incomes/{date_range}', [IncomeController::class, 'index'])->name('incomes.index');                     // Get all income according to date range
+    Route::GET('/expenses/{date_range}', [ExpenseController::class, 'index'])->name('expenses.index');                     // Get all income according to date range
     Route::GET('/income-categories/active', [IncomeCategoryController::class, 'get_active_categories']);                        // Get all active income Categories
     Route::GET('/expense-categories/active', [ExpenseCategoryController::class, 'get_active_categories']);                      // Get all active expense Categories
 

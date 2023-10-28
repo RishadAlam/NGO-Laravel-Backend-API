@@ -27,7 +27,8 @@ class ExpenseUpdateRequest extends FormRequest
             'previous_balance'      => 'required|numeric',
             'balance'               => 'required|numeric',
             'description'           => 'nullable',
-            'date'                  => 'nullable'
+            'date'                  => 'nullable',
+            'category'              => 'nullable'
         ];
     }
 }

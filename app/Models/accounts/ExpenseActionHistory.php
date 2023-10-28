@@ -2,8 +2,8 @@
 
 namespace App\Models\accounts;
 
+use App\Models\User;
 use App\Models\accounts\Expense;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

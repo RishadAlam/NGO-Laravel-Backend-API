@@ -194,6 +194,13 @@ return [
         'delete'            => 'The income category has been successfully deleted.',
         'update'            => 'The income category has been successfully updated.',
         'status'            => 'The income category status has been successfully updated.',
+
+        'default'           => [
+            'registration_fee'                  => 'Registration Fee',
+            'closing_fee'                       => 'Closing Fee',
+            'withdrawal_fee'                    => 'Withdrawal Fee',
+            'money_transfer_transaction_fee'    => 'Money Transfer Fee'
+        ]
     ],
 
     /*
@@ -217,6 +224,12 @@ return [
         'delete'            => 'The expense category has been successfully deleted.',
         'update'            => 'The expense category has been successfully updated.',
         'status'            => 'The expense category status has been successfully updated.',
+
+        'default'           => [
+            'electricity_bill'  => 'Electricity Bill',
+            'office_rent'       => 'Office Rent',
+            'daily_expense'     => 'Daily Expense'
+        ]
     ],
 
     /*

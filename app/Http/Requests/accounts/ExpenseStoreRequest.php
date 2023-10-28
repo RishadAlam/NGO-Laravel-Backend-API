@@ -24,9 +24,9 @@ class ExpenseStoreRequest extends FormRequest
         return [
             'account_id'            => 'required',
             'expense_category_id'   => 'required',
-            'amount'                => 'required|numeric',
+            'amount'                => 'required|numeric|min:1',
             'previous_balance'      => 'required|numeric',
-            'balance'               => 'required|numeric',
+            'balance'               => 'required|numeric|min:0',
             'description'           => 'nullable',
             'date'                  => 'nullable'
         ];

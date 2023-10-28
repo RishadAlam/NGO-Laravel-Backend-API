@@ -99,12 +99,14 @@ class IncomeController extends Controller
     public function update(IncomeUpdateRequest $request, string $id)
     {
         $data       = (object) $request->validated();
-        $income     = Income::with('IncomeCategory:id,name')->find($id);
+        $income     = Income::with('IncomeCategory:id,name,is_default')->find($id);
         $histData   = [];
-        $incomeDate = date('d-m-y', strtotime($income->date));
-        $newDate    = date('d-m-y', strtotime($data->date));
+        $incomeDate = date('d/m/Y', strtotime($income->date));
+        $newDate    = date('d/m/Y', strtotime($data->date));
+        $oldCat     = $income->IncomeCategory->is_default ? __("customValidations.income_category.default.{$income->IncomeCategory->name}") : $income->IncomeCategory->name;
+        $newCat     = $data->category['is_default'] ? __("customValidations.income_category.default.{$data->category['name']}") : $data->category['name'];
 
-        $income->income_category_id !== $data->income_category_id ? $histData['category'] = "<p class='text-danger'>{$income->IncomeCategory->name}</p><p class='text-success'>{$data->category['name']}</p>" : '';
+        $income->income_category_id !== $data->income_category_id ? $histData['category'] = "<p class='text-danger'>{$oldCat}</p><p class='text-success'>{$newCat}</p>" : '';
         $income->amount             !== $data->amount ? $histData['amount'] = "<p class='text-danger'>{$income->amount}</p><p class='text-success'>{$data->amount}</p>" : '';
         $income->previous_balance   !== $data->previous_balance ? $histData['previous_balance'] = "<p class='text-danger'>{$income->previous_balance}</p><p class='text-success'>{$data->previous_balance}</p>" : '';
         $income->balance            !== $data->balance ? $histData['balance'] = "<p class='text-danger'>{$income->balance}</p><p class='text-success'>{$data->balance}</p>" : '';

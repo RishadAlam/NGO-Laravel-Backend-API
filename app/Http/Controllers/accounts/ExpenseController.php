@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\accounts;
 
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use App\Models\accounts\Expense;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\accounts\ExpenseActionHistory;
 use App\Http\Requests\accounts\ExpenseStoreRequest;
 use App\Http\Requests\accounts\ExpenseUpdateRequest;
-use App\Models\accounts\Expense;
-use App\Models\accounts\ExpenseActionHistory;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ExpenseController extends Controller
 {
@@ -41,12 +42,18 @@ class ExpenseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($date_range)
     {
+        $date_range = json_decode($date_range);
+        $start_date = Carbon::parse($date_range[0])->startOfDay();
+        $end_date   = Carbon::parse($date_range[1])->endOfDay();
+
         $expenses = Expense::with('ExpenseCategory:id,name,is_default')
             ->with('Account:id,name,is_default')
             ->with('Author:id,name')
             ->with(['ExpenseActionHistory', 'ExpenseActionHistory.Author:id,name,image_uri'])
+            ->whereBetween('date', [$start_date, $end_date])
+            ->orderBy('date', 'DESC')
             ->get();
 
         return response(
@@ -92,12 +99,19 @@ class ExpenseController extends Controller
     public function update(ExpenseUpdateRequest $request, string $id)
     {
         $data       = (object) $request->validated();
-        $expense    = Expense::find($id);
+        $expense    = Expense::with('ExpenseCategory:id,name,is_default')->find($id);
         $histData   = [];
+        $oldDate    = date('d/m/Y', strtotime($expense->date));
+        $newDate    = date('d/m/Y', strtotime($data->date));
+        $oldCat     = $expense->ExpenseCategory->is_default ? __("customValidations.expense_category.default.{$expense->ExpenseCategory->name}") : $expense->ExpenseCategory->name;
+        $newCat     = $data->category['is_default'] ? __("customValidations.expense_category.default.{$data->category['name']}") : $data->category['name'];
 
-        $expense->amount         !== $data->amount ? $histData['amount'] = "<p class='text-danger'>{$expense->amount}</p><p class='text-success'>{$data->amount}</p>" : '';
-        $expense->description    !== $data->description ? $histData['description'] = "<p class='text-danger'>{$expense->description}</p><p class='text-success'>{$data->description}</p>" : '';
-        $expense->date           !== $data->date ? $histData['date'] = "<p class='text-danger'>{$expense->date}</p><p class='text-success'>{$data->date}</p>" : '';
+        $expense->expense_category_id   !== $data->expense_category_id ? $histData['category'] = "<p class='text-danger'>{$oldCat}</p><p class='text-success'>{$newCat}</p>" : '';
+        $expense->amount                !== $data->amount ? $histData['amount'] = "<p class='text-danger'>{$expense->amount}</p><p class='text-success'>{$data->amount}</p>" : '';
+        $expense->previous_balance      !== $data->previous_balance ? $histData['previous_balance'] = "<p class='text-danger'>{$expense->previous_balance}</p><p class='text-success'>{$data->previous_balance}</p>" : '';
+        $expense->balance               !== $data->balance ? $histData['balance'] = "<p class='text-danger'>{$expense->balance}</p><p class='text-success'>{$data->balance}</p>" : '';
+        $expense->description           !== $data->description ? $histData['description'] = "<p class='text-danger'>{$expense->description}</p><p class='text-success'>{$data->description}</p>" : '';
+        $expense->date                  !== $data->date ? $histData['date'] = "<p class='text-danger'>{$oldDate}</p><p class='text-success'>{$newDate}</p>" : '';
 
         DB::transaction(function () use ($id, $data, $expense, $histData) {
             $expense->update(
@@ -134,7 +148,7 @@ class ExpenseController extends Controller
         return response(
             [
                 'success'   => true,
-                'message'   => __('customValidations.income.delete')
+                'message'   => __('customValidations.expense.delete')
             ],
             200
         );
