@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\DB;
 class ExpenseController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:expense_list_view')->only('index');
+        $this->middleware('can:expense_registration')->only('store');
+        $this->middleware('can:expense_data_update')->only(['update']);
+        $this->middleware('can:expense_soft_delete')->only('destroy');
+    }
+
+    /**
      * AccountActionHistory Common Function
      */
     private static function setActionHistory($id, $action, $histData)

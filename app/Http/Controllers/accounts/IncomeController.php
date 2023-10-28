@@ -2,17 +2,29 @@
 
 namespace App\Http\Controllers\accounts;
 
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use App\Models\accounts\Income;
+use App\Models\accounts\Account;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\accounts\IncomeActionHistory;
 use App\Http\Requests\accounts\IncomeStoreRequest;
 use App\Http\Requests\accounts\IncomeUpdateRequest;
-use App\Models\accounts\Account;
-use App\Models\accounts\Income;
-use App\Models\accounts\IncomeActionHistory;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class IncomeController extends Controller
 {
+    /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:income_list_view')->only('index');
+        $this->middleware('can:income_registration')->only('store');
+        $this->middleware('can:income_data_update')->only(['update']);
+        $this->middleware('can:income_soft_delete')->only('destroy');
+    }
+
     /**
      * AccountActionHistory Common Function
      */
@@ -31,12 +43,18 @@ class IncomeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($date_range)
     {
+        $date_range = json_decode($date_range);
+        $start_date = Carbon::parse($date_range[0])->startOfDay();
+        $end_date   = Carbon::parse($date_range[1])->endOfDay();
+
         $incomes = Income::with('IncomeCategory:id,name,is_default')
             ->with('Account:id,name,is_default')
             ->with('Author:id,name')
             ->with(['IncomeActionHistory', 'IncomeActionHistory.Author:id,name,image_uri'])
+            ->whereBetween('date', [$start_date, $end_date])
+            ->orderBy('date', 'DESC')
             ->get();
 
         return response(
