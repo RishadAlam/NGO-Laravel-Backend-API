@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\accounts\ExpenseActionHistory;
 use App\Http\Requests\accounts\ExpenseStoreRequest;
 use App\Http\Requests\accounts\ExpenseUpdateRequest;
+use App\Models\accounts\Account;
 
 class ExpenseController extends Controller
 {
@@ -71,18 +72,24 @@ class ExpenseController extends Controller
     public function store(ExpenseStoreRequest $request)
     {
         $data = (object) $request->validated();
-        Expense::create(
-            [
-                'account_id'            => $data->account_id,
-                'expense_category_id'   => $data->expense_category_id,
-                'amount'                => $data->amount,
-                'amount'                => $data->amount,
-                'previous_balance'      => $data->previous_balance,
-                'description'           => $data->description ?? null,
-                'date'                  => $data->date,
-                'creator_id'            => auth()->id()
-            ]
-        );
+
+        DB::transaction(function () use ($data) {
+            Expense::create(
+                [
+                    'account_id'            => $data->account_id,
+                    'expense_category_id'   => $data->expense_category_id,
+                    'amount'                => $data->amount,
+                    'amount'                => $data->amount,
+                    'previous_balance'      => $data->previous_balance,
+                    'description'           => $data->description ?? null,
+                    'date'                  => $data->date,
+                    'creator_id'            => auth()->id()
+                ]
+            );
+
+            Account::find($data->account_id)
+                ->increment('total_withdrawal', $data->amount);
+        });
 
         return response(
             [
@@ -101,6 +108,7 @@ class ExpenseController extends Controller
         $data       = (object) $request->validated();
         $expense    = Expense::with('ExpenseCategory:id,name,is_default')->find($id);
         $histData   = [];
+        $amountDef  = $data->amount - $expense->amount;
         $oldDate    = date('d/m/Y', strtotime($expense->date));
         $newDate    = date('d/m/Y', strtotime($data->date));
         $oldCat     = $expense->ExpenseCategory->is_default ? __("customValidations.expense_category.default.{$expense->ExpenseCategory->name}") : $expense->ExpenseCategory->name;
@@ -113,7 +121,7 @@ class ExpenseController extends Controller
         $expense->description           !== $data->description ? $histData['description'] = "<p class='text-danger'>{$expense->description}</p><p class='text-success'>{$data->description}</p>" : '';
         $expense->date                  !== $data->date ? $histData['date'] = "<p class='text-danger'>{$oldDate}</p><p class='text-success'>{$newDate}</p>" : '';
 
-        DB::transaction(function () use ($id, $data, $expense, $histData) {
+        DB::transaction(function () use ($id, $data, $expense, $amountDef, $histData) {
             $expense->update(
                 [
                     'expense_category_id'   => $data->expense_category_id,
@@ -123,6 +131,11 @@ class ExpenseController extends Controller
                     'date'                  => $data->date,
                 ]
             );
+
+            if ($amountDef) {
+                Account::find($expense->account_id)
+                    ->increment('total_withdrawal', $amountDef);
+            }
             ExpenseActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
@@ -141,7 +154,10 @@ class ExpenseController extends Controller
     public function destroy(string $id)
     {
         DB::transaction(function () use ($id) {
-            Expense::find($id)->delete();
+            $expense = Expense::find($id);
+            Account::find($expense->account_id)
+                ->increment('total_withdrawal', $expense->amount);
+            $expense->delete();
             ExpenseActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 

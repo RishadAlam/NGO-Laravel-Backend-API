@@ -72,17 +72,22 @@ class IncomeController extends Controller
     public function store(IncomeStoreRequest $request)
     {
         $data = (object) $request->validated();
-        Income::create(
-            [
-                'account_id'            => $data->account_id,
-                'income_category_id'    => $data->income_category_id,
-                'amount'                => $data->amount,
-                'previous_balance'      => $data->previous_balance,
-                'description'           => $data->description ?? null,
-                'date'                  => $data->date,
-                'creator_id'            => auth()->id()
-            ]
-        );
+        DB::transaction(function () use ($data) {
+            Income::create(
+                [
+                    'account_id'            => $data->account_id,
+                    'income_category_id'    => $data->income_category_id,
+                    'amount'                => $data->amount,
+                    'previous_balance'      => $data->previous_balance,
+                    'description'           => $data->description ?? null,
+                    'date'                  => $data->date,
+                    'creator_id'            => auth()->id()
+                ]
+            );
+
+            Account::find($data->account_id)
+                ->increment('total_deposit', $data->amount);
+        });
 
         return response(
             [
@@ -101,6 +106,7 @@ class IncomeController extends Controller
         $data       = (object) $request->validated();
         $income     = Income::with('IncomeCategory:id,name,is_default')->find($id);
         $histData   = [];
+        $amountDef  = $data->amount - $income->amount;
         $incomeDate = date('d/m/Y', strtotime($income->date));
         $newDate    = date('d/m/Y', strtotime($data->date));
         $oldCat     = $income->IncomeCategory->is_default ? __("customValidations.income_category.default.{$income->IncomeCategory->name}") : $income->IncomeCategory->name;
@@ -113,7 +119,7 @@ class IncomeController extends Controller
         $income->description        !== $data->description ? $histData['description'] = "<p class='text-danger'>{$income->description}</p><p class='text-success'>{$data->description}</p>" : '';
         $incomeDate                 !== $newDate ? $histData['date'] = "<p class='text-danger'>{$incomeDate}</p><p class='text-success'>{$newDate}</p>" : '';
 
-        DB::transaction(function () use ($id, $data, $income, $histData) {
+        DB::transaction(function () use ($id, $data, $income, $amountDef, $histData) {
             $income->update(
                 [
                     'income_category_id'    => $data->income_category_id,
@@ -122,6 +128,11 @@ class IncomeController extends Controller
                     'date'                  => $data->date,
                 ]
             );
+
+            if ($amountDef) {
+                Account::find($income->account_id)
+                    ->increment('total_deposit', $amountDef);
+            }
             IncomeActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
@@ -140,7 +151,10 @@ class IncomeController extends Controller
     public function destroy(string $id)
     {
         DB::transaction(function () use ($id) {
-            Income::find($id)->delete();
+            $income = Income::find($id);
+            Account::find($income->account_id)
+                ->decrement('total_deposit', $income->amount);
+            $income->delete();
             IncomeActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
