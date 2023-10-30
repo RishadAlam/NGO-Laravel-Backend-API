@@ -61,6 +61,6 @@ class AccountWithdrawal extends Model
      */
     public function AccountWithdrawalActionHistory()
     {
-        return $this->hasMany(AccountWithdrawalActionHistory::class);
+        return $this->hasMany(AccountWithdrawalActionHistory::class, 'withdrawal_id', 'id');
     }
 }

@@ -17,7 +17,7 @@ class AccountWithdrawalActionHistory extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'account_withdrawal_id',
+        'withdrawal_id',
         'author_id',
         'name',
         'image_uri',

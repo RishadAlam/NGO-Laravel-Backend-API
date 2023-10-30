@@ -124,6 +124,18 @@ class RolePermissionSeeder extends Seeder
                     'expense_category_soft_delete',
                 ]
             ],
+            // Account Withdrawal
+            [
+                'groupName'     => 'account_withdrawal',
+                'permissions'   => [
+                    'account_withdrawal_list_view',
+                    'account_withdrawal_registration',
+                    'account_withdrawal_data_update',
+                    'account_withdrawal_soft_delete',
+                    'account_withdrawal_action_history',
+                    'account_withdrawal_permanently_delete',
+                ]
+            ],
             // Staffs
             [
                 'groupName'     => 'staff',

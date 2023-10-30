@@ -12,6 +12,7 @@ use App\Http\Controllers\staffs\UserController;
 use App\Http\Controllers\center\CenterController;
 use App\Http\Controllers\accounts\IncomeController;
 use App\Http\Controllers\accounts\AccountController;
+use App\Http\Controllers\accounts\AccountWithdrawalController;
 use App\Http\Controllers\accounts\ExpenseController;
 use App\Http\Controllers\config\AppConfigController;
 use App\Http\Controllers\category\CategoryController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\config\CategoryConfigController;
 use App\Http\Controllers\accounts\IncomeCategoryController;
 use App\Http\Controllers\accounts\ExpenseCategoryController;
+use App\Models\accounts\AccountWithdrawal;
 
 /**
  * ------------------------------------------------------------------------
@@ -106,8 +108,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('/fields/active', [FieldController::class, 'get_active_fields']);                                                // Get all active fields
     Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);                                       // Get all Category Groups
     Route::GET('/accounts/active', [AccountController::class, 'get_active_accounts']);                                          // Get all Category Groups
-    Route::GET('/incomes/{date_range}', [IncomeController::class, 'index'])->name('incomes.index');                     // Get all income according to date range
-    Route::GET('/expenses/{date_range}', [ExpenseController::class, 'index'])->name('expenses.index');                     // Get all income according to date range
+    Route::GET('/incomes/{date_range}', [IncomeController::class, 'index'])->name('incomes.index');                             // Get all income according to date range
+    Route::GET('/expenses/{date_range}', [ExpenseController::class, 'index'])->name('expenses.index');                          // Get all Expense according to date range
+    Route::GET('/accounts/withdrawals/{date_range}', [AccountWithdrawalController::class, 'index'])->name('withdrawal.index');    // Get all Withdrawal according to date range
     Route::GET('/income-categories/active', [IncomeCategoryController::class, 'get_active_categories']);                        // Get all active income Categories
     Route::GET('/expense-categories/active', [ExpenseCategoryController::class, 'get_active_categories']);                      // Get all active expense Categories
 
@@ -140,6 +143,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('expense-categories', ExpenseCategoryController::class)->except('show');
     Route::apiResource('incomes', IncomeController::class)->except('show');
     Route::apiResource('expenses', ExpenseController::class)->except('show');
+    Route::apiResource('accounts/withdrawals', AccountWithdrawalController::class)->except('show');
 
     /**
      * -------------------------------------------------------------------------

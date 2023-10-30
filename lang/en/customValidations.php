@@ -234,12 +234,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Expense Categories Custom Message
+    | Expense Custom Message
     |--------------------------------------------------------------------------
     */
     'expense' => [
         'successful'        => 'The expense has been successfully registered.',
         'delete'            => 'The expense has been successfully deleted.',
         'update'            => 'The expense has been successfully updated.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Account Withdrawal Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'account_withdrawal' => [
+        'successful'        => 'The Withdrawal has been successfully registered.',
+        'delete'            => 'The Withdrawal has been successfully deleted.',
+        'update'            => 'The Withdrawal has been successfully updated.',
     ],
 ];
