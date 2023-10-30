@@ -23,8 +23,9 @@ class DatabaseSeeder extends Seeder
                 // AccountSeeder::class,
                 // IncomeCategorySeeder::class,
                 // ExpenseCategorySeeder::class,
-                IncomeSeeder::class,
-                ExpenseSeeder::class
+                // IncomeSeeder::class,
+                // ExpenseSeeder::class,
+                AccountWithdrawalSeeder::class
             ]
         );
     }
