@@ -55,6 +55,7 @@ class IncomeController extends Controller
             ->with(['IncomeActionHistory', 'IncomeActionHistory.Author:id,name,image_uri'])
             ->whereBetween('date', [$start_date, $end_date])
             ->orderBy('date', 'DESC')
+            ->orderBy('id', 'DESC')
             ->get();
 
         return response(
