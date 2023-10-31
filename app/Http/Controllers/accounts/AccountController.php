@@ -65,8 +65,9 @@ class AccountController extends Controller
         Account::create(
             [
                 'name'          => $data->name,
-                'acc_no'        => $data->acc_no,
-                'acc_details'   => $data->acc_details,
+                'acc_no'        => $data->acc_no ?? null,
+                'acc_details'   => $data->acc_details ?? null,
+                'total_deposit' => $data->initial_balance ?? 0,
                 'creator_id'    => auth()->id()
             ]
         );
