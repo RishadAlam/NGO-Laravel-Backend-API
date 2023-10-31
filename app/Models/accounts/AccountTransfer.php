@@ -44,7 +44,7 @@ class AccountTransfer extends Model
      *
      * @return response()
      */
-    public function TXAccount()
+    public function TxAccount()
     {
         return $this->belongsTo(Account::class, 'tx_acc_id', 'id')->withTrashed();
     }
@@ -54,7 +54,7 @@ class AccountTransfer extends Model
      *
      * @return response()
      */
-    public function RXAccount()
+    public function RxAccount()
     {
         return $this->belongsTo(Account::class, 'rx_acc_id', 'id')->withTrashed();
     }

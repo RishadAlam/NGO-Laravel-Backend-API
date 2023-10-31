@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('tx_prev_balance');
             $table->integer('tx_balance')->storedAs('tx_prev_balance - amount');
             $table->integer('rx_prev_balance');
-            $table->integer('rx_balance')->storedAs('rx_prev_balance - amount');
+            $table->integer('rx_balance')->storedAs('rx_prev_balance + amount');
             $table->string('description');
             $table->timestamp('date')->useCurrent();
             $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
