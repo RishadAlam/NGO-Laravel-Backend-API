@@ -4,8 +4,11 @@ namespace App\Http\Controllers\accounts;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\accounts\Account;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\accounts\AccountTransfer;
+use App\Http\Requests\accounts\AccountTransferStoreRequest;
 
 class AccountTransferController extends Controller
 {
@@ -59,15 +62,48 @@ class AccountTransferController extends Controller
         }
 
 
-        return $transfers;
+        return response(
+            [
+                'success'   => true,
+                'data'      => $transfers
+            ],
+            200
+        );
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(AccountTransferStoreRequest $request)
     {
-        //
+        $data = (object) $request->validated();
+        DB::transaction(function () use ($data) {
+            AccountTransfer::create(
+                [
+                    'tx_acc_id'         => $data->tx_acc_id,
+                    'rx_acc_id'         => $data->rx_acc_id,
+                    'amount'            => $data->amount,
+                    'tx_prev_balance'   => $data->tx_prev_balance,
+                    'rx_prev_balance'   => $data->rx_prev_balance,
+                    'description'       => $data->description ?? null,
+                    'date'              => Carbon::parse($data->date),
+                    'creator_id'        => auth()->id()
+                ]
+            );
+
+            Account::find($data->tx_acc_id)
+                ->increment('total_withdrawal', $data->amount);
+            Account::find($data->rx_acc_id)
+                ->increment('total_deposit', $data->amount);
+        });
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.account_transfer.successful'),
+            ],
+            200
+        );
     }
 
     /**

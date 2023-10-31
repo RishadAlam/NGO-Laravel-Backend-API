@@ -253,4 +253,15 @@ return [
         'delete'            => 'The Withdrawal has been successfully deleted.',
         'update'            => 'The Withdrawal has been successfully updated.',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Account Transfer Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'account_transfer' => [
+        'successful'        => 'The Transfer has been successfully registered.',
+        'delete'            => 'The Transfer has been successfully deleted.',
+        'update'            => 'The Transfer has been successfully updated.',
+    ],
 ];

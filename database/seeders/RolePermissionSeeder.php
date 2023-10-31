@@ -136,6 +136,14 @@ class RolePermissionSeeder extends Seeder
                     'account_withdrawal_permanently_delete',
                 ]
             ],
+            // Account Transfer
+            [
+                'groupName'     => 'account_transfer',
+                'permissions'   => [
+                    'account_transfer_list_view',
+                    'account_transfer_registration'
+                ]
+            ],
             // Staffs
             [
                 'groupName'     => 'staff',
