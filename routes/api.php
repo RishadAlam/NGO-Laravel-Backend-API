@@ -108,6 +108,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('/fields/active', [FieldController::class, 'get_active_fields']);                                                // Get all active fields
     Route::GET('/categories/groups', [CategoryController::class, 'get_category_groups']);                                       // Get all Category Groups
     Route::GET('/accounts/active', [AccountController::class, 'get_active_accounts']);                                          // Get all Category Groups
+    Route::GET('/accounts/transactions/{account_id?}/{date_range?}', [AccountController::class, 'get_all_transactions']);                                          // Get all Category Groups
     Route::GET('/incomes/{date_range}', [IncomeController::class, 'index'])->name('incomes.index');                             // Get all income according to date range
     Route::GET('/expenses/{date_range}', [ExpenseController::class, 'index'])->name('expenses.index');                          // Get all Expense according to date range
     Route::GET('/accounts/withdrawals/{date_range}', [AccountWithdrawalController::class, 'index'])->name('withdrawal.index');  // Get all Account Withdrawal according to date range
@@ -145,7 +146,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('incomes', IncomeController::class)->except('show');
     Route::apiResource('expenses', ExpenseController::class)->except('show');
     Route::apiResource('accounts/withdrawals', AccountWithdrawalController::class)->except('show');
-    Route::apiResource('accounts/transfers', AccountTransferController::class)->except('show');
+    Route::apiResource('accounts/transfers', AccountTransferController::class)->only(['index', 'store']);
 
     /**
      * -------------------------------------------------------------------------

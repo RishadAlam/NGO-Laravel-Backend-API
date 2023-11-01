@@ -13,6 +13,15 @@ use App\Http\Requests\accounts\AccountTransferStoreRequest;
 class AccountTransferController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:account_transfer_list_view')->only('index');
+        $this->middleware('can:account_transfer_registration')->only('store');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index($date_range)
@@ -104,21 +113,5 @@ class AccountTransferController extends Controller
             ],
             200
         );
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

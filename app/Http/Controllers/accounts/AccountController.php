@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers\accounts;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\accounts\Income;
 use App\Models\accounts\Account;
+use App\Models\accounts\Expense;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\accounts\AccountChangeStatusRequest;
+use App\Models\accounts\AccountTransfer;
+use App\Models\accounts\AccountWithdrawal;
+use App\Models\accounts\AccountActionHistory;
 use App\Http\Requests\accounts\AccountStoreRequest;
 use App\Http\Requests\accounts\AccountUpdateRequest;
-use App\Models\accounts\AccountActionHistory;
+use App\Http\Requests\accounts\AccountChangeStatusRequest;
 
 class AccountController extends Controller
 {
@@ -22,12 +27,14 @@ class AccountController extends Controller
         $this->middleware('can:account_registration')->only('store');
         $this->middleware('can:account_data_update')->only(['update', 'change_status']);
         $this->middleware('can:account_soft_delete')->only('destroy');
+        $this->middleware('can:account_transaction_list_view')->only('get_all_transactions');
     }
 
     /**
      * AccountActionHistory Common Function
      */
-    private static function setActionHistory($id, $action, $histData){
+    private static function setActionHistory($id, $action, $histData)
+    {
         return [
             "account_id"        => $id,
             "author_id"         => auth()->id(),
@@ -171,5 +178,161 @@ class AccountController extends Controller
             ],
             200
         );
+    }
+
+    /**
+     * Get all transaction lists
+     */
+    public function get_all_transactions($account_id = null, $date_range = null)
+    {
+        if ($date_range) {
+            $date_range = json_decode($date_range);
+            $start_date = Carbon::parse($date_range[0])->startOfDay();
+            $end_date   = Carbon::parse($date_range[1])->endOfDay();
+        } else {
+            $start_date = Carbon::now()->startOfMonth();
+            $end_date   = Carbon::now()->endOfDay();
+        }
+
+        $incomes = Income::with('Account:id,name,is_default')
+            ->with('Author:id,name')
+            ->whereBetween('date', [$start_date, $end_date])
+            ->when($account_id, function ($query) use ($account_id) {
+                $query->where('account_id', $account_id);
+            })
+            ->select(
+                'id',
+                DB::raw("'income' as type"),
+                'account_id',
+                'amount',
+                'previous_balance',
+                'balance',
+                'description',
+                'date',
+                'creator_id'
+            );
+
+        $expenses = Expense::with('Account:id,name,is_default')
+            ->with('Author:id,name')
+            ->whereBetween('date', [$start_date, $end_date])
+            ->when($account_id, function ($query) use ($account_id) {
+                $query->where('account_id', $account_id);
+            })
+            ->select(
+                'id',
+                DB::raw("'expense' as type"),
+                'account_id',
+                'amount',
+                'previous_balance',
+                'balance',
+                'description',
+                'date',
+                'creator_id'
+            );
+
+        $withdrawals = AccountWithdrawal::with('Account:id,name,is_default')
+            ->with('Author:id,name')
+            ->whereBetween('date', [$start_date, $end_date])
+            ->when($account_id, function ($query) use ($account_id) {
+                $query->where('account_id', $account_id);
+            })
+            ->select(
+                'id',
+                DB::raw("'withdrawal' as type"),
+                'account_id',
+                'amount',
+                'previous_balance',
+                'balance',
+                'description',
+                'date',
+                'creator_id'
+            );
+
+        $transfers = AccountTransfer::with('Author:id,name')
+            ->with('TxAccount:id,name')
+            ->with('RxAccount:id,name')
+            ->whereBetween('date', [$start_date, $end_date])
+            ->when($account_id, function ($query) use ($account_id) {
+                $query->where('tx_acc_id', $account_id)
+                    ->orWhere('rx_acc_id', $account_id);
+            })
+            ->get();
+
+        $send_money     = [];
+        $received_money = [];
+        foreach ($transfers as $transfer) {
+            if ($account_id) {
+                if ($account_id == $transfer->tx_acc_id) {
+                    $send_money[] = self::set_send_money_transaction($transfer);
+                }
+                if ($account_id == $transfer->rx_acc_id) {
+                    $received_money[] = self::set_received_money_transaction($transfer);
+                }
+            } else {
+                $send_money[]       = self::set_send_money_transaction($transfer);
+                $received_money[]   = self::set_received_money_transaction($transfer);
+            }
+        }
+
+        $transactions = $incomes
+            ->unionAll($expenses)
+            ->unionAll($withdrawals)
+            ->orderBy('date', 'DESC')
+            ->get();
+
+        $send_money     = collect($send_money);
+        $received_money = collect($received_money);
+        $transactions   = collect($transactions)
+            ->merge($send_money)
+            ->merge($received_money)
+            ->SortByDesc('date');
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $transactions
+            ],
+            200
+        );
+    }
+
+    /**
+     * Set Send money transaction data object
+     */
+    private static function set_send_money_transaction($transfer)
+    {
+        return (object) [
+            'id'                => $transfer->id,
+            'type'              => 'send_money',
+            'account_id'        => $transfer->tx_acc_id,
+            'amount'            => $transfer->amount,
+            'previous_balance'  => $transfer->tx_prev_balance,
+            'balance'           => $transfer->tx_balance,
+            'description'       => $transfer->description,
+            'date'              => $transfer->date,
+            'creator_id'        => $transfer->creator_id,
+            'account'           => $transfer->TxAccount,
+            'author'            => $transfer->author,
+        ];
+    }
+
+    /**
+     * Set Received money transaction data object
+     */
+    private static function set_received_money_transaction($transfer)
+    {
+        return (object) [
+            'id'                => $transfer->id,
+            'type'              => 'received_money',
+            'account_id'        => $transfer->rx_acc_id,
+            'amount'            => $transfer->amount,
+            'previous_balance'  => $transfer->rx_prev_balance,
+            'balance'           => $transfer->rx_balance,
+            'description'       => $transfer->description,
+            'date'              => $transfer->date,
+            'creator_id'        => $transfer->creator_id,
+            'account'           => $transfer->RxAccount,
+            'author'            => $transfer->author,
+        ];
     }
 }

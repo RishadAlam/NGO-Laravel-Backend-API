@@ -78,6 +78,7 @@ class RolePermissionSeeder extends Seeder
                     'account_soft_delete',
                     'account_action_history',
                     'account_permanently_delete',
+                    'account_transaction_list_view',
                 ]
             ],
             // Income
