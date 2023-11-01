@@ -183,7 +183,7 @@ class AccountController extends Controller
     /**
      * Get all transaction lists
      */
-    public function get_all_transactions($account_id = null, $date_range = null)
+    public function get_all_transactions($date_range = null, $account_id = null)
     {
         if ($date_range) {
             $date_range = json_decode($date_range);
@@ -209,7 +209,8 @@ class AccountController extends Controller
                 'balance',
                 'description',
                 'date',
-                'creator_id'
+                'creator_id',
+                'created_at'
             );
 
         $expenses = Expense::with('Account:id,name,is_default')
@@ -227,7 +228,8 @@ class AccountController extends Controller
                 'balance',
                 'description',
                 'date',
-                'creator_id'
+                'creator_id',
+                'created_at'
             );
 
         $withdrawals = AccountWithdrawal::with('Account:id,name,is_default')
@@ -245,7 +247,8 @@ class AccountController extends Controller
                 'balance',
                 'description',
                 'date',
-                'creator_id'
+                'creator_id',
+                'created_at'
             );
 
         $transfers = AccountTransfer::with('Author:id,name')
@@ -280,12 +283,13 @@ class AccountController extends Controller
             ->orderBy('date', 'DESC')
             ->get();
 
-        $send_money     = collect($send_money);
-        $received_money = collect($received_money);
-        $transactions   = collect($transactions)
+        $transactions = collect($transactions)
             ->merge($send_money)
             ->merge($received_money)
-            ->SortByDesc('date');
+            ->sortByDesc('date')
+            ->values()
+            ->all();
+
 
         return response(
             [
@@ -311,6 +315,7 @@ class AccountController extends Controller
             'description'       => $transfer->description,
             'date'              => $transfer->date,
             'creator_id'        => $transfer->creator_id,
+            'created_at'        => $transfer->created_at,
             'account'           => $transfer->TxAccount,
             'author'            => $transfer->author,
         ];
@@ -331,6 +336,7 @@ class AccountController extends Controller
             'description'       => $transfer->description,
             'date'              => $transfer->date,
             'creator_id'        => $transfer->creator_id,
+            'created_at'        => $transfer->created_at,
             'account'           => $transfer->RxAccount,
             'author'            => $transfer->author,
         ];
