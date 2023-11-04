@@ -118,12 +118,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('/incomes/categories/active', [IncomeCategoryController::class, 'get_active_categories'])->name('accounts.incomes.categories.active');
         Route::GET('/expenses/categories/active', [ExpenseCategoryController::class, 'get_active_categories'])->name('accounts.expenses.categories.active');
 
-        // Index Route with Date Range Parameter
-        Route::GET('/withdrawals/{date_range}', [AccountWithdrawalController::class, 'index'])->name('accounts.withdrawal.index');  // Get all Account Withdrawal according to date range
-        Route::GET('/transfers/{date_range}', [AccountTransferController::class, 'index'])->name('accounts.transfer.index');        // Get all Account Transfer according to date range
-        Route::GET('/incomes/{date_range}', [IncomeController::class, 'index'])->name('accounts.incomes.index');                             // Get all income according to date range
-        Route::GET('/expenses/{date_range}', [ExpenseController::class, 'index'])->name('accounts.expenses.index');                          // Get all Expense according to date range
-        Route::GET('/transactions/{date_range?}/{account_id?}', [AccountController::class, 'get_all_transactions']);                                          // Get all Category Groups
+        // Get Account transaction
+        Route::GET('/transactions/{account_id?}', [AccountController::class, 'get_all_transactions']);
     });
 
     // Change Status Routes
@@ -132,6 +128,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::PUT('/centers/change-status/{id}', [CenterController::class, 'change_status'])->name('centers.changeStatus');
     Route::PUT('/categories/change-status/{id}', [CategoryController::class, 'change_status'])->name('categories.changeStatus');
 
+    // Accounts
     Route::prefix('accounts')->name('accounts.')->group(function () {
         Route::PUT('/change-status/{id}', [AccountController::class, 'change_status'])->name('accounts.changeStatus');
         Route::PUT('/incomes/categories/change-status/{id}', [IncomeCategoryController::class, 'change_status'])->name('accounts.incomes.changeStatus');

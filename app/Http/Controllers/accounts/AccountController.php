@@ -183,10 +183,10 @@ class AccountController extends Controller
     /**
      * Get all transaction lists
      */
-    public function get_all_transactions($date_range = null, $account_id = null)
+    public function get_all_transactions($account_id = null)
     {
-        if ($date_range) {
-            $date_range = json_decode($date_range);
+        if (request('date_range')) {
+            $date_range = json_decode(request('date_range'));
             $start_date = Carbon::parse($date_range[0])->startOfDay();
             $end_date   = Carbon::parse($date_range[1])->endOfDay();
         } else {

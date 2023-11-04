@@ -43,11 +43,16 @@ class AccountWithdrawalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($date_range)
+    public function index()
     {
-        $date_range = json_decode($date_range);
-        $start_date = Carbon::parse($date_range[0])->startOfDay();
-        $end_date   = Carbon::parse($date_range[1])->endOfDay();
+        if (request('date_range')) {
+            $date_range = json_decode(request('date_range'));
+            $start_date = Carbon::parse($date_range[0])->startOfDay();
+            $end_date   = Carbon::parse($date_range[1])->endOfDay();
+        } else {
+            $start_date = Carbon::now()->startOfMonth();
+            $end_date   = Carbon::now()->endOfDay();
+        }
 
         $withdrawals = AccountWithdrawal::with('Account:id,name,is_default')
             ->with('Author:id,name')
