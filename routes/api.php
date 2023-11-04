@@ -156,19 +156,19 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     // Accounts Routes
     Route::prefix('accounts')->name('accounts.')->group(function () {
-        Route::apiResource('/', AccountController::class)->except('show');
+        Route::apiResource('/', AccountController::class)->except('show')->parameter('', 'account');
         Route::apiResource('withdrawals', AccountWithdrawalController::class)->except('show');
         Route::apiResource('transfers', AccountTransferController::class)->only(['index', 'store']);
 
         // Income Routes
         Route::prefix('incomes')->name('incomes.')->group(function () {
-            Route::apiResource('/', IncomeController::class)->except('show');
+            Route::apiResource('/', IncomeController::class)->except('show')->parameter('', 'income');
             Route::apiResource('categories', IncomeCategoryController::class)->except('show');
         });
 
         // Income Routes
         Route::prefix('expenses')->name('expenses.')->group(function () {
-            Route::apiResource('/', ExpenseController::class)->except('show');
+            Route::apiResource('/', ExpenseController::class)->except('show')->parameter('', 'expense');
             Route::apiResource('categories', ExpenseCategoryController::class)->except('show');
         });
     });
