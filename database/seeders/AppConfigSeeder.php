@@ -61,9 +61,13 @@ class AppConfigSeeder extends Seeder
                 "meta_key"      => "money_exchange_transaction_fee",
                 "meta_value"    => json_encode([
                     "saving_to_saving"              => 0,
+                    "s_to_s_fee_store_acc_id"       => 1,
                     "saving_to_loan_saving"         => 0,
+                    "s_to_l_fee_store_acc_id"       => 1,
                     "loan_saving_to_loan_saving"    => 0,
+                    "ls_to_ls_fee_store_acc_id"     => 1,
                     "loan_saving_to_saving"         => 0,
+                    "ls_to_s_fee_store_acc_id"      => 1,
                 ])
             ], [
                 "meta_key"      => "money_exchange_transaction_limit",
