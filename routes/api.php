@@ -183,6 +183,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('/approvals-config', 'get_all_approvals');
         Route::PUT('/app-settings-update', 'app_settings_update');
         Route::PUT('/approvals-config-update', 'approvals_update');
+        Route::PUT('/transfer-transaction-config-update', 'transfer_transaction_update');
     });
     Route::controller(CategoryConfigController::class)->group(function () {
         Route::GET('/categories-config', 'get_all_categories_config');

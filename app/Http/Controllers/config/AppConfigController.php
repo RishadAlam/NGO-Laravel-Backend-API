@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\appConfig\ApprovalsRequest;
 use App\Http\Requests\appConfig\AppSettingsRequest;
+use App\Http\Requests\appConfig\TransferTransactionUpdateRequest;
 
 class AppConfigController extends Controller
 {
@@ -55,6 +56,7 @@ class AppConfigController extends Controller
             'saving_account_closing_approval',
             'loan_account_registration_approval',
             'loan_account_closing_approval',
+            'money_transfer_transaction',
         ])->get(['id', 'meta_key', 'meta_value']);
 
         return response(
@@ -139,6 +141,41 @@ class AppConfigController extends Controller
             [
                 'success'   => true,
                 'message'   => __('customValidations.app_config.approval_configuration_update')
+            ],
+            200
+        );
+    }
+
+    /**
+     * App Setting Update Update
+     *
+     * @param App\Http\Requests\appConfig\TransferTransactionUpdateRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function transfer_transaction_update(TransferTransactionUpdateRequest $request)
+    {
+        $data = (object) $request->validated();
+        $new_data = [];
+        foreach ($data->transferConfigs as $key => $config) {
+            $config = (object) $config;
+            $new_data[$key] = [
+                "fee"               => $config->fee,
+                "fee_store_acc_id"  => $config->fee_store_acc_id,
+                "min"               => $config->min,
+                "max"               => $config->max,
+            ];
+        }
+        AppConfig::where('meta_key', 'money_transfer_transaction')
+            ->update(
+                [
+                    'meta_value'  => json_encode($new_data),
+                ]
+            );
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.app_config.transfer_transaction_update')
             ],
             200
         );

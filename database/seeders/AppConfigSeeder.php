@@ -21,7 +21,7 @@ class AppConfigSeeder extends Seeder
                     "company_short_name"    => "Jonokollan",
                     "company_address"       => "",
                     "company_logo"          => "logo_1695993860.png",
-                    "company_logo_uri"      => "http:\/\/127.0.0.1:8000\/storage\/config\/\/logo_1695993860.png",
+                    "company_logo_uri"      => "http:\/\/127.0.0.1:8000\/storage\/config\/logo_1699030624.png",
                 ])
             ], [
                 "meta_key"      => "collection_time",
@@ -58,24 +58,32 @@ class AppConfigSeeder extends Seeder
                 "meta_key"      => "loan_account_closing_approval",
                 "meta_value"    => json_encode(true)
             ], [
-                "meta_key"      => "money_exchange_transaction_fee",
+                "meta_key"      => "money_transfer_transaction",
                 "meta_value"    => json_encode([
-                    "saving_to_saving"              => 0,
-                    "s_to_s_fee_store_acc_id"       => 1,
-                    "saving_to_loan_saving"         => 0,
-                    "s_to_l_fee_store_acc_id"       => 1,
-                    "loan_saving_to_loan_saving"    => 0,
-                    "ls_to_ls_fee_store_acc_id"     => 1,
-                    "loan_saving_to_saving"         => 0,
-                    "ls_to_s_fee_store_acc_id"      => 1,
-                ])
-            ], [
-                "meta_key"      => "money_exchange_transaction_limit",
-                "meta_value"    => json_encode([
-                    "saving_to_saving"              => ["min" => 0, "max" => 0],
-                    "saving_to_loan_saving"         => ["min" => 0, "max" => 0],
-                    "loan_saving_to_loan_saving"    => ["min" => 0, "max" => 0],
-                    "loan_saving_to_saving"         => ["min" => 0, "max" => 0],
+                    "saving_to_saving"              => [
+                        "fee"                       => 0,
+                        "fee_store_acc_id"          => 1,
+                        "min"                       => 0,
+                        "max"                       => 0,
+                    ],
+                    "saving_to_loan_saving"         => [
+                        "fee"                       => 0,
+                        "fee_store_acc_id"          => 1,
+                        "min"                       => 0,
+                        "max"                       => 0,
+                    ],
+                    "loan_saving_to_loan_saving"    => [
+                        "fee"                       => 0,
+                        "fee_store_acc_id"          => 1,
+                        "min"                       => 0,
+                        "max"                       => 0,
+                    ],
+                    "loan_saving_to_saving"         => [
+                        "fee"                       => 0,
+                        "fee_store_acc_id"          => 1,
+                        "min"                       => 0,
+                        "max"                       => 0,
+                    ],
                 ])
             ]
         ];

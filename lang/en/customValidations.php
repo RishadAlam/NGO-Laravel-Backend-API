@@ -168,9 +168,10 @@ return [
     |--------------------------------------------------------------------------
     */
     'app_config' => [
-        'app_settings_update' => 'The app settings has been successfully updated.',
-        'approval_configuration_update' => 'The Approvals has been successfully updated.',
-        'categories_configuration_update' => 'The Categories Configuration has been successfully updated.',
+        'app_settings_update'               => 'The app settings has been successfully updated.',
+        'approval_configuration_update'     => 'The Approvals has been successfully updated.',
+        'categories_configuration_update'   => 'The Categories Configuration has been successfully updated.',
+        'transfer_transaction_update'       => 'The Transfer Transaction Configuration has been successfully updated.',
     ],
     /*
     |--------------------------------------------------------------------------

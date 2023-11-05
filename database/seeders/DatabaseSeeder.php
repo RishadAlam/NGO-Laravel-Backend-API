@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             [
                 // UserSeeder::class,
                 // RolePermissionSeeder::class,
-                // AppConfigSeeder::class,
+                AppConfigSeeder::class,
                 // FieldSeeder::class,
                 // CenterSeeder::class,
                 // CategorySeeder::class,
@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
                 // ExpenseCategorySeeder::class,
                 // IncomeSeeder::class,
                 // ExpenseSeeder::class,
-                AccountWithdrawalSeeder::class
+                // AccountWithdrawalSeeder::class
             ]
         );
     }
