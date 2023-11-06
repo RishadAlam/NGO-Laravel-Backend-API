@@ -40,6 +40,12 @@ class CategoryConfigController extends Controller
             CategoryConfig::find($config->id)
                 ->update(
                     [
+                        's_reg_fee_acc_id'                          => $config->s_reg_fee_acc_id,
+                        's_col_fee_acc_id'                          => $config->s_col_fee_acc_id,
+                        'l_reg_fee_acc_id'                          => $config->l_reg_fee_acc_id,
+                        'l_col_fee_acc_id'                          => $config->l_col_fee_acc_id,
+                        's_with_fee_acc_id'                         => $config->s_with_fee_acc_id,
+                        'ls_with_fee_acc_id'                        => $config->ls_with_fee_acc_id,
                         'saving_acc_reg_fee'                        => $config->saving_acc_reg_fee,
                         'saving_acc_closing_fee'                    => $config->saving_acc_closing_fee,
                         'loan_acc_reg_fee'                          => $config->loan_acc_reg_fee,

@@ -17,6 +17,12 @@ class CategoryConfig extends Model
      */
     protected $fillable = [
         'category_id',
+        's_reg_fee_acc_id',
+        's_col_fee_acc_id',
+        'l_reg_fee_acc_id',
+        'l_col_fee_acc_id',
+        's_with_fee_acc_id',
+        'ls_with_fee_acc_id',
         'saving_acc_reg_fee',
         'saving_acc_closing_fee',
         'loan_acc_reg_fee',
