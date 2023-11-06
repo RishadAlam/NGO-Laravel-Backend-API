@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('category_configs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
-            $table->foreignId('s_reg_fee_store_acc_id')->constrained('accounts', 'id')->default(1)->nullOnDelete();
-            $table->foreignId('s_col_fee_store_acc_id')->constrained('accounts', 'id')->default(1)->nullOnDelete();
-            $table->foreignId('l_reg_fee_store_acc_id')->constrained('accounts', 'id')->default(1)->nullOnDelete();
-            $table->foreignId('l_col_fee_store_acc_id')->constrained('accounts', 'id')->default(1)->nullOnDelete();
-            $table->foreignId('s_with_fee_store_acc_id')->constrained('accounts', 'id')->default(1)->nullOnDelete();
-            $table->foreignId('ls_with_fee_store_acc_id')->constrained('accounts', 'id')->default(1)->nullOnDelete();
+            $table->foreignId('s_reg_fee_acc_id')->nullable()->default(1)->constrained('accounts', 'id')->nullOnDelete()->comment('Fees Received Account');
+            $table->foreignId('s_col_fee_acc_id')->nullable()->default(1)->constrained('accounts', 'id')->nullOnDelete()->comment('Fees Received Account');
+            $table->foreignId('l_reg_fee_acc_id')->nullable()->default(1)->constrained('accounts', 'id')->nullOnDelete()->comment('Fees Received Account');
+            $table->foreignId('l_col_fee_acc_id')->nullable()->default(1)->constrained('accounts', 'id')->nullOnDelete()->comment('Fees Received Account');
+            $table->foreignId('s_with_fee_acc_id')->nullable()->default(1)->constrained('accounts', 'id')->nullOnDelete()->comment('Fees Received Account');
+            $table->foreignId('ls_with_fee_acc_id')->nullable()->default(1)->constrained('accounts', 'id')->nullOnDelete()->comment('Fees Received Account');
             $table->smallInteger('saving_acc_reg_fee')->default(0);
             $table->smallInteger('saving_acc_closing_fee')->default(0);
             $table->smallInteger('loan_acc_reg_fee')->default(0);

@@ -16,10 +16,10 @@ class DatabaseSeeder extends Seeder
             [
                 // UserSeeder::class,
                 // RolePermissionSeeder::class,
-                AppConfigSeeder::class,
+                // AppConfigSeeder::class,
                 // FieldSeeder::class,
                 // CenterSeeder::class,
-                // CategorySeeder::class,
+                CategorySeeder::class,
                 // AccountSeeder::class,
                 // IncomeCategorySeeder::class,
                 // ExpenseCategorySeeder::class,
