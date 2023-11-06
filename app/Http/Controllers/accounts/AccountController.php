@@ -252,8 +252,8 @@ class AccountController extends Controller
             );
 
         $transfers = AccountTransfer::with('Author:id,name')
-            ->with('TxAccount:id,name')
-            ->with('RxAccount:id,name')
+            ->with('TxAccount:id,name,is_default')
+            ->with('RxAccount:id,name,is_default')
             ->whereBetween('date', [$start_date, $end_date])
             ->when($account_id, function ($query) use ($account_id) {
                 $query->where('tx_acc_id', $account_id)

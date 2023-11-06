@@ -36,8 +36,8 @@ class AccountTransferController extends Controller
         }
 
         $account_transfers = AccountTransfer::with('Author:id,name')
-            ->with('TxAccount:id,name')
-            ->with('RxAccount:id,name')
+            ->with('TxAccount:id,name,is_default')
+            ->with('RxAccount:id,name,is_default')
             ->whereBetween('date', [$start_date, $end_date])
             ->orderBy('date', 'DESC')
             ->orderBy('id', 'DESC')
