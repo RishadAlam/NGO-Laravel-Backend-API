@@ -19,13 +19,14 @@ class DatabaseSeeder extends Seeder
                 // AppConfigSeeder::class,
                 // FieldSeeder::class,
                 // CenterSeeder::class,
-                CategorySeeder::class,
+                // CategorySeeder::class,
                 // AccountSeeder::class,
                 // IncomeCategorySeeder::class,
                 // ExpenseCategorySeeder::class,
                 // IncomeSeeder::class,
                 // ExpenseSeeder::class,
-                // AccountWithdrawalSeeder::class
+                // AccountWithdrawalSeeder::class,
+                ClientRegistrationSeeder::class
             ]
         );
     }
