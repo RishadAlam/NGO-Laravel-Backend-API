@@ -21,6 +21,7 @@ use App\Http\Controllers\accounts\IncomeCategoryController;
 use App\Http\Controllers\accounts\AccountTransferController;
 use App\Http\Controllers\accounts\ExpenseCategoryController;
 use App\Http\Controllers\accounts\AccountWithdrawalController;
+use App\Http\Controllers\client\ClientRegistrationController;
 
 /**
  * ------------------------------------------------------------------------
@@ -168,6 +169,11 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
             Route::apiResource('/', ExpenseController::class)->except('show')->parameter('', 'expense');
             Route::apiResource('categories', ExpenseCategoryController::class)->except('show');
         });
+    });
+
+    // Client Routes
+    Route::prefix('client/registration')->name('client.registration.')->group(function () {
+        Route::apiResource('/', ClientRegistrationController::class)->except('show')->parameter('', 'registration');
     });
 
     /**
