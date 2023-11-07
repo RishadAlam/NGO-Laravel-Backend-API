@@ -155,7 +155,7 @@ class UserController extends Controller
 
         if ($staff->roles[0]->id !== $staffData->role) {
             $role       = Role::find($staffData->role, ['id', 'name']);
-            $histData[] = "<p class='text-danger'>{$staff->roles[0]->name}</p><p class='text-success'>{$role->name}</p>";
+            $histData['role'] = "<p class='text-danger'>{$staff->roles[0]->name}</p><p class='text-success'>{$role->name}</p>";
         }
 
         DB::transaction(function () use ($id, $staffData, $staff, $histData) {
@@ -164,6 +164,11 @@ class UserController extends Controller
                 'email' => $staffData->email,
                 'phone' => $staffData->phone
             ]);
+
+            if(isset($staffData->password)){
+                $histData['password'] = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
+                $staff->update(['password'  => bcrypt($staffData->password)]);
+            }
 
             if (isset($staff->roles[0]->id)) {
                 if ($staffData->role !== $staff->roles[0]->id) {

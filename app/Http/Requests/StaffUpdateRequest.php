@@ -22,10 +22,19 @@ class StaffUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'  => 'required|string|max:100',
-            'email' => 'required|email',
-            "phone" => 'nullable|phone:BD',
-            'role'  => 'required|integer'
+            'name'      => 'required|string|max:100',
+            'email'     => 'required|email',
+            'password'  => [
+                'nullable',
+                'min:8',
+                'regex:/[a-z]/',      // must contain at least one lowercase letter
+                'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                'regex:/[0-9]/',      // must contain at least one digit
+                'regex:/[@$!%*#?&]/', // must contain at least one special character
+            ],
+            'confirm_password'  => 'nullable|same:password',
+            "phone"             => 'nullable|phone:BD',
+            'role'              => 'required|integer'
         ];
     }
 }
