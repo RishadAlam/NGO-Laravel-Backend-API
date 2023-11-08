@@ -160,4 +160,21 @@ class CenterController extends Controller
             200
         );
     }
+
+    /**
+     * Get all active centers
+     */
+    public function get_active_centers()
+    {
+        $fields = Center::where('status', true)
+            ->get(['id', 'name']);
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $fields
+            ],
+            200
+        );
+    }
 }

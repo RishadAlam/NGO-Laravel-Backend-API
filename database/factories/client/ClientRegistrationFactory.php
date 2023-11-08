@@ -25,8 +25,8 @@ class ClientRegistrationFactory extends Factory
         $present_address    = (object) [
             'street_address'    => fake()->streetAddress(),
             'city'              => fake()->city(),
-            'postal_office'     => fake()->streetName(),
-            'postal_code'       => fake()->buildingNumber(),
+            'post_office'     => fake()->streetName(),
+            'post_code'       => fake()->buildingNumber(),
             'police_station'    => fake()->buildingNumber(),
             'state'             => fake()->state(),
             'division'          => fake()->state(),
@@ -34,8 +34,8 @@ class ClientRegistrationFactory extends Factory
         $permanent_address  = (object) [
             'street_address'    => fake()->streetAddress(),
             'city'              => fake()->city(),
-            'postal_office'     => fake()->streetName(),
-            'postal_code'       => fake()->buildingNumber(),
+            'post_office'     => fake()->streetName(),
+            'post_code'       => fake()->buildingNumber(),
             'police_station'    => fake()->buildingNumber(),
             'state'             => fake()->state(),
             'division'          => fake()->state(),

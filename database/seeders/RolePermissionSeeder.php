@@ -68,6 +68,14 @@ class RolePermissionSeeder extends Seeder
                     'category_permanently_delete',
                 ]
             ],
+            // Registration
+            [
+                'groupName'     => 'registration',
+                'permissions'   => [
+                    'client_registration',
+                    'client_registration_officer_selection',
+                ]
+            ],
             // Account
             [
                 'groupName'     => 'account_management',

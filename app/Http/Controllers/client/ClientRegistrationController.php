@@ -194,4 +194,20 @@ class ClientRegistrationController extends Controller
             200
         );
     }
+
+    /**
+     * Get all Occupations
+     */
+    public function get_client_occupations()
+    {
+        $occupations = ClientRegistration::distinct('occupation')->orderBy('occupation', 'asc')->pluck('occupation');
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $occupations
+            ],
+            200
+        );
+    }
 }

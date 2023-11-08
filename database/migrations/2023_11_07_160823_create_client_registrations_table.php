@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('field_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('center_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
-            $table->string('acc_no', 50);
+            $table->string('acc_no', 50)->unique();
             $table->string('name');
             $table->string('father_name')->nullable();
             $table->string('husband_name')->nullable();
             $table->string('mother_name');
-            $table->string('nid', 50);
+            $table->string('nid', 50)->unique();
             $table->date('dob');
             $table->string('occupation');
             $table->enum('religion', ['islam', 'hindu', 'christian', 'buddha', 'others']);
