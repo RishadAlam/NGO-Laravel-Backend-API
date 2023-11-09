@@ -52,7 +52,7 @@ class ClientRegistrationFactory extends Factory
             'nid'               => fake()->numberBetween(1000000000000, 9999999999999),
             'dob'               => fake()->date,
             'occupation'        => fake()->text(10),
-            'religion'          => fake()->randomElement(['islam', 'hindu', 'christian', 'buddha', 'others']),
+            'religion'          => fake()->randomElement(['islam', 'hindu', 'christian', 'Buddhist', 'others']),
             'gender'            => fake()->randomElement(['male', 'female', 'others']),
             'primary_phone'     => fake()->phoneNumber(),
             'secondary_phone'   => fake()->phoneNumber(),

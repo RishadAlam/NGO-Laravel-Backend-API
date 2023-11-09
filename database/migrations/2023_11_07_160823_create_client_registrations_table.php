@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('nid', 50)->unique();
             $table->date('dob');
             $table->string('occupation');
-            $table->enum('religion', ['islam', 'hindu', 'christian', 'buddha', 'others']);
+            $table->enum('religion', ['islam', 'hindu', 'christian', 'Buddhist', 'others']);
             $table->enum('gender', ['male', 'female', 'others']);
             $table->string('primary_phone', 20);
             $table->string('secondary_phone', 20)->nullable();
