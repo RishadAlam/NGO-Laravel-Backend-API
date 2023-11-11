@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\client\ClientRegistration;
 use App\Http\Requests\client\ClientRegistrationStoreRequest;
 use App\Http\Requests\client\ClientRegistrationUpdateRequest;
+use App\Models\AppConfig;
 use App\Models\client\ClientRegistrationActionHistory;
 use Carbon\Carbon;
 
@@ -61,6 +62,8 @@ class ClientRegistrationController extends Controller
         $extension  = $data->image->extension();
         $imgName    = 'client_' . time() . '.' . $extension;
         $data->image->move(public_path() . '/storage/client/', $imgName);
+        $is_approved = AppConfig::where('meta_key', 'client_registration_approval')
+            ->value('meta_value');
 
         ClientRegistration::create(
             [
@@ -80,9 +83,13 @@ class ClientRegistrationController extends Controller
                 'secondary_phone'   => $data->secondary_phone,
                 'image'             => $imgName,
                 'image_uri'         => URL::to('/storage/client/', $imgName),
+                'annual_income'     => $data->annual_income ?? null,
+                'bank_acc_no'       => $data->bank_acc_no ?? null,
+                'bank_check_no'     => $data->bank_check_no ?? null,
                 'share'             => $data->share,
                 'present_address'   => $data->present_address,
                 'permanent_address' => $data->permanent_address,
+                'is_approved'       => $is_approved,
                 'creator_id'        => auth()->id()
             ]
         );

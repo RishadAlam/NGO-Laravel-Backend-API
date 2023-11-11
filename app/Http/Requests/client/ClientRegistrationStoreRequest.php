@@ -24,7 +24,7 @@ class ClientRegistrationStoreRequest extends FormRequest
         return [
             'field_id'          => "required",
             'center_id'         => "required",
-            'acc_no'            => "required",
+            'acc_no'            => "required|unique:client_registrations,acc_no",
             'name'              => "required",
             'father_name'       => "required_if:husband_name,''",
             'husband_name'      => "required_if:father_name,''",
@@ -38,6 +38,9 @@ class ClientRegistrationStoreRequest extends FormRequest
             'secondary_phone'   => "nullable|phone:BD",
             'image'             => "required|mimes:jpeg,png,jpg,webp|max:5120",
             'share'             => "required|integer",
+            'annual_income'     => "nullable",
+            'bank_acc_no'       => "nullable",
+            'bank_check_no'     => "nullable",
             'present_address'   => "required|json",
             'permanent_address' => "required|json"
         ];

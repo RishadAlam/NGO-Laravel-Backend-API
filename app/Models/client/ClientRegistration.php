@@ -35,8 +35,12 @@ class ClientRegistration extends Model
         'image',
         'image_uri',
         'share',
+        'annual_income',
+        'bank_acc_no',
+        'bank_check_no',
         'present_address',
         'permanent_address',
+        'is_approved',
         'creator_id',
     ];
 
