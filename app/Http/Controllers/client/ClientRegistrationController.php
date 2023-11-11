@@ -10,6 +10,7 @@ use App\Models\client\ClientRegistration;
 use App\Http\Requests\client\ClientRegistrationStoreRequest;
 use App\Http\Requests\client\ClientRegistrationUpdateRequest;
 use App\Models\client\ClientRegistrationActionHistory;
+use Carbon\Carbon;
 
 class ClientRegistrationController extends Controller
 {
@@ -71,7 +72,7 @@ class ClientRegistrationController extends Controller
                 'husband_name'      => $data->husband_name,
                 'mother_name'       => $data->mother_name,
                 'nid'               => $data->nid,
-                'dob'               => $data->dob,
+                'dob'               => date('y-m-d', strtotime($data->dob)),
                 'occupation'        => $data->occupation,
                 'religion'          => $data->religion,
                 'gender'            => $data->gender,
