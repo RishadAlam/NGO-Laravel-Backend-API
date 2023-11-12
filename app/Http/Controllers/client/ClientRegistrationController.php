@@ -59,11 +59,25 @@ class ClientRegistrationController extends Controller
     public function store(ClientRegistrationStoreRequest $request)
     {
         $data       = (object) $request->validated();
+        $sign       = null;
+        $sign_uri   = null;
+        $is_approved = AppConfig::where('meta_key', 'client_registration_approval')
+            ->value('meta_value');
+
         $extension  = $data->image->extension();
         $imgName    = 'client_' . time() . '.' . $extension;
         $data->image->move(public_path() . '/storage/client/', $imgName);
-        $is_approved = AppConfig::where('meta_key', 'client_registration_approval')
-            ->value('meta_value');
+
+        if (!empty($data->signature)) {
+            $folderPath     = public_path() . '/storage/client/';
+            $image_parts    = explode(";base64,", $data->signature);
+            $image_type_aux = explode("image/", $image_parts[0]);
+            $image_type     = $image_type_aux[1];
+            $image_base64   = base64_decode($image_parts[1]);
+            $sign           = 'client_signature_' . time() . '.' . $image_type;
+            file_put_contents($folderPath . $sign, $image_base64);
+            $sign_uri       = URL::to('/storage/client/', $sign);
+        }
 
         ClientRegistration::create(
             [
@@ -83,6 +97,8 @@ class ClientRegistrationController extends Controller
                 'secondary_phone'   => $data->secondary_phone,
                 'image'             => $imgName,
                 'image_uri'         => URL::to('/storage/client/', $imgName),
+                'signature'         => $sign,
+                'signature_uri'     => $sign_uri,
                 'annual_income'     => $data->annual_income ?? null,
                 'bank_acc_no'       => $data->bank_acc_no ?? null,
                 'bank_check_no'     => $data->bank_check_no ?? null,

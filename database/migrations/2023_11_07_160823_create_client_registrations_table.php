@@ -29,6 +29,8 @@ return new class extends Migration
             $table->string('secondary_phone', 20)->nullable();
             $table->string('image')->nullable();
             $table->string('image_uri');
+            $table->string('signature')->nullable();
+            $table->string('signature_uri')->nullable();
             $table->string('annual_income', 50)->nullable();
             $table->string('bank_acc_no', 50)->nullable();
             $table->string('bank_check_no', 50)->nullable();

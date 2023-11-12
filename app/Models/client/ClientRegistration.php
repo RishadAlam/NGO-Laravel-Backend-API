@@ -34,6 +34,8 @@ class ClientRegistration extends Model
         'secondary_phone',
         'image',
         'image_uri',
+        'signature',
+        'signature_uri',
         'share',
         'annual_income',
         'bank_acc_no',
