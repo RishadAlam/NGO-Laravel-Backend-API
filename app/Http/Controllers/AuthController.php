@@ -212,10 +212,16 @@ class AuthController extends Controller
             $otpResponse = self::createOTP($user->id);
             self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
 
-            return $this->create_validation_error_response(
-                'message',
-                __('customValidations.otp.otpSent'),
-                '202'
+            return response(
+                [
+                    'success'   => false,
+                    "errors"    => [
+                        'message'   => __('customValidations.otp.otpSent'),
+                    ],
+                    "otp_sended"    => true,
+                    'user_id'       => $user->id
+                ],
+                202
             );
         } elseif ($user && !$user->status) {
             return $this->create_validation_error_response(
@@ -237,7 +243,7 @@ class AuthController extends Controller
             );
         }
 
-        $user   = auth::user();
+        $user   = Auth::user();
         $token  = $user->createToken('auth_token')->plainTextToken;
         return response(
             [
