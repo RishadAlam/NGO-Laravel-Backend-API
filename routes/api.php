@@ -73,6 +73,10 @@ Route::group(['middleware' => 'LangCheck'], function () {
         Route::POST('/account-verification', 'otp_verification');
         Route::PUT('/reset-password', 'reset_password');
     });
+    Route::controller(AppConfigController::class)->group(function () {
+        Route::GET('/app-settings', 'index');
+        Route::GET('/approvals-config', 'get_all_approvals');
+    });
 });
 
 
@@ -187,8 +191,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      */
     // App Config Routes
     Route::controller(AppConfigController::class)->group(function () {
-        Route::GET('/app-settings', 'index');
-        Route::GET('/approvals-config', 'get_all_approvals');
         Route::PUT('/app-settings-update', 'app_settings_update');
         Route::PUT('/approvals-config-update', 'approvals_update');
         Route::PUT('/transfer-transaction-config-update', 'transfer_transaction_update');

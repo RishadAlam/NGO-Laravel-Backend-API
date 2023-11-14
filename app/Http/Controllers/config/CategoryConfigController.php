@@ -14,7 +14,7 @@ class CategoryConfigController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:categories_config')->only(['get_all_categories_config', 'config_update']);
+        $this->middleware('can:categories_config')->only('config_update');
     }
 
     /**

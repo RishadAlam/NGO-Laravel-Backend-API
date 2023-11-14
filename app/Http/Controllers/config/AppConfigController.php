@@ -17,8 +17,8 @@ class AppConfigController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:app_settings')->only(['index', 'app_settings_update']);
-        $this->middleware('can:approvals_config')->only(['get_all_approvals', 'approvals_update']);
+        $this->middleware('can:app_settings')->only('app_settings_update');
+        $this->middleware('can:approvals_config')->only('approvals_update');
     }
 
     /**
