@@ -14,15 +14,15 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(
             [
-                UserSeeder::class,
-                RolePermissionSeeder::class,
-                AppConfigSeeder::class,
+                // UserSeeder::class,
+                // RolePermissionSeeder::class,
+                // AppConfigSeeder::class,
                 // FieldSeeder::class,
                 // CenterSeeder::class,
-                // CategorySeeder::class,
+                CategorySeeder::class,
                 // AccountSeeder::class,
-                IncomeCategorySeeder::class,
-                ExpenseCategorySeeder::class,
+                // IncomeCategorySeeder::class,
+                // ExpenseCategorySeeder::class,
                 // IncomeSeeder::class,
                 // ExpenseSeeder::class,
                 // AccountWithdrawalSeeder::class,
