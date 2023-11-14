@@ -23,14 +23,16 @@ class AppConfigSeeder extends Seeder
                     "company_logo"          => "logo_1695993860.png",
                     "company_logo_uri"      => "http:\/\/127.0.0.1:8000\/storage\/config\/logo_1699030624.png",
                 ])
-            ], [
-                "meta_key"      => "collection_time",
-                "meta_value"    => json_encode([
-                    "has_collection_time_is_enabled"    => false,
-                    "collection_start_time"             => "",
-                    "collection_end_time"               => "",
-                ])
-            ], [
+            ],
+            // [
+            //     "meta_key"      => "collection_time",
+            //     "meta_value"    => json_encode([
+            //         "has_collection_time_is_enabled"    => false,
+            //         "collection_start_time"             => "",
+            //         "collection_end_time"               => "",
+            //     ])
+            // ],
+            [
                 "meta_key"      => "saving_collection_approval",
                 "meta_value"    => json_encode(true)
             ], [
@@ -56,6 +58,9 @@ class AppConfigSeeder extends Seeder
                 "meta_value"    => json_encode(true)
             ], [
                 "meta_key"      => "loan_account_closing_approval",
+                "meta_value"    => json_encode(true)
+            ], [
+                "meta_key"      => "client_reg_sign_is_required",
                 "meta_value"    => json_encode(true)
             ], [
                 "meta_key"      => "money_transfer_transaction",

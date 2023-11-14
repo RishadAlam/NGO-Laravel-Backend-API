@@ -73,7 +73,7 @@ class RolePermissionSeeder extends Seeder
                 'groupName'     => 'registration',
                 'permissions'   => [
                     'client_registration',
-                    'client_registration_officer_selection',
+                    'client_registration_approval',
                 ]
             ],
             // Account

@@ -84,7 +84,7 @@ class AuthController extends Controller
      * @param $email
      * @return boolean
      */
-    public static function sendCredentrials($name, $email, $password)
+    public static function sendCredentials($name, $email, $password)
     {
         Mail::to($email)
             ->send(
@@ -175,7 +175,7 @@ class AuthController extends Controller
             ]
         );
 
-        self::sendCredentrials($data->name, $data->email, $data->password);
+        self::sendCredentials($data->name, $data->email, $data->password);
         return $this->create_response('Registration Successful');
     }
 

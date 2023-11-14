@@ -153,7 +153,7 @@ class UserController extends Controller
         $staff->email   !== $staffData->email ?$histData['email'] = "<p class='text-danger'>{$staff->email}</p><p class='text-success'>{$staffData->email}</p>" : '';
         $staff->phone   !== $staffData->phone ?$histData['phone'] = "<p class='text-danger'>{$staff->phone}</p><p class='text-success'>{$staffData->phone}</p>" : '';
 
-        if ($staff->roles[0]->id !== $staffData->role) {
+        if (isset( $staff->roles[0]->id) && $staff->roles[0]->id !== $staffData->role) {
             $role       = Role::find($staffData->role, ['id', 'name']);
             $histData['role'] = "<p class='text-danger'>{$staff->roles[0]->name}</p><p class='text-success'>{$role->name}</p>";
         }
