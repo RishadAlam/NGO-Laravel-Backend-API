@@ -210,7 +210,8 @@ class AccountController extends Controller
                 'description',
                 'date',
                 'creator_id',
-                'created_at'
+                'created_at',
+                'updated_at'
             );
 
         $expenses = Expense::with('Account:id,name,is_default')
@@ -229,7 +230,8 @@ class AccountController extends Controller
                 'description',
                 'date',
                 'creator_id',
-                'created_at'
+                'created_at',
+                'updated_at'
             );
 
         $withdrawals = AccountWithdrawal::with('Account:id,name,is_default')
@@ -248,7 +250,8 @@ class AccountController extends Controller
                 'description',
                 'date',
                 'creator_id',
-                'created_at'
+                'created_at',
+                'updated_at'
             );
 
         $transfers = AccountTransfer::with('Author:id,name')
@@ -316,6 +319,7 @@ class AccountController extends Controller
             'date'              => $transfer->date,
             'creator_id'        => $transfer->creator_id,
             'created_at'        => $transfer->created_at,
+            'updated_at'        => $transfer->updated_at,
             'account'           => $transfer->TxAccount,
             'author'            => $transfer->author,
         ];
@@ -337,6 +341,7 @@ class AccountController extends Controller
             'date'              => $transfer->date,
             'creator_id'        => $transfer->creator_id,
             'created_at'        => $transfer->created_at,
+            'updated_at'        => $transfer->updated_at,
             'account'           => $transfer->RxAccount,
             'author'            => $transfer->author,
         ];

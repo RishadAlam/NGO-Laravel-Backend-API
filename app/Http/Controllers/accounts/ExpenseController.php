@@ -114,9 +114,10 @@ class ExpenseController extends Controller
         $data       = (object) $request->validated();
         $expense    = Expense::with('ExpenseCategory:id,name,is_default')->find($id);
         $histData   = [];
+        $date       = Carbon::parse($data->date)->setTimezone('+06:00')->toIso8601String();
         $amountDef  = $data->amount - $expense->amount;
         $oldDate    = date('d/m/Y', strtotime($expense->date));
-        $newDate    = date('d/m/Y', strtotime($data->date));
+        $newDate    = date('d/m/Y', strtotime($date));
         $oldCat     = $expense->ExpenseCategory->is_default ? __("customValidations.expense_category.default.{$expense->ExpenseCategory->name}") : $expense->ExpenseCategory->name;
         $newCat     = $data->category['is_default'] ? __("customValidations.expense_category.default.{$data->category['name']}") : $data->category['name'];
 
@@ -127,14 +128,14 @@ class ExpenseController extends Controller
         $expense->description           !== $data->description ? $histData['description'] = "<p class='text-danger'>{$expense->description}</p><p class='text-success'>{$data->description}</p>" : '';
         $expense->date                  !== $data->date ? $histData['date'] = "<p class='text-danger'>{$oldDate}</p><p class='text-success'>{$newDate}</p>" : '';
 
-        DB::transaction(function () use ($id, $data, $expense, $amountDef, $histData) {
+        DB::transaction(function () use ($id, $data, $expense, $amountDef, $histData, $date) {
             $expense->update(
                 [
                     'expense_category_id'   => $data->expense_category_id,
                     'amount'                => $data->amount,
                     'previous_balance'      => $data->previous_balance,
                     'description'           => $data->description ?? null,
-                    'date'                  => $data->date,
+                    'date'                  => $date
                 ]
             );
 

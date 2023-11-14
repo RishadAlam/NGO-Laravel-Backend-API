@@ -89,7 +89,7 @@ class ClientRegistrationController extends Controller
                 'husband_name'      => $data->husband_name,
                 'mother_name'       => $data->mother_name,
                 'nid'               => $data->nid,
-                'dob'               => date('y-m-d', strtotime($data->dob)),
+                'dob'               => date('Y-m-d', strtotime($data->dob)),
                 'occupation'        => $data->occupation,
                 'religion'          => $data->religion,
                 'gender'            => $data->gender,

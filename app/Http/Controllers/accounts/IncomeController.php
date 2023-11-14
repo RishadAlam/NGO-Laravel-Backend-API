@@ -112,9 +112,10 @@ class IncomeController extends Controller
         $data       = (object) $request->validated();
         $income     = Income::with('IncomeCategory:id,name,is_default')->find($id);
         $histData   = [];
+        $date       = Carbon::parse($data->date)->setTimezone('+06:00')->toIso8601String();
         $amountDef  = $data->amount - $income->amount;
         $incomeDate = date('d/m/Y', strtotime($income->date));
-        $newDate    = date('d/m/Y', strtotime($data->date));
+        $newDate    = date('d/m/Y', strtotime($date));
         $oldCat     = $income->IncomeCategory->is_default ? __("customValidations.income_category.default.{$income->IncomeCategory->name}") : $income->IncomeCategory->name;
         $newCat     = $data->category['is_default'] ? __("customValidations.income_category.default.{$data->category['name']}") : $data->category['name'];
 
@@ -125,13 +126,13 @@ class IncomeController extends Controller
         $income->description        !== $data->description ? $histData['description'] = "<p class='text-danger'>{$income->description}</p><p class='text-success'>{$data->description}</p>" : '';
         $incomeDate                 !== $newDate ? $histData['date'] = "<p class='text-danger'>{$incomeDate}</p><p class='text-success'>{$newDate}</p>" : '';
 
-        DB::transaction(function () use ($id, $data, $income, $amountDef, $histData) {
+        DB::transaction(function () use ($id, $data, $income, $amountDef, $histData, $date) {
             $income->update(
                 [
                     'income_category_id'    => $data->income_category_id,
                     'amount'                => $data->amount,
                     'description'           => $data->description ?? null,
-                    'date'                  => $data->date,
+                    'date'                  => $date,
                 ]
             );
 

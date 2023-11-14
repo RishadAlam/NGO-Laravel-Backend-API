@@ -112,9 +112,10 @@ class AccountWithdrawalController extends Controller
         $data       = (object) $request->validated();
         $withdrawal = AccountWithdrawal::find($id);
         $histData   = [];
+        $date       = Carbon::parse($data->date)->setTimezone('+06:00')->toIso8601String();
         $amountDef  = $data->amount - $withdrawal->amount;
         $oldDate    = date('d/m/Y', strtotime($withdrawal->date));
-        $newDate    = date('d/m/Y', strtotime($data->date));
+        $newDate    = date('d/m/Y', strtotime($date));
 
         $withdrawal->amount                !== $data->amount ? $histData['amount'] = "<p class='text-danger'>{$withdrawal->amount}</p><p class='text-success'>{$data->amount}</p>" : '';
         $withdrawal->previous_balance      !== $data->previous_balance ? $histData['previous_balance'] = "<p class='text-danger'>{$withdrawal->previous_balance}</p><p class='text-success'>{$data->previous_balance}</p>" : '';
@@ -122,13 +123,13 @@ class AccountWithdrawalController extends Controller
         $withdrawal->description           !== $data->description ? $histData['description'] = "<p class='text-danger'>{$withdrawal->description}</p><p class='text-success'>{$data->description}</p>" : '';
         $withdrawal->date                  !== $data->date ? $histData['date'] = "<p class='text-danger'>{$oldDate}</p><p class='text-success'>{$newDate}</p>" : '';
 
-        DB::transaction(function () use ($id, $data, $withdrawal, $amountDef, $histData) {
+        DB::transaction(function () use ($id, $data, $withdrawal, $amountDef, $histData, $date) {
             $withdrawal->update(
                 [
                     'amount'                => $data->amount,
                     'previous_balance'      => $data->previous_balance,
                     'description'           => $data->description ?? null,
-                    'date'                  => $data->date,
+                    'date'                  => $date,
                 ]
             );
 

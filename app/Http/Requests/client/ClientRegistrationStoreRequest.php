@@ -30,7 +30,7 @@ class ClientRegistrationStoreRequest extends FormRequest
             'husband_name'      => "required_if:father_name,''",
             'mother_name'       => "required",
             'nid'               => "required",
-            'dob'               => "required",
+            'dob'               => "required|date",
             'occupation'        => "required",
             'religion'          => "required",
             'gender'            => "required",
