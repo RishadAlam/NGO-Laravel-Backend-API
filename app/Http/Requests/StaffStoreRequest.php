@@ -22,10 +22,20 @@ class StaffStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'  => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email',
-            "phone" => 'nullable|phone:BD',
-            'role'  => 'required|integer'
+            'name'          => 'required|string|max:100',
+            'email'         => 'required|email|unique:users,email',
+            "phone"         => 'nullable|phone:BD',
+            'role'          => 'required|integer',
+            'password'  =>
+            [
+                'required',
+                'min:8',
+                'regex:/[a-z]/',      // must contain at least one lowercase letter
+                'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                'regex:/[0-9]/',      // must contain at least one digit
+                'regex:/[@$!%*#?&]/', // must contain at least one special character
+            ],
+            'confirm_password' => 'required|same:new_password',
         ];
     }
 }

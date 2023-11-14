@@ -71,10 +71,10 @@ class UserController extends Controller
     {
         $staffData = (object) $request->validated();
         $staff = User::create([
-            'name' => $staffData->name,
-            'email' => $staffData->email,
-            'phone' => $staffData->phone,
-            'password' => Hash::make(123)
+            'name'      => $staffData->name,
+            'email'     => $staffData->email,
+            'phone'     => $staffData->phone,
+            'password'  => Hash::make($staffData->password)
         ]);
         $staff->assignRole($staffData->role);
 
