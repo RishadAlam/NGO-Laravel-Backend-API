@@ -16,28 +16,24 @@ class ExpenseCategorySeeder extends Seeder
         $categories = [
             [
                 'name'          => 'electricity_bill',
-                'description'   => fake()->text(20),
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
                 'name'          => 'office_rent',
-                'description'   => fake()->text(20),
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
                 'name'          => 'stationary',
-                'description'   => fake()->text(20),
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
                 'name'          => 'daily_expense',
-                'description'   => fake()->text(20),
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ],
         ];
 
         ExpenseCategory::insert($categories);
-        ExpenseCategory::factory(5)->create();
+        // ExpenseCategory::factory(5)->create();
     }
 }

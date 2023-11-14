@@ -16,28 +16,24 @@ class IncomeCategorySeeder extends Seeder
         $categories = [
             [
                 'name'          => 'registration_fee',
-                'description'   => fake()->text(20),
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ],[
                 'name'          => 'closing_fee',
-                'description'   => fake()->text(20),
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ],[
                 'name'          => 'withdrawal_fee',
-                'description'   => fake()->text(20),
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ],[
                 'name'          => 'money_transfer_transaction_fee',
-                'description'   => fake()->text(20),
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ],
         ];
 
         IncomeCategory::insert($categories);
-        IncomeCategory::factory(5)->create();
+        // IncomeCategory::factory(5)->create();
     }
 }

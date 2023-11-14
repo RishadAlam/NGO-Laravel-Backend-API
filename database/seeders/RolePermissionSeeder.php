@@ -194,10 +194,10 @@ class RolePermissionSeeder extends Seeder
         $user = User::where('email', 'sazzadullalamrishad@yahoo.com')->first();
         $user->assignRole($roleDeveloper);
 
-        for ($j = 2; $j < 12; $j++) {
-            $role = Arr::random([$roleSuperAdmin, $roleAdmin, $roleManager, $roleUser]);
-            User::find($j)->assignRole($role);
-        }
+        // for ($j = 2; $j < 12; $j++) {
+        //     $role = Arr::random([$roleSuperAdmin, $roleAdmin, $roleManager, $roleUser]);
+        //     User::find($j)->assignRole($role);
+        // }
 
         foreach ($permissions as $row) {
             $groupName = $row['groupName'];
