@@ -36,13 +36,20 @@ class ClientRegistrationController extends Controller
      */
     public function index()
     {
-        $client_registrations = ClientRegistration::when(request('field_id'), function ($query) {
-            $query->where('field_id', request('field_id'));
+        $client_registrations = ClientRegistration::with('Author:id,name')
+        ->with("Field:id,name")
+        ->with("Center:id,name")
+        ->when(request('fetch_pending'), function ($query) {
+            $query->where('is_approved', false);
         })
+            ->when(request('field_id'), function ($query) {
+                $query->where('field_id', request('field_id'));
+            })
             ->when(request('center_id'), function ($query) {
                 $query->where('center_id', request('center_id'));
             })
-            ->get(['id', 'name']);
+            ->orderBy('id', 'DESC')
+            ->get();
 
         return response(
             [

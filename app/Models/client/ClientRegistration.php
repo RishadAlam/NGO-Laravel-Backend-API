@@ -3,6 +3,8 @@
 namespace App\Models\client;
 
 use App\Models\User;
+use App\Models\field\Field;
+use App\Models\center\Center;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\ClientRegistrationActionHistory;
@@ -62,5 +64,25 @@ class ClientRegistration extends Model
     public function ClientRegistrationActionHistory()
     {
         return $this->hasMany(ClientRegistrationActionHistory::class);
+    }
+
+    /**
+     * Relationship belongs to Field model
+     *
+     * @return response()
+     */
+    public function Field()
+    {
+        return $this->belongsTo(Field::class)->withTrashed();
+    }
+
+    /**
+     * Relationship belongs to Center model
+     *
+     * @return response()
+     */
+    public function Center()
+    {
+        return $this->belongsTo(Center::class)->withTrashed();
     }
 }
