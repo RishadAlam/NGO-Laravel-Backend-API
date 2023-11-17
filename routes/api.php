@@ -151,6 +151,16 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     /**
      * -------------------------------------------------------------------------
+     * Api Resources Approval Routes
+     * -------------------------------------------------------------------------
+     *
+     * Here you can see all the API routes that have been additionally added to
+     * the Approval method in resource controller
+     */
+    Route::PUT('/client/registration/approved/{id}', [ClientRegistrationController::class, 'approved'])->name('client.registration.approved');
+
+    /**
+     * -------------------------------------------------------------------------
      * Api Resources Permanent Destroy Routes
      * -------------------------------------------------------------------------
      *

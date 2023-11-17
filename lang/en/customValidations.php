@@ -282,6 +282,7 @@ return [
             'update'            => 'The Client Profile has been successfully updated.',
             'delete'            => 'The Client Profile has been successfully deleted.',
             'p_delete'          => 'The Client Profile has been permanently deleted.',
+            'approved'          => 'The Client Profile has been successfully approved.',
         ],
     ],
 ];

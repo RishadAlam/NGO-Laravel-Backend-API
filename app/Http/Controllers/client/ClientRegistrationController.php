@@ -160,10 +160,10 @@ class ClientRegistrationController extends Controller
 
         DB::transaction(function () use ($id, $client, $data, $histData) {
             if (!empty($data->image)) {
-                // if (!empty($client->image)) {
-                //     $path = public_path('storage/client/' . $client->image);
-                //     unlink($path);
-                // }
+                if (!empty($client->image)) {
+                    $path = public_path('storage/client/' . $client->image);
+                    unlink($path);
+                }
 
                 $histData['image']  = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
                 $extension          = $data->image->extension();
@@ -275,6 +275,22 @@ class ClientRegistrationController extends Controller
             [
                 'success'   => true,
                 'data'      => $occupations
+            ],
+            200
+        );
+    }
+
+    /**
+     * Approved the specified Resource
+     */
+    public function approved(string $id)
+    {
+        ClientRegistration::find($id)->update(['is_approved' => true]);
+
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.client.registration.approved')
             ],
             200
         );
