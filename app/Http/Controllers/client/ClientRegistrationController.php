@@ -15,6 +15,17 @@ use Carbon\Carbon;
 
 class ClientRegistrationController extends Controller
 {
+    /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:client_registration')->only('store');
+        $this->middleware('can:client_registration_update')->only('update');
+        $this->middleware('can:client_registration_soft_delete')->only('destroy');
+        $this->middleware('can:client_registration_permanently_delete')->only('permanently_destroy');
+        $this->middleware('can:client_registration_approval')->only('approved');
+    }
 
     /**
      * AccountActionHistory Common Function

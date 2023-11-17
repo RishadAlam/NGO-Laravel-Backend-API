@@ -73,7 +73,16 @@ class RolePermissionSeeder extends Seeder
                 'groupName'     => 'registration',
                 'permissions'   => [
                     'client_registration',
+                ]
+            ],
+            // Pending Client Registration
+            [
+                'groupName'     => 'pending_client_registration',
+                'permissions'   => [
+                    'pending_client_registration_list_view',
                     'client_registration_approval',
+                    'client_registration_update',
+                    'client_registration_permanently_delete',
                 ]
             ],
             // Account
