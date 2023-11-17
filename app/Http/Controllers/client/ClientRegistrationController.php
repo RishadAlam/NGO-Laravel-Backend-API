@@ -22,12 +22,12 @@ class ClientRegistrationController extends Controller
     private static function setActionHistory($id, $action, $histData)
     {
         return [
-            "client_registration_id"    => $id,
-            "author_id"                 => auth()->id(),
-            "name"                      => auth()->user()->name,
-            "image_uri"                 => auth()->user()->image_uri,
-            "action_type"               => $action,
-            "action_details"            => $histData,
+            "registration_id"   => $id,
+            "author_id"         => auth()->id(),
+            "name"              => auth()->user()->name,
+            "image_uri"         => auth()->user()->image_uri,
+            "action_type"       => $action,
+            "action_details"    => $histData,
         ];
     }
 
@@ -158,25 +158,48 @@ class ClientRegistrationController extends Controller
         $client->present_address    !== $data->present_address ? $histData['present_address'] = "<p class='text-danger'>{$client->present_address}</p><p class='text-success'>{$data->present_address}</p>" : '';
         $client->permanent_address  !== $data->permanent_address ? $histData['permanent_address'] = "<p class='text-danger'>{$client->permanent_address}</p><p class='text-success'>{$data->permanent_address}</p>" : '';
 
-        if (!empty($data->image)) {
-            if (!empty($client->image)) {
-                $path = public_path('storage/client/' . $client->image);
-                unlink($path);
+        DB::transaction(function () use ($id, $client, $data, $histData) {
+            if (!empty($data->image)) {
+                // if (!empty($client->image)) {
+                //     $path = public_path('storage/client/' . $client->image);
+                //     unlink($path);
+                // }
+
+                $histData['image']  = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
+                $extension          = $data->image->extension();
+                $imgName            = 'client_' . time() . '.' . $extension;
+
+                $data->image->move(public_path() . '/storage/client/', $imgName);
+                $client->update(
+                    [
+                        'image'     => $imgName,
+                        'image_uri' => URL::to('/storage/client/', $imgName),
+                    ]
+                );
+            }
+            if (!empty($data->signature)) {
+                if (!empty($client->signature)) {
+                    $path = public_path('storage/client/' . $client->signature);
+                    unlink($path);
+                }
+
+                $histData['signature']  = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
+                $folderPath             = public_path() . '/storage/client/';
+                $image_parts            = explode(";base64,", $data->signature);
+                $image_type_aux         = explode("image/", $image_parts[0]);
+                $image_type             = $image_type_aux[1];
+                $image_base64           = base64_decode($image_parts[1]);
+                $sign                   = 'client_signature_' . time() . '.' . $image_type;
+
+                file_put_contents($folderPath . $sign, $image_base64);
+                $client->update(
+                    [
+                        'signature'     => $sign,
+                        'signature_uri' => URL::to('/storage/client/', $sign),
+                    ]
+                );
             }
 
-            $extension  = $data->image->extension();
-            $imgName    = 'client_' . time() . '.' . $extension;
-
-            $data->image->move(public_path() . '/storage/client/', $imgName);
-            $client->update(
-                [
-                    'image'     => $imgName,
-                    'image_uri' => URL::to('/storage/client/', $imgName),
-                ]
-            );
-        }
-
-        DB::transaction(function () use ($id, $client, $data, $histData) {
             $client->update(
                 [
                     'name'              => $data->name,
@@ -221,6 +244,21 @@ class ClientRegistrationController extends Controller
             [
                 'success'   => true,
                 'message'   => __('customValidations.client.registration.delete')
+            ],
+            200
+        );
+    }
+
+    /**
+     * Permanently Remove the specified resource from storage.
+     */
+    public function permanently_destroy(string $id)
+    {
+        ClientRegistration::find($id)->forceDelete();
+        return response(
+            [
+                'success'   => true,
+                'message'   => __('customValidations.client.registration.p_delete')
             ],
             200
         );

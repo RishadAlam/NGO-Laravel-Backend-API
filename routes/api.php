@@ -129,7 +129,14 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('/transactions/{account_id?}', [AccountController::class, 'get_all_transactions']);
     });
 
-    // Change Status Routes
+    /**
+     * -------------------------------------------------------------------------
+     * Api Resources Change Status Routes
+     * -------------------------------------------------------------------------
+     *
+     * Here you can see all the API routes that have been additionally added to
+     * the Change Status method in resource controller
+     */
     Route::PUT('/users/change-status/{id}', [UserController::class, 'change_status'])->name('users.changeStatus');
     Route::PUT('/fields/change-status/{id}', [FieldController::class, 'change_status'])->name('fields.changeStatus');
     Route::PUT('/centers/change-status/{id}', [CenterController::class, 'change_status'])->name('centers.changeStatus');
@@ -141,6 +148,16 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::PUT('/incomes/categories/change-status/{id}', [IncomeCategoryController::class, 'change_status'])->name('accounts.incomes.changeStatus');
         Route::PUT('/expenses/categories/change-status/{id}', [ExpenseCategoryController::class, 'change_status'])->name('accounts.expenses.changeStatus');
     });
+
+    /**
+     * -------------------------------------------------------------------------
+     * Api Resources Permanent Destroy Routes
+     * -------------------------------------------------------------------------
+     *
+     * Here you can see all the API routes that have been additionally added to
+     * the Permanent Destroy method in resource controller
+     */
+    Route::DELETE('/client/registration/force-delete/{id}', [ClientRegistrationController::class, 'permanently_destroy'])->name('client.registration.forceDelete');
 
     /**
      * -------------------------------------------------------------------------

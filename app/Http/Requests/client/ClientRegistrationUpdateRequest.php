@@ -34,6 +34,7 @@ class ClientRegistrationUpdateRequest extends FormRequest
             'primary_phone'     => "required|phone:BD",
             'secondary_phone'   => "nullable|phone:BD",
             'image'             => "nullable",
+            'signature'         => "nullable",
             'share'             => "required|integer",
             'annual_income'     => "nullable",
             'bank_acc_no'       => "nullable",

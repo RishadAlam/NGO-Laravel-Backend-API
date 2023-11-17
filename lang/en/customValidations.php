@@ -265,4 +265,23 @@ return [
         'delete'            => 'The Transfer has been successfully deleted.',
         'update'            => 'The Transfer has been successfully updated.',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Client Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'client' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Client registration Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'registration' => [
+            'successful'        => 'The Client Profile has been successfully registered.',
+            'update'            => 'The Client Profile has been successfully updated.',
+            'delete'            => 'The Client Profile has been successfully deleted.',
+            'p_delete'          => 'The Client Profile has been permanently deleted.',
+        ],
+    ],
 ];

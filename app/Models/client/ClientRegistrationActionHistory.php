@@ -17,7 +17,7 @@ class ClientRegistrationActionHistory extends Model
     * @var array<int, string>
     */
    protected $fillable = [
-       'client_registration_id',
+       'registration_id',
        'author_id',
        'name',
        'image_uri',
