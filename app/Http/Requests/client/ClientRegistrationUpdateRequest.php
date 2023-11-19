@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\client;
 
+use App\Models\AppConfig;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ClientRegistrationUpdateRequest extends FormRequest
@@ -21,7 +22,7 @@ class ClientRegistrationUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $validations = [
             'name'              => "required",
             'father_name'       => "required_if:husband_name,''",
             'husband_name'      => "required_if:father_name,''",
@@ -42,5 +43,11 @@ class ClientRegistrationUpdateRequest extends FormRequest
             'present_address'   => "required|json",
             'permanent_address' => "required|json"
         ];
+
+        if(AppConfig::get_config('client_reg_sign_is_required')){
+            $validations['signature'] = "required";
+        }
+
+        return $validations;
     }
 }

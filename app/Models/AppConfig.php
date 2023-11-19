@@ -31,4 +31,15 @@ class AppConfig extends Model
     {
         return json_decode($value);
     }
+
+    /**
+     * Get App config
+     */
+    public static function get_config($meta_key)
+    {
+        $meta_value = self::where('meta_key', $meta_key)
+            ->value('meta_value');
+
+        return response($meta_value, 200);
+    }
 }

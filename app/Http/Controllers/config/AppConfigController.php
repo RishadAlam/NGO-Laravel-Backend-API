@@ -39,6 +39,7 @@ class AppConfigController extends Controller
             200
         );
     }
+
     /**
      * Approvals Configuration Data
      *

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\client;
 
+use App\Models\AppConfig;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ClientRegistrationStoreRequest extends FormRequest
@@ -21,7 +22,7 @@ class ClientRegistrationStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $validations = [
             'field_id'          => "required",
             'center_id'         => "required",
             'acc_no'            => "required|unique:client_registrations,acc_no",
@@ -45,5 +46,11 @@ class ClientRegistrationStoreRequest extends FormRequest
             'present_address'   => "required|json",
             'permanent_address' => "required|json"
         ];
+
+        if(AppConfig::get_config('client_reg_sign_is_required')){
+            $validations['signature'] = "required";
+        }
+
+        return $validations;
     }
 }
