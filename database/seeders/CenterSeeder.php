@@ -15,10 +15,9 @@ class CenterSeeder extends Seeder
     public function run(): void
     {
         for ($i=0; $i < 10; $i++) {
-            $field_id = Field::inRandomOrder()->first()->id;
             Center::create(
                 [
-                    'field_id'      => $field_id,
+                    'field_id'      => $i+1,
                     'name'          => fake()->unique()->name(),
                     'description'   => fake()->paragraph(),
                     'status'        => fake()->numberBetween(0,1)

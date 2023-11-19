@@ -20,12 +20,12 @@ class ClientRegistrationFactory extends Factory
     public function definition(): array
     {
         $field_id           = Field::inRandomOrder()->first()->id;
-        $center_id          = Center::inRandomOrder()->first()->id;
+        $center_id          = Center::inRandomOrder()->where('field_id', $field_id)->first()->id;
         $user_id            = User::inRandomOrder()->first()->id;
         $present_address    = (object) [
             'street_address'    => fake()->streetAddress(),
             'city'              => fake()->city(),
-            'word_no'           => fake()->random_int(1, 30),
+            'word_no'           => fake()->numberBetween(1, 30),
             'post_office'       => fake()->streetName(),
             'post_code'         => fake()->buildingNumber(),
             'police_station'    => fake()->buildingNumber(),
@@ -35,7 +35,7 @@ class ClientRegistrationFactory extends Factory
         $permanent_address  = (object) [
             'street_address'    => fake()->streetAddress(),
             'city'              => fake()->city(),
-            'word_no'           => fake()->random_int(1, 30),
+            'word_no'           => fake()->numberBetween(1, 30),
             'post_office'       => fake()->streetName(),
             'post_code'         => fake()->buildingNumber(),
             'police_station'    => fake()->buildingNumber(),
@@ -46,7 +46,7 @@ class ClientRegistrationFactory extends Factory
         return [
             'field_id'          => $field_id,
             'center_id'         => $center_id,
-            'acc_no'            => fake()->numberBetween(1000, 9999),
+            'acc_no'            => fake()->uniqid(),
             'name'              => fake()->name,
             'father_name'       => fake()->name('male'),
             'husband_name'      => fake()->name('male'),

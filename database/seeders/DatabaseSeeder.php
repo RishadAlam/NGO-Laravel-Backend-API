@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,20 +15,22 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(
             [
-                UserSeeder::class,
-                RolePermissionSeeder::class,
-                AppConfigSeeder::class,
-                AccountSeeder::class,
-                IncomeCategorySeeder::class,
-                ExpenseCategorySeeder::class,
+                // UserSeeder::class,
+                // RolePermissionSeeder::class,
+                // AppConfigSeeder::class,
+                // AccountSeeder::class,
+                // IncomeCategorySeeder::class,
+                // ExpenseCategorySeeder::class,
                 // IncomeSeeder::class,
                 // ExpenseSeeder::class,
                 // AccountWithdrawalSeeder::class,
                 // FieldSeeder::class,
                 // CenterSeeder::class,
-                CategorySeeder::class,
-                // ClientRegistrationSeeder::class
-            ]
+                // CategorySeeder::class,
+                // ClientRegistrationSeeder::class,
+                SavingRegistrationSeeder::class,
+                LoanRegistrationSeeder::class
+                ]
         );
     }
 }

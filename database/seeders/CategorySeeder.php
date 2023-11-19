@@ -15,21 +15,6 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // for ($i = 0; $i < 10; $i++) {
-        //     $category = Category::create(
-        //         [
-        //             'name'          => fake()->unique()->name(),
-        //             'group'         => Arr::random(['Daily', 'Weekly', 'Half Month', 'Monthly', 'Yearly']),
-        //             'description'   => fake()->paragraph(),
-        //             'saving'        => fake()->numberBetween(0, 1),
-        //             'loan'          => fake()->numberBetween(0, 1),
-        //             'status'        => fake()->numberBetween(0, 1)
-        //         ]
-        //     );
-
-        //     CategoryConfig::create(['category_id' => $category->id]);
-        // }
-
         $category1 = Category::create(
             [
                 'name'          => "monthly_loan",
@@ -55,5 +40,20 @@ class CategorySeeder extends Seeder
 
         CategoryConfig::create(['category_id' => $category1->id]);
         CategoryConfig::create(['category_id' => $category2->id]);
+
+        for ($i = 0; $i < 10; $i++) {
+            $category = Category::create(
+                [
+                    'name'          => fake()->unique()->name(),
+                    'group'         => Arr::random(['Daily', 'Weekly', 'Half Month', 'Monthly', 'Yearly']),
+                    'description'   => fake()->paragraph(),
+                    'saving'        => fake()->numberBetween(0, 1),
+                    'loan'          => fake()->numberBetween(0, 1),
+                    'status'        => fake()->numberBetween(0, 1)
+                ]
+            );
+
+            CategoryConfig::create(['category_id' => $category->id]);
+        }
     }
 }
