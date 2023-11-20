@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\client;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
@@ -11,7 +10,6 @@ use App\Http\Requests\client\ClientRegistrationStoreRequest;
 use App\Http\Requests\client\ClientRegistrationUpdateRequest;
 use App\Models\AppConfig;
 use App\Models\client\ClientRegistrationActionHistory;
-use Carbon\Carbon;
 
 class ClientRegistrationController extends Controller
 {
@@ -48,16 +46,19 @@ class ClientRegistrationController extends Controller
     public function index()
     {
         $client_registrations = ClientRegistration::with('Author:id,name')
-        ->with("Field:id,name")
-        ->with("Center:id,name")
-        ->when(request('fetch_pending'), function ($query) {
-            $query->where('is_approved', false);
-        })
+            ->with("Field:id,name")
+            ->with("Center:id,name")
+            ->when(request('fetch_pending'), function ($query) {
+                $query->where('is_approved', false);
+            })
             ->when(request('field_id'), function ($query) {
                 $query->where('field_id', request('field_id'));
             })
             ->when(request('center_id'), function ($query) {
                 $query->where('center_id', request('center_id'));
+            })
+            ->when(request('user_id'), function ($query) {
+                $query->where('creator_id', request('user_id'));
             })
             ->orderBy('id', 'DESC')
             ->get();

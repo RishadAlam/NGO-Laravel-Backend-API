@@ -39,7 +39,7 @@ return new class extends Migration
             $table->integer('total_interest_remaining')->storedAs('total_payable_interest - total_interest_rec')->comment('balance = total_payable_interest - total_interest_rec');
             $table->integer('closing_balance')->nullable();
             $table->string('description')->nullable();
-            $table->enum('status', [0, 1, 2])->default(0)->comment('deactivate = 0, activate = 1, hold = 2');
+            $table->enum('status', [0, 1, 2])->default(1)->comment('deactivate = 0, activate = 1, hold = 2');
             $table->boolean('is_approved')->default(false);
             $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->timestamps();

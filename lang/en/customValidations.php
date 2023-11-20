@@ -284,5 +284,31 @@ return [
             'p_delete'          => 'The Client Profile has been permanently deleted.',
             'approved'          => 'The Client Profile has been successfully approved.',
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Saving registration Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'saving' => [
+            'successful'        => 'The Saving Account has been successfully registered.',
+            'update'            => 'The Saving Account has been successfully updated.',
+            'delete'            => 'The Saving Account has been successfully deleted.',
+            'p_delete'          => 'The Saving Account has been permanently deleted.',
+            'approved'          => 'The Saving Account has been successfully approved.',
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Loan registration Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'loan' => [
+            'successful'        => 'The Loan Account has been successfully registered.',
+            'update'            => 'The Loan Account has been successfully updated.',
+            'delete'            => 'The Loan Account has been successfully deleted.',
+            'p_delete'          => 'The Loan Account has been permanently deleted.',
+            'approved'          => 'The Loan Account has been successfully approved.',
+        ],
     ],
 ];

@@ -34,7 +34,7 @@ return new class extends Migration
             $table->integer('closing_interest')->nullable();
             $table->integer('closing_balance_with_interest')->nullable();
             $table->string('description')->nullable();
-            $table->enum('status', [0, 1, 2])->default(0)->comment('deactivate = 0, activate = 1, hold = 2');
+            $table->enum('status', [0, 1, 2])->default(1)->comment('deactivate = 0, activate = 1, hold = 2');
             $table->boolean('is_approved')->default(false);
             $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->timestamps();
