@@ -27,8 +27,8 @@ class ClientRegistrationStoreRequest extends FormRequest
             'center_id'         => "required",
             'acc_no'            => "required|unique:client_registrations,acc_no",
             'name'              => "required",
-            'father_name'       => "required_if:husband_name,''",
-            'husband_name'      => "required_if:father_name,''",
+            'father_name'       => "required",
+            'husband_name'      => "nullable",
             'mother_name'       => "required",
             'nid'               => "required",
             'dob'               => "required|date",
@@ -47,7 +47,7 @@ class ClientRegistrationStoreRequest extends FormRequest
             'permanent_address' => "required|json"
         ];
 
-        if(AppConfig::get_config('client_reg_sign_is_required')){
+        if (AppConfig::get_config('client_reg_sign_is_required')) {
             $validations['signature'] = "required";
         }
 

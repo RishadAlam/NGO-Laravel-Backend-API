@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\client;
 
+use App\Models\AppConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Models\client\ClientRegistration;
+use Illuminate\Support\Facades\Validator;
+use App\Models\client\ClientRegistrationActionHistory;
 use App\Http\Requests\client\ClientRegistrationStoreRequest;
 use App\Http\Requests\client\ClientRegistrationUpdateRequest;
-use App\Models\AppConfig;
-use App\Models\client\ClientRegistrationActionHistory;
 
 class ClientRegistrationController extends Controller
 {
@@ -63,13 +64,7 @@ class ClientRegistrationController extends Controller
             ->orderBy('id', 'DESC')
             ->get();
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $client_registrations
-            ],
-            200
-        );
+        return self::create_response(null, $client_registrations);
     }
 
     /**
@@ -77,10 +72,18 @@ class ClientRegistrationController extends Controller
      */
     public function store(ClientRegistrationStoreRequest $request)
     {
-        $data       = (object) $request->validated();
-        $sign       = null;
-        $sign_uri   = null;
-        $is_approved = AppConfig::where('meta_key', 'client_registration_approval')
+        $errors                         = [];
+        $data                           = (object) $request->validated();
+        $errors['present_address']      = self::address_validation((array) json_decode($data->present_address));
+        $errors['permanent_address']    = self::address_validation((array) json_decode($data->permanent_address));
+
+        if (!empty($errors)) {
+            return self::create_validation_error_response($errors);
+        }
+
+        $sign           = null;
+        $sign_uri       = null;
+        $is_approved    = AppConfig::where('meta_key', 'client_registration_approval')
             ->value('meta_value');
 
         $extension  = $data->image->extension();
@@ -129,13 +132,7 @@ class ClientRegistrationController extends Controller
             ]
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.client.registration.successful'),
-            ],
-            200
-        );
+        return self::create_response(__('customValidations.client.registration.successful'));
     }
 
     /**
@@ -233,13 +230,7 @@ class ClientRegistrationController extends Controller
             ClientRegistrationActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.client.registration.update'),
-            ],
-            200
-        );
+        return self::create_response(__('customValidations.client.registration.update'));
     }
 
     /**
@@ -252,13 +243,7 @@ class ClientRegistrationController extends Controller
             ClientRegistrationActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.client.registration.delete')
-            ],
-            200
-        );
+        return self::create_response(__('customValidations.client.registration.delete'));
     }
 
     /**
@@ -267,13 +252,29 @@ class ClientRegistrationController extends Controller
     public function permanently_destroy(string $id)
     {
         ClientRegistration::find($id)->forceDelete();
-        return response(
+        return self::create_response(__('customValidations.client.registration.p_delete'));
+    }
+
+    /**
+     * Address Validation
+     */
+    private static function address_validation($address)
+    {
+        $validated = Validator::make(
+            $address,
             [
-                'success'   => true,
-                'message'   => __('customValidations.client.registration.p_delete')
-            ],
-            200
+                'street_address'    => 'required',
+                'city'              => "required",
+                'post_office'       => "required",
+                'police_station'    => "required",
+                'state'             => "required",
+                'division'          => "required",
+            ]
         );
+
+        if ($validated->fails()) {
+            return $validated->errors()->toArray();
+        }
     }
 
     /**
@@ -282,14 +283,7 @@ class ClientRegistrationController extends Controller
     public function get_client_occupations()
     {
         $occupations = ClientRegistration::distinct('occupation')->orderBy('occupation', 'asc')->pluck('occupation');
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $occupations
-            ],
-            200
-        );
+        return self::create_response(null, $occupations);
     }
 
     /**
@@ -298,13 +292,37 @@ class ClientRegistrationController extends Controller
     public function approved(string $id)
     {
         ClientRegistration::find($id)->update(['is_approved' => true]);
+        return self::create_response(__('customValidations.client.registration.approved'));
+    }
 
+    /**
+     * Create success Response
+     */
+    private static function create_response($message = null, $data = null, $code = '200', $success = true)
+    {
+        $res = ['success' => $success];
+
+        if (!empty($message)) {
+            $res['message'] = $message;
+        }
+        if (!empty($data)) {
+            $res['data'] = $data;
+        }
+
+        return response($res, $code);
+    }
+
+    /**
+     * error response
+     */
+    private static function create_validation_error_response($message, $code = '401', $success = false)
+    {
         return response(
             [
-                'success'   => true,
-                'message'   => __('customValidations.client.registration.approved')
+                'success'   => $success,
+                "errors"    => $message
             ],
-            200
+            $code
         );
     }
 }
