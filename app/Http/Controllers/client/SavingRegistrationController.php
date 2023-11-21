@@ -6,8 +6,8 @@ use App\Models\AppConfig;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingRegistration;
-use App\Http\Requests\client\SavingRegistrationStoreRequest;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\client\SavingRegistrationStoreRequest;
 
 class SavingRegistrationController extends Controller
 {
@@ -100,7 +100,7 @@ class SavingRegistrationController extends Controller
             ]
         );
 
-        return self::create_response(__('customValidations.client.saving.successful'));
+        return create_response(__('customValidations.client.saving.successful'));
     }
 
     /**
@@ -117,20 +117,6 @@ class SavingRegistrationController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-
-    /**
-     * Create Response
-     */
-    private static function create_response($message, $code = '200', $success = true)
-    {
-        return response(
-            [
-                'success' => $success,
-                'message' => $message,
-            ],
-            $code
-        );
     }
 
     /**

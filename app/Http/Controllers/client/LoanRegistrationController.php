@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\client;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\client\LoanRegistrationStoreRequest;
-use App\Models\client\LoanRegistration;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\client\LoanRegistration;
+use App\Http\Requests\client\LoanRegistrationStoreRequest;
 
 class LoanRegistrationController extends Controller
 {
