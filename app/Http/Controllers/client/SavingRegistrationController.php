@@ -4,9 +4,12 @@ namespace App\Http\Controllers\client;
 
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingRegistration;
 use Illuminate\Support\Facades\Validator;
+use App\Models\client\NomineeRegistration;
 use App\Http\Requests\client\SavingRegistrationStoreRequest;
 
 class SavingRegistrationController extends Controller
@@ -67,7 +70,7 @@ class SavingRegistrationController extends Controller
         $errors         = [];
         $data           = (object) $request->validated();
         $nominees       = json_decode($data->nominees);
-        $errors         = self::nominee_validation($nominees);
+        $errors         = self::nominee_validation((array) $nominees);
         $is_approved    = AppConfig::where('meta_key', 'saving_registration_approval')
             ->value('meta_value');
 
@@ -81,24 +84,67 @@ class SavingRegistrationController extends Controller
             );
         }
 
-        SavingRegistration::create(
-            [
-                'field_id'                          => $data->field_id,
-                'center_id'                         => $data->center_id,
-                'category_id'                       => $data->category_id,
-                'client_registration_id'            => $data->client_registration_id,
-                'acc_no'                            => $data->acc_no,
-                'start_date'                        => $data->start_date,
-                'duration_date'                     => $data->duration_date,
-                'payable_installment'               => $data->payable_installment,
-                'payable_deposit'                   => $data->payable_deposit,
-                'payable_interest'                  => $data->payable_interest,
-                'total_deposit_without_interest'    => $data->total_deposit_without_interest,
-                'total_deposit_with_interest'       => $data->total_deposit_with_interest,
-                'is_approved'                       => $is_approved,
-                'creator_id'                        => $data->creator_id ?? auth()->id(),
-            ]
-        );
+        DB::transaction(function () use ($data, $is_approved, $nominees) {
+            $saving_registration = SavingRegistration::create(
+                [
+                    'field_id'                          => $data->field_id,
+                    'center_id'                         => $data->center_id,
+                    'category_id'                       => $data->category_id,
+                    'client_registration_id'            => $data->client_registration_id,
+                    'acc_no'                            => $data->acc_no,
+                    'start_date'                        => $data->start_date,
+                    'duration_date'                     => $data->duration_date,
+                    'payable_installment'               => $data->payable_installment,
+                    'payable_deposit'                   => $data->payable_deposit,
+                    'payable_interest'                  => $data->payable_interest,
+                    'total_deposit_without_interest'    => $data->total_deposit_without_interest,
+                    'total_deposit_with_interest'       => $data->total_deposit_with_interest,
+                    'is_approved'                       => $is_approved,
+                    'creator_id'                        => $data->creator_id ?? auth()->id(),
+                ]
+            );
+
+            $nominees_arr = [];
+            foreach ($nominees as $nominee) {
+                $extension  = $nominee->image->extension();
+                $imgName    = 'nominee_' . time() . '.' . $extension;
+                $nominee->image->move(public_path() . '/storage/nominees/', $imgName);
+
+                $sign       = null;
+                $sign_uri   = null;
+                if (!empty($nominee->signature)) {
+                    $folderPath     = public_path() . '/storage/nominees/';
+                    $image_parts    = explode(";base64,", $nominee->signature);
+                    $image_type_aux = explode("image/", $image_parts[0]);
+                    $image_type     = $image_type_aux[1];
+                    $image_base64   = base64_decode($image_parts[1]);
+                    $sign           = 'nominee_signature_' . time() . '.' . $image_type;
+                    file_put_contents($folderPath . $sign, $image_base64);
+                    $sign_uri       = URL::to('/storage/nominees/', $sign);
+                }
+
+                $nominee_arr[] = [
+                    'saving_registration_id'    => $saving_registration->id,
+                    'name'                      => $nominee->name,
+                    'father_name'               => $nominee->father_name,
+                    'husband_name'              => $nominee->husband_name,
+                    'mother_name'               => $nominee->mother_name,
+                    'nid'                       => $nominee->nid,
+                    'dob'                       => $nominee->dob,
+                    'occupation'                => $nominee->occupation,
+                    'relation'                  => $nominee->relation,
+                    'gender'                    => $nominee->gender,
+                    'primary_phone'             => $nominee->primary_phone,
+                    'secondary_phone'           => $nominee->secondary_phone,
+                    'image'                     => $imgName,
+                    'image_uri'                 => URL::to('/storage/nominees/', $imgName),
+                    'signature'                 => $sign,
+                    'signature'                 => $sign_uri,
+                    'address'                   => $nominee->address,
+                ];
+            }
+            NomineeRegistration::insert($nominees_arr);
+        });
 
         return create_response(__('customValidations.client.saving.successful'));
     }

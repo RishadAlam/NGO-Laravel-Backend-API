@@ -7,6 +7,7 @@ use App\Models\field\Field;
 use App\Models\center\Center;
 use App\Models\category\Category;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\client\NomineeRegistration;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\SavingRegistrationActionHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -61,6 +62,14 @@ class SavingRegistration extends Model
     public function SavingRegistrationActionHistory()
     {
         return $this->hasMany(SavingRegistrationActionHistory::class);
+    }
+
+    /**
+     * Relation with NomineeRegistration Table
+     */
+    public function NomineeRegistration()
+    {
+        return $this->hasMany(NomineeRegistration::class);
     }
 
     /**

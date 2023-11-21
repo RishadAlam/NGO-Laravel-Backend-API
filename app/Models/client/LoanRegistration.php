@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\field\Field;
 use App\Models\center\Center;
 use App\Models\category\Category;
+use App\Models\client\LoanRegistration;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\LoanRegistrationActionHistory;
@@ -64,6 +65,14 @@ class LoanRegistration extends Model
     public function LoanRegistrationActionHistory()
     {
         return $this->hasMany(LoanRegistrationActionHistory::class);
+    }
+
+    /**
+     * Relation with LoanRegistration Table
+     */
+    public function LoanRegistration()
+    {
+        return $this->hasMany(LoanRegistration::class);
     }
 
     /**
