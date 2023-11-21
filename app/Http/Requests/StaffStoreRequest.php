@@ -35,7 +35,7 @@ class StaffStoreRequest extends FormRequest
                 'regex:/[0-9]/',      // must contain at least one digit
                 'regex:/[@$!%*#?&]/', // must contain at least one special character
             ],
-            'confirm_password' => 'required|same:new_password',
+            'confirm_password' => 'required|same:password',
         ];
     }
 }
