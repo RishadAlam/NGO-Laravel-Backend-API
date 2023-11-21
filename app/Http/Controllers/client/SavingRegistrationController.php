@@ -129,22 +129,28 @@ class SavingRegistrationController extends Controller
             $validated = Validator::make(
                 $nominee,
                 [
-                    'name'          => 'required',
-                    'father_name'   => "required_if:husband_name,''",
-                    'husband_name'  => "required_if:father_name,''",
-                    'mother_name'   => "required",
-                    'nid'           => "required|numeric",
-                    'dob'           => "required|date",
-                    'image'         => "required|mimes:jpeg,png,jpg,webp|max:5120",
-                    'address'       => "required|json"
+                    'name'              => 'required',
+                    'father_name'       => "required",
+                    'husband_name'      => "nullable",
+                    'mother_name'       => "required",
+                    'nid'               => "required|numeric",
+                    'dob'               => "required|date",
+                    'occupation'        => "required",
+                    'relation'          => "required",
+                    'gender'            => "required",
+                    'primary_phone'     => "nullable|phone:BD",
+                    'secondary_phone'   => "nullable|phone:BD",
+                    'image'             => "required|mimes:jpeg,png,jpg,webp|max:5120",
+                    'signature'         => "nullable",
+                    'address'           => "required|json"
                 ]
             );
 
             if ($validated->fails()) {
                 $errors['nominees'[$key]] = $validated->errors()->toArray();
             } else {
-                $result = self::address_validation($nominee->address);
-                if ($result) {
+                $result = self::address_validation((array) json_decode($nominee->address));
+                if (!empty($result)) {
                     $errors['nominees'[$key]] = $result;
                 }
             }
