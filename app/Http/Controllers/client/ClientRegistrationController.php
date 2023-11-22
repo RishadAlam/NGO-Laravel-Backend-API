@@ -20,7 +20,7 @@ class ClientRegistrationController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:pending_client_registration_list_view|pending_client_registration_list_view_as_admin')->only('index');
+        $this->middleware('can:pending_client_registration_list_view,pending_client_registration_list_view_as_admin')->only('index');
         $this->middleware('can:client_registration')->only('store');
         $this->middleware('can:client_registration_update')->only('update');
         $this->middleware('can:client_registration_soft_delete')->only('destroy');

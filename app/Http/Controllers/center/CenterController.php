@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\center;
 
+use App\Models\center\Center;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\center\CenterChangeStatusRequest;
+use App\Models\center\CenterActionHistory;
 use App\Http\Requests\center\CenterStoreRequest;
 use App\Http\Requests\center\CenterUpdateRequest;
-use App\Models\center\Center;
-use App\Models\center\CenterActionHistory;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\center\CenterChangeStatusRequest;
 
 class CenterController extends Controller
 {
@@ -31,6 +31,9 @@ class CenterController extends Controller
         $centers = Center::with('Author:id,name')
             ->with('Field:id,name')
             ->with(['CenterActionHistory', 'CenterActionHistory.Author:id,name,image_uri'])
+            ->when(!empty(request('field_id')), function ($query) {
+                $query->where('field_id', request('field_id'));
+            })
             ->get(['id', 'field_id', 'name', 'description', 'status', 'creator_id', 'created_at', 'updated_at']);
 
         return response(
@@ -167,7 +170,10 @@ class CenterController extends Controller
     public function get_active_centers()
     {
         $fields = Center::where('status', true)
-            ->get(['id', 'name']);
+            ->when(!empty(request('field_id')), function ($query) {
+                $query->where('field_id', request('field_id'));
+            })
+            ->get(['id', 'field_id', 'name']);
 
         return response(
             [
