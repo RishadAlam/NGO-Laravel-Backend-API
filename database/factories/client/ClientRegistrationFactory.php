@@ -2,9 +2,9 @@
 
 namespace Database\Factories\Client;
 
-use App\Models\center\Center;
-use App\Models\field\Field;
 use App\Models\User;
+use App\Models\field\Field;
+use App\Models\center\Center;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -44,7 +44,7 @@ class ClientRegistrationFactory extends Factory
         return [
             'field_id'          => $field_id,
             'center_id'         => $center_id,
-            'acc_no'            => fake()->uniqid(),
+            'acc_no'            => fake()->unique()->numberBetween(4000, 9000),
             'name'              => fake()->name,
             'father_name'       => fake()->name('male'),
             'husband_name'      => fake()->name('male'),
@@ -56,6 +56,7 @@ class ClientRegistrationFactory extends Factory
             'gender'            => fake()->randomElement(['male', 'female', 'others']),
             'primary_phone'     => fake()->phoneNumber(),
             'secondary_phone'   => fake()->phoneNumber(),
+            'image'             => fake()->text(),
             'image_uri'         => fake()->imageUrl(),
             'share'             => fake()->numberBetween(100, 1000),
             'present_address'   => json_encode($present_address),

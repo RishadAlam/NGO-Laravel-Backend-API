@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('loan_account_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('author_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->string('name');
-            $table->string('image_uri');
+            $table->string('image_uri')->nullable();
             $table->enum('action_type', ['update', 'delete', 'restore']);
             $table->json('action_details');
             $table->timestamps();

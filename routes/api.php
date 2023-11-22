@@ -1,28 +1,28 @@
 <?php
 
-use App\Http\Controllers\accounts\AccountController;
-use App\Http\Controllers\accounts\AccountTransferController;
-use App\Http\Controllers\accounts\AccountWithdrawalController;
-use App\Http\Controllers\accounts\ExpenseCategoryController;
-use App\Http\Controllers\accounts\ExpenseController;
-use App\Http\Controllers\accounts\IncomeCategoryController;
-use App\Http\Controllers\accounts\IncomeController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\category\CategoryController;
-use App\Http\Controllers\center\CenterController;
-use App\Http\Controllers\client\ClientRegistrationController;
-use App\Http\Controllers\client\LoanRegistrationController;
-use App\Http\Controllers\client\SavingRegistrationController;
-use App\Http\Controllers\config\AppConfigController;
-use App\Http\Controllers\config\CategoryConfigController;
+use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\field\FieldController;
-use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Route;
-use Spatie\Permission\Models\Permission;
+use App\Http\Controllers\center\CenterController;
+use App\Http\Controllers\accounts\IncomeController;
+use App\Http\Controllers\accounts\AccountController;
+use App\Http\Controllers\accounts\ExpenseController;
+use App\Http\Controllers\config\AppConfigController;
+use App\Http\Controllers\category\CategoryController;
+use App\Http\Controllers\staffs\PermissionController;
+use App\Http\Controllers\client\LoanAccountController;
+use App\Http\Controllers\client\SavingAccountController;
+use App\Http\Controllers\config\CategoryConfigController;
+use App\Http\Controllers\accounts\IncomeCategoryController;
+use App\Http\Controllers\accounts\AccountTransferController;
+use App\Http\Controllers\accounts\ExpenseCategoryController;
+use App\Http\Controllers\client\ClientRegistrationController;
+use App\Http\Controllers\accounts\AccountWithdrawalController;
 
 /*
  * ------------------------------------------------------------------------
@@ -165,8 +165,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     // Registration Approval Routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
         Route::PUT('approved/{id}', [ClientRegistrationController::class, 'approved'])->name('approved');
-        Route::PUT('saving/approved/{id}', [SavingRegistrationController::class, 'approved'])->name('saving.approved');
-        Route::PUT('loan/approved/{id}', [LoanRegistrationController::class, 'approved'])->name('loan.approved');
+        Route::PUT('saving/approved/{id}', [SavingAccountController::class, 'approved'])->name('saving.approved');
+        Route::PUT('loan/approved/{id}', [LoanAccountController::class, 'approved'])->name('loan.approved');
     });
 
     /*
@@ -180,8 +180,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     // Client Registration Permanent Destroy Routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
         Route::DELETE('force-delete/{id}', [ClientRegistrationController::class, 'permanently_destroy'])->name('forceDelete');
-        Route::DELETE('saving/force-delete/{id}', [SavingRegistrationController::class, 'permanently_destroy'])->name('saving.forceDelete');
-        Route::DELETE('loan/force-delete/{id}', [LoanRegistrationController::class, 'permanently_destroy'])->name('loan.forceDelete');
+        Route::DELETE('saving/force-delete/{id}', [SavingAccountController::class, 'permanently_destroy'])->name('saving.forceDelete');
+        Route::DELETE('loan/force-delete/{id}', [LoanAccountController::class, 'permanently_destroy'])->name('loan.forceDelete');
     });
 
     /*
@@ -222,8 +222,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     // Client Routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
         Route::apiResource('/', ClientRegistrationController::class)->except('show')->parameter('', 'registration');
-        Route::apiResource('saving', SavingRegistrationController::class)->except('show');
-        Route::apiResource('loan', LoanRegistrationController::class)->except('show');
+        Route::apiResource('saving', SavingAccountController::class)->except('show');
+        Route::apiResource('loan', LoanAccountController::class)->except('show');
     });
 
     /*

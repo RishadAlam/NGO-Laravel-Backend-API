@@ -73,16 +73,43 @@ class RolePermissionSeeder extends Seeder
                 'groupName'     => 'registration',
                 'permissions'   => [
                     'client_registration',
+                    'saving_acc_registration',
+                    'loan_acc_registration',
+                    'saving_acc_creator_selection',
+                    'loan_acc_creator_selection'
                 ]
             ],
-            // Pending Client Registration
+            // Pending Client Registration Form
             [
-                'groupName'     => 'pending_client_registration',
+                'groupName'     => 'pending_client_registration_form',
                 'permissions'   => [
                     'pending_client_registration_list_view',
-                    'client_registration_approval',
-                    'client_registration_update',
-                    'client_registration_permanently_delete',
+                    'pending_client_registration_list_view_as_admin',
+                    'pending_client_registration_approval',
+                    'pending_client_registration_update',
+                    'pending_client_registration_permanently_delete',
+                ]
+            ],
+            // Pending Saving Account Registration Form
+            [
+                'groupName'     => 'pending_saving_acc_registration_form',
+                'permissions'   => [
+                    'pending_saving_acc_list_view',
+                    'pending_saving_acc_list_view_as_admin',
+                    'pending_saving_acc_approval',
+                    'pending_saving_acc_update',
+                    'pending_saving_acc_permanently_delete',
+                ]
+            ],
+            // Pending Saving Account Registration Form
+            [
+                'groupName'     => 'pending_loan_acc_registration_form',
+                'permissions'   => [
+                    'pending_loan_acc_list_view',
+                    'pending_loan_acc_list_view_as_admin',
+                    'pending_loan_acc_approval',
+                    'pending_loan_acc_update',
+                    'pending_loan_acc_permanently_delete',
                 ]
             ],
             // Account

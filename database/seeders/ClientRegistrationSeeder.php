@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\client\ClientRegistration;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 
 class ClientRegistrationSeeder extends Seeder
 {
@@ -13,6 +13,6 @@ class ClientRegistrationSeeder extends Seeder
      */
     public function run(): void
     {
-        ClientRegistration::factory(1000)->create();
+        ClientRegistration::factory(100)->create();
     }
 }

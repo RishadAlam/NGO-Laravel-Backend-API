@@ -6,6 +6,7 @@ use App\Models\AppConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\client\ClientRegistration;
 use Illuminate\Support\Facades\Validator;
 use App\Models\client\ClientRegistrationActionHistory;
@@ -19,6 +20,7 @@ class ClientRegistrationController extends Controller
      */
     public function __construct()
     {
+        $this->middleware('can:pending_client_registration_list_view|pending_client_registration_list_view_as_admin')->only('index');
         $this->middleware('can:client_registration')->only('store');
         $this->middleware('can:client_registration_update')->only('update');
         $this->middleware('can:client_registration_soft_delete')->only('destroy');
@@ -51,6 +53,9 @@ class ClientRegistrationController extends Controller
             ->with("Center:id,name")
             ->when(request('fetch_pending'), function ($query) {
                 $query->where('is_approved', false);
+                if (!Auth::user()->can('pending_client_registration_list_view_as_admin')) {
+                    $query->where('creator_id', Auth::user()->id);
+                }
             })
             ->when(request('field_id'), function ($query) {
                 $query->where('field_id', request('field_id'));
