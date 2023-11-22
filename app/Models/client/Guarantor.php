@@ -5,7 +5,7 @@ namespace App\Models\client;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class NomineeRegistration extends Model
+class Guarantor extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,7 @@ class NomineeRegistration extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'saving_registration_id',
+        'loan_registration_id',
         'name',
         'father_name',
         'husband_name',

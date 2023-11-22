@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('saving_registrations', function (Blueprint $table) {
+        Schema::create('saving_accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('field_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('center_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
@@ -47,6 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('saving_registrations');
+        Schema::dropIfExists('saving_accounts');
     }
 };

@@ -1,19 +1,19 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
-return new class() extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('saving_registration_action_histories', function (Blueprint $table) {
+        Schema::create('loan_account_action_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('saving_reg_id')->constrained('saving_registrations')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
+            $table->foreignId('loan_account_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('author_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->string('name');
             $table->string('image_uri');
@@ -28,6 +28,6 @@ return new class() extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('saving_registration_action_histories');
+        Schema::dropIfExists('loan_account_action_histories');
     }
 };

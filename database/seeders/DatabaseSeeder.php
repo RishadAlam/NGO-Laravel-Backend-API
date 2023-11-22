@@ -28,9 +28,9 @@ class DatabaseSeeder extends Seeder
                 // CenterSeeder::class,
                 // CategorySeeder::class,
                 // ClientRegistrationSeeder::class,
-                SavingRegistrationSeeder::class,
-                LoanRegistrationSeeder::class
-                ]
+                SavingAccountSeeder::class,
+                LoanAccountSeeder::class
+            ]
         );
     }
 }

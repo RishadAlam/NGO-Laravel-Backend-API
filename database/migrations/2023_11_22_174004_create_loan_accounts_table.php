@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loan_registrations', function (Blueprint $table) {
+        Schema::create('loan_accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('field_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('center_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
@@ -52,6 +52,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loan_registrations');
+        Schema::dropIfExists('loan_accounts');
     }
 };

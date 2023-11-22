@@ -4,7 +4,7 @@ namespace App\Http\Requests\client;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoanRegistrationStoreRequest extends FormRequest
+class SavingAccountStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,14 +29,12 @@ class LoanRegistrationStoreRequest extends FormRequest
             'acc_no'                            => 'required|numeric',
             'start_date'                        => 'required|numeric',
             'duration_date'                     => 'required|numeric',
-            'loan_given'                        => 'required|numeric',
-            'payable_deposit'                   => 'required|numeric',
             'payable_installment'               => 'required|numeric',
+            'payable_deposit'                   => 'required|numeric',
             'payable_interest'                  => 'required|numeric',
-            'total_payable_loan_with_interest'  => 'required|numeric',
-            'loan_installment'                  => 'required|numeric',
-            'interest_installment'              => 'required|numeric',
-            'guarantors'                        => 'required|json',
+            'total_deposit_without_interest'    => 'required|numeric',
+            'total_deposit_with_interest'       => 'required|numeric',
+            'nominees'                          => 'required|json',
             'creator_id'                        => 'nullable|numeric'
         ];
     }

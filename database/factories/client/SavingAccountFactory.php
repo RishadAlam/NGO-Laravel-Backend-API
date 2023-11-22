@@ -10,9 +10,9 @@ use App\Models\client\ClientRegistration;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\client\LoanRegistration>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\client\SavingAccount>
  */
-class LoanRegistrationFactory extends Factory
+class SavingAccountFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -35,14 +35,11 @@ class LoanRegistrationFactory extends Factory
             'acc_no'                            => $register->acc_no,
             'start_date'                        => fake()->date(),
             'duration_date'                     => fake()->date(),
-            'loan_given'                        => fake()->numberBetween(5, 10),
             'payable_installment'               => fake()->numberBetween(5, 10),
             'payable_deposit'                   => fake()->numberBetween(0, 1000),
             'payable_interest'                  => fake()->numberBetween(0, 100),
-            'total_payable_interest'            => fake()->numberBetween(0, 100),
-            'total_payable_loan_with_interest'  => fake()->numberBetween(1000, 10000),
-            'loan_installment'                  => fake()->numberBetween(1000, 10000),
-            'interest_installment'              => fake()->numberBetween(1000, 10000),
+            'total_deposit_without_interest'    => fake()->numberBetween(1000, 10000),
+            'total_deposit_with_interest'       => fake()->numberBetween(1000, 10000),
             'status'                            => 1,
             'creator_id'                        => $user_id,
         ];

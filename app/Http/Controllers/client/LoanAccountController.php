@@ -3,20 +3,18 @@
 namespace App\Http\Controllers\client;
 
 use Illuminate\Http\Request;
+use App\Models\client\LoanAccount;
 use App\Http\Controllers\Controller;
-use App\Models\client\LoanRegistration;
-use App\Http\Requests\client\LoanRegistrationStoreRequest;
 
-class LoanRegistrationController extends Controller
+class LoanAccountController extends Controller
 {
-
     /**
      * Action History Common Function
      */
     private static function setActionHistory($id, $action, $histData)
     {
         return [
-            "loan_reg_id"       => $id,
+            "loan_Account_id"   => $id,
             "author_id"         => auth()->id(),
             "name"              => auth()->user()->name,
             "image_uri"         => auth()->user()->image_uri,
@@ -30,7 +28,7 @@ class LoanRegistrationController extends Controller
      */
     public function index()
     {
-        $loan_registrations = LoanRegistration::with('Author:id,name')
+        $loan_registrations = LoanAccount::with('Author:id,name')
             ->with("Field:id,name")
             ->with("Center:id,name")
             ->when(request('fetch_pending'), function ($query) {
@@ -60,7 +58,7 @@ class LoanRegistrationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(LoanRegistrationStoreRequest $request)
+    public function store(Request $request)
     {
         //
     }

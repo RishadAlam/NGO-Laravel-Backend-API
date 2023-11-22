@@ -7,12 +7,12 @@ use App\Models\field\Field;
 use App\Models\center\Center;
 use App\Models\category\Category;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\client\NomineeRegistration;
+use App\Models\client\GuarantorRegistration;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\client\SavingRegistrationActionHistory;
+use App\Models\client\LoanAccountActionHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class SavingRegistration extends Model
+class LoanAccount extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -29,17 +29,20 @@ class SavingRegistration extends Model
         'acc_no',
         'start_date',
         'duration_date',
-        'payable_installment',
+        'loan_given',
         'payable_deposit',
+        'payable_installment',
         'payable_interest',
-        'total_deposit_without_interest',
-        'total_deposit_with_interest',
-        'total_installment',
+        'total_payable_interest',
+        'total_payable_loan_with_interest',
+        'loan_installment',
+        'interest_installment',
+        'total_rec_installment',
         'total_deposited',
         'total_withdrawn',
+        'total_loan_rec',
+        'total_interest_rec',
         'closing_balance',
-        'closing_interest',
-        'closing_balance_with_interest',
         'description',
         'status',
         'is_approved',
@@ -57,19 +60,19 @@ class SavingRegistration extends Model
     }
 
     /**
-     * Relation with SavingRegistrationActionHistory Table
+     * Relation with LoanAccountActionHistory Table
      */
-    public function SavingRegistrationActionHistory()
+    public function LoanAccountActionHistory()
     {
-        return $this->hasMany(SavingRegistrationActionHistory::class);
+        return $this->hasMany(LoanAccountActionHistory::class);
     }
 
     /**
-     * Relation with NomineeRegistration Table
+     * Relation with GuarantorRegistration Table
      */
-    public function NomineeRegistration()
+    public function GuarantorRegistration()
     {
-        return $this->hasMany(NomineeRegistration::class);
+        return $this->hasMany(GuarantorRegistration::class);
     }
 
     /**

@@ -4,24 +4,23 @@ namespace App\Http\Controllers\client;
 
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
+use App\Models\client\Nominee;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
-use App\Models\client\SavingRegistration;
+use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Validator;
-use App\Models\client\NomineeRegistration;
-use App\Http\Requests\client\SavingRegistrationStoreRequest;
+use App\Http\Requests\client\SavingAccountStoreRequest;
 
-class SavingRegistrationController extends Controller
+class SavingAccountController extends Controller
 {
-
     /**
      * Action History Common Function
      */
     private static function setActionHistory($id, $action, $histData)
     {
         return [
-            "saving_reg_id"     => $id,
+            "saving_account_id" => $id,
             "author_id"         => auth()->id(),
             "name"              => auth()->user()->name,
             "image_uri"         => auth()->user()->image_uri,
@@ -35,7 +34,7 @@ class SavingRegistrationController extends Controller
      */
     public function index()
     {
-        $saving_registrations = SavingRegistration::with('Author:id,name')
+        $saving_accounts = SavingAccount::with('Author:id,name')
             ->with("Field:id,name")
             ->with("Center:id,name")
             ->when(request('fetch_pending'), function ($query) {
@@ -56,7 +55,7 @@ class SavingRegistrationController extends Controller
         return response(
             [
                 'success'   => true,
-                'data'      => $saving_registrations
+                'data'      => $saving_accounts
             ],
             200
         );
@@ -65,7 +64,7 @@ class SavingRegistrationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SavingRegistrationStoreRequest $request)
+    public function store(SavingAccountStoreRequest $request)
     {
         $errors         = [];
         $data           = (object) $request->validated();
@@ -85,7 +84,7 @@ class SavingRegistrationController extends Controller
         }
 
         DB::transaction(function () use ($data, $is_approved, $nominees) {
-            $saving_registration = SavingRegistration::create(
+            $saving_registration = SavingAccount::create(
                 [
                     'field_id'                          => $data->field_id,
                     'center_id'                         => $data->center_id,
@@ -143,7 +142,7 @@ class SavingRegistrationController extends Controller
                     'address'                   => $nominee->address,
                 ];
             }
-            NomineeRegistration::insert($nominees_arr);
+            Nominee::insert($nominees_arr);
         });
 
         return create_response(__('customValidations.client.saving.successful'));
