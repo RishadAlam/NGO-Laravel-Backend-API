@@ -23,7 +23,7 @@ class StaffUpdateRequest extends FormRequest
     {
         return [
             'name'      => 'required|string|max:100',
-            'email'     => 'required|email',
+            'email'     => "required|email|unique:users,email,{$this->user}",
             'password'  => [
                 'nullable',
                 'min:8',

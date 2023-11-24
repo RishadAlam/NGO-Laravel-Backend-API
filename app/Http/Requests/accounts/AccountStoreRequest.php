@@ -23,7 +23,7 @@ class AccountStoreRequest extends FormRequest
     {
         return [
             "name"              => "required|max:100",
-            "acc_no"            => "nullable",
+            "acc_no"            => "nullable|unique:accounts,acc_no",
             "acc_details"       => "nullable",
             "initial_balance"   => "nullable"
         ];

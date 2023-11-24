@@ -23,7 +23,7 @@ class AccountUpdateRequest extends FormRequest
     {
         return [
             "name"              => "required|max:100",
-            "acc_no"            => "nullable",
+            "acc_no"            => "nullable|unique:accounts,acc_no,{$this->account}",
             "acc_details"       => "nullable",
         ];
     }
