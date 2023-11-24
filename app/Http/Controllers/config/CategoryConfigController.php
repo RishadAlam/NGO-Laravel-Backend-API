@@ -22,7 +22,7 @@ class CategoryConfigController extends Controller
      */
     public function get_all_categories_config()
     {
-        $configs = CategoryConfig::with("Category:id,name")->get();
+        $configs = CategoryConfig::with("Category:id,name,is_default")->get();
         return $configs;
     }
 
