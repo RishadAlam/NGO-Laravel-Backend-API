@@ -169,7 +169,7 @@ class CenterController extends Controller
      */
     public function get_active_centers()
     {
-        $fields = Center::where('status', true)
+        $centers = Center::where('status', true)
             ->when(!empty(request('field_id')), function ($query) {
                 $query->where('field_id', request('field_id'));
             })
@@ -178,7 +178,7 @@ class CenterController extends Controller
         return response(
             [
                 'success'   => true,
-                'data'      => $fields
+                'data'      => $centers
             ],
             200
         );

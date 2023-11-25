@@ -66,6 +66,9 @@ class ClientRegistrationController extends Controller
             ->when(request('user_id'), function ($query) {
                 $query->where('creator_id', request('user_id'));
             })
+            ->when(request('form'), function ($query) {
+                $query->select('id', 'acc_no', 'name', 'image_uri');
+            })
             ->orderBy('id', 'DESC')
             ->get();
 

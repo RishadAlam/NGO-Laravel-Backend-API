@@ -116,12 +116,14 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Here you can see all the API routes that have been additionally added to
      * the resource controller
      */
-    Route::GET('users/permissions/{id}', [UserController::class, 'get_user_permissions']);                                     // Get Specified users permissions
-    Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');                          // Permissions Index
-    Route::GET('fields/active', [FieldController::class, 'get_active_fields']);                                                // Get all active fields
-    Route::GET('centers/active', [CenterController::class, 'get_active_Centers']);                                                // Get all active fields
-    Route::GET('categories/groups', [CategoryController::class, 'get_category_groups']);                                       // Get all Category Groups
-    Route::GET('client/registration/occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('client.registration.occupations');                                       // Get all Category Groups
+    Route::GET('users/permissions/{id}', [UserController::class, 'get_user_permissions']);
+    Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');
+    Route::GET('users/active', [UserController::class, 'get_active_users']);
+    Route::GET('fields/active', [FieldController::class, 'get_active_fields']);
+    Route::GET('centers/active', [CenterController::class, 'get_active_Centers']);
+    Route::GET('categories/active', [CategoryController::class, 'get_active_Categories']);
+    Route::GET('categories/groups', [CategoryController::class, 'get_category_groups']);
+    Route::GET('client/registration/occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('client.registration.occupations');
 
     // Accounts Additional Routes
     Route::prefix('accounts')->name('accounts.')->group(function () {

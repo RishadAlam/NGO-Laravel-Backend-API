@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\staffs;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\staffs\ChangeStatusRequest;
-use App\Http\Requests\StaffStoreRequest;
-use App\Http\Requests\StaffUpdateRequest;
 use App\Models\User;
 use App\Models\UserActionHistory;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\StaffStoreRequest;
+use App\Http\Requests\StaffUpdateRequest;
+use App\Http\Requests\staffs\ChangeStatusRequest;
 
 class UserController extends Controller
 {
@@ -150,10 +151,10 @@ class UserController extends Controller
         $staff      = User::with('roles:id,name')->find($id);
         $histData   = [];
         $staff->name    !== $staffData->name ? $histData['name'] = "<p class='text-danger'>{$staff->name}</p><p class='text-success'>{$staffData->name}</p>" : '';
-        $staff->email   !== $staffData->email ?$histData['email'] = "<p class='text-danger'>{$staff->email}</p><p class='text-success'>{$staffData->email}</p>" : '';
-        $staff->phone   !== $staffData->phone ?$histData['phone'] = "<p class='text-danger'>{$staff->phone}</p><p class='text-success'>{$staffData->phone}</p>" : '';
+        $staff->email   !== $staffData->email ? $histData['email'] = "<p class='text-danger'>{$staff->email}</p><p class='text-success'>{$staffData->email}</p>" : '';
+        $staff->phone   !== $staffData->phone ? $histData['phone'] = "<p class='text-danger'>{$staff->phone}</p><p class='text-success'>{$staffData->phone}</p>" : '';
 
-        if (isset( $staff->roles[0]->id) && $staff->roles[0]->id !== $staffData->role) {
+        if (isset($staff->roles[0]->id) && $staff->roles[0]->id !== $staffData->role) {
             $role       = Role::find($staffData->role, ['id', 'name']);
             $histData['role'] = "<p class='text-danger'>{$staff->roles[0]->name}</p><p class='text-success'>{$role->name}</p>";
         }
@@ -165,7 +166,7 @@ class UserController extends Controller
                 'phone' => $staffData->phone
             ]);
 
-            if(isset($staffData->password)){
+            if (isset($staffData->password)) {
                 $histData['password'] = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
                 $staff->update(['password'  => bcrypt($staffData->password)]);
             }
@@ -219,6 +220,26 @@ class UserController extends Controller
             [
                 'success'   => true,
                 'message'   => __('customValidations.staff.delete')
+            ],
+            200
+        );
+    }
+
+    /**
+     * Get all active users
+     */
+    public function get_active_users()
+    {
+        $users = User::where('status', true)
+            ->when(!Auth::user()->can('saving_acc_creator_selection'), function ($query) {
+                $query->whereId(auth()->user()->id);
+            })
+            ->get(['id', 'name']);
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $users
             ],
             200
         );

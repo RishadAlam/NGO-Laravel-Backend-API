@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\category;
 
+use Illuminate\Http\Request;
+use App\Models\category\Category;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\category\CategoryChangeStatusRequest;
+use App\Models\category\CategoryConfig;
+use App\Models\category\CategoryActionHistory;
 use App\Http\Requests\category\CategoryStoreRequest;
 use App\Http\Requests\category\CategoryUpdateRequest;
-use App\Models\category\Category;
-use App\Models\category\CategoryActionHistory;
-use App\Models\category\CategoryConfig;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\category\CategoryChangeStatusRequest;
 
 class CategoryController extends Controller
 {
@@ -187,6 +187,23 @@ class CategoryController extends Controller
             [
                 'success'   => true,
                 'data'      => $groups
+            ],
+            200
+        );
+    }
+
+    /**
+     * Get all active Categories
+     */
+    public function get_active_Categories()
+    {
+        $categories = Category::where('status', true)
+            ->get(['id', 'name', 'group', 'is_default']);
+
+        return response(
+            [
+                'success'   => true,
+                'data'      => $categories
             ],
             200
         );
