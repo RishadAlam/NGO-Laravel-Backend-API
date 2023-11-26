@@ -138,7 +138,7 @@ class SavingAccountController extends Controller
                     'image'                     => $imgName,
                     'image_uri'                 => URL::to('/storage/nominees/', $imgName),
                     'signature'                 => $sign,
-                    'signature'                 => $sign_uri,
+                    'signature_uri'             => $sign_uri,
                     'address'                   => $nominee->address,
                 ];
             }
@@ -223,5 +223,23 @@ class SavingAccountController extends Controller
         if ($validated->fails()) {
             return $validated->errors()->toArray();
         }
+    }
+
+    /**
+     * Get all Occupations
+     */
+    public function get_nominee_occupations()
+    {
+        $occupations = Nominee::distinct('occupation')->orderBy('occupation', 'asc')->pluck('occupation');
+        return create_response(null, $occupations);
+    }
+
+    /**
+     * Get all Relation
+     */
+    public function get_nominee_relations()
+    {
+        $relations = Nominee::distinct('relation')->orderBy('relation', 'asc')->pluck('relation');
+        return create_response(null, $relations);
     }
 }

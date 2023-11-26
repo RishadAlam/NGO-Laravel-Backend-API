@@ -123,7 +123,13 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('centers/active', [CenterController::class, 'get_active_Centers']);
     Route::GET('categories/active', [CategoryController::class, 'get_active_Categories']);
     Route::GET('categories/groups', [CategoryController::class, 'get_category_groups']);
-    Route::GET('client/registration/occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('client.registration.occupations');
+
+    // Registration form additional routes
+    Route::prefix('client/registration')->name('client.registration.')->group(function () {
+        Route::GET('occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('occupations');
+        Route::GET('saving/nominee/occupations', [SavingAccountController::class, 'get_nominee_occupations'])->name('saving.occupations');
+        Route::GET('saving/nominee/relations', [SavingAccountController::class, 'get_nominee_relations'])->name('saving.relations');
+    });
 
     // Accounts Additional Routes
     Route::prefix('accounts')->name('accounts.')->group(function () {
