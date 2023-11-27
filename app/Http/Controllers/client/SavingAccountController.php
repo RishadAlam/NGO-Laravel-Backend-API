@@ -68,8 +68,8 @@ class SavingAccountController extends Controller
     {
         $errors         = [];
         $data           = (object) $request->validated();
-        $nominees       = json_decode($data->nominees);
-        $errors         = self::nominee_validation((array) $nominees);
+        $nominees       = (array) json_decode($data->nominees);
+        $errors         = self::nominee_validation($nominees);
         $is_approved    = AppConfig::where('meta_key', 'saving_registration_approval')
             ->value('meta_value');
 
@@ -171,13 +171,14 @@ class SavingAccountController extends Controller
     {
         $errors = [];
         foreach ($nominees as $key => $nominee) {
+            $nominee = (array) $nominee;
             $validated = Validator::make(
                 $nominee,
                 [
                     'name'              => 'required',
                     'father_name'       => "required",
                     'husband_name'      => "nullable",
-                    'mother_name'       => "required",
+                    'mother_name'       => "required|numeric",
                     'nid'               => "required|numeric",
                     'dob'               => "required|date",
                     'occupation'        => "required",
@@ -187,14 +188,15 @@ class SavingAccountController extends Controller
                     'secondary_phone'   => "nullable|phone:BD",
                     'image'             => "required|mimes:jpeg,png,jpg,webp|max:5120",
                     'signature'         => "nullable",
-                    'address'           => "required|json"
+                    'address'           => "required"
                 ]
             );
-
+            return $validated->fails();
+            die;
             if ($validated->fails()) {
                 $errors['nominees'[$key]] = $validated->errors()->toArray();
             } else {
-                $result = self::address_validation((array) json_decode($nominee->address));
+                $result = self::address_validation((array) $nominee['address']);
                 if (!empty($result)) {
                     $errors['nominees'[$key]] = $result;
                 }
