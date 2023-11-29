@@ -67,85 +67,115 @@ class SavingAccountController extends Controller
     public function store(SavingAccountStoreRequest $request)
     {
         $errors         = [];
-        $data           = (object) $request->validated();
-        $nominees       = (array) json_decode($data->nominees);
-        $errors         = self::nominee_validation($nominees);
-        $is_approved    = AppConfig::where('meta_key', 'saving_registration_approval')
-            ->value('meta_value');
+        // $data           = (object) $request->validated();
+        // // $nominees       = (array) json_decode($data->nominees);
+        // $nominees       = $data->nominees;
+        // return $data;
+        // die;
+        try {
+            $validatedData = $request->validate();
+            // Process the validated data
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $errors = $exception->validator->errors();
 
-        if (!empty($errors)) {
-            return response(
-                [
-                    'success'   => false,
-                    "errors"    => $errors
-                ],
-                401
-            );
-        }
+            // Format error messages for nested arrays
+            $formattedErrors = [];
+            foreach ($errors->getMessages() as $field => $messages) {
+                if (strpos($field, '.') !== false) {
+                    $nestedFieldParts = explode('.', $field);
+                    $nestedFieldName = $nestedFieldParts[0];
+                    $nestedFieldKey = $nestedFieldParts[1];
 
-        DB::transaction(function () use ($data, $is_approved, $nominees) {
-            $saving_registration = SavingAccount::create(
-                [
-                    'field_id'                          => $data->field_id,
-                    'center_id'                         => $data->center_id,
-                    'category_id'                       => $data->category_id,
-                    'client_registration_id'            => $data->client_registration_id,
-                    'acc_no'                            => $data->acc_no,
-                    'start_date'                        => $data->start_date,
-                    'duration_date'                     => $data->duration_date,
-                    'payable_installment'               => $data->payable_installment,
-                    'payable_deposit'                   => $data->payable_deposit,
-                    'payable_interest'                  => $data->payable_interest,
-                    'total_deposit_without_interest'    => $data->total_deposit_without_interest,
-                    'total_deposit_with_interest'       => $data->total_deposit_with_interest,
-                    'is_approved'                       => $is_approved,
-                    'creator_id'                        => $data->creator_id ?? auth()->id(),
-                ]
-            );
+                    if (!isset($formattedErrors[$nestedFieldName])) {
+                        $formattedErrors[$nestedFieldName] = [];
+                    }
 
-            $nominees_arr = [];
-            foreach ($nominees as $nominee) {
-                $extension  = $nominee->image->extension();
-                $imgName    = 'nominee_' . time() . '.' . $extension;
-                $nominee->image->move(public_path() . '/storage/nominees/', $imgName);
-
-                $sign       = null;
-                $sign_uri   = null;
-                if (!empty($nominee->signature)) {
-                    $folderPath     = public_path() . '/storage/nominees/';
-                    $image_parts    = explode(";base64,", $nominee->signature);
-                    $image_type_aux = explode("image/", $image_parts[0]);
-                    $image_type     = $image_type_aux[1];
-                    $image_base64   = base64_decode($image_parts[1]);
-                    $sign           = 'nominee_signature_' . time() . '.' . $image_type;
-                    file_put_contents($folderPath . $sign, $image_base64);
-                    $sign_uri       = URL::to('/storage/nominees/', $sign);
+                    $formattedErrors[$nestedFieldName][$nestedFieldKey] = $messages;
+                } else {
+                    $formattedErrors[$field] = $messages;
                 }
-
-                $nominee_arr[] = [
-                    'saving_registration_id'    => $saving_registration->id,
-                    'name'                      => $nominee->name,
-                    'father_name'               => $nominee->father_name,
-                    'husband_name'              => $nominee->husband_name,
-                    'mother_name'               => $nominee->mother_name,
-                    'nid'                       => $nominee->nid,
-                    'dob'                       => $nominee->dob,
-                    'occupation'                => $nominee->occupation,
-                    'relation'                  => $nominee->relation,
-                    'gender'                    => $nominee->gender,
-                    'primary_phone'             => $nominee->primary_phone,
-                    'secondary_phone'           => $nominee->secondary_phone,
-                    'image'                     => $imgName,
-                    'image_uri'                 => URL::to('/storage/nominees/', $imgName),
-                    'signature'                 => $sign,
-                    'signature_uri'             => $sign_uri,
-                    'address'                   => $nominee->address,
-                ];
             }
-            Nominee::insert($nominees_arr);
-        });
 
-        return create_response(__('customValidations.client.saving.successful'));
+            // Return the error response
+            return response()->json($formattedErrors, 422);
+        }
+        // $errors         = self::nominee_validation($nominees);
+        // $is_approved    = AppConfig::where('meta_key', 'saving_registration_approval')
+        //     ->value('meta_value');
+
+        // if (!empty($errors)) {
+        //     return response(
+        //         [
+        //             'success'   => false,
+        //             "errors"    => $errors
+        //         ],
+        //         401
+        //     );
+        // }
+
+        // DB::transaction(function () use ($data, $is_approved, $nominees) {
+        //     $saving_registration = SavingAccount::create(
+        //         [
+        //             'field_id'                          => $data->field_id,
+        //             'center_id'                         => $data->center_id,
+        //             'category_id'                       => $data->category_id,
+        //             'client_registration_id'            => $data->client_registration_id,
+        //             'acc_no'                            => $data->acc_no,
+        //             'start_date'                        => $data->start_date,
+        //             'duration_date'                     => $data->duration_date,
+        //             'payable_installment'               => $data->payable_installment,
+        //             'payable_deposit'                   => $data->payable_deposit,
+        //             'payable_interest'                  => $data->payable_interest,
+        //             'total_deposit_without_interest'    => $data->total_deposit_without_interest,
+        //             'total_deposit_with_interest'       => $data->total_deposit_with_interest,
+        //             'is_approved'                       => $is_approved,
+        //             'creator_id'                        => $data->creator_id ?? auth()->id(),
+        //         ]
+        //     );
+
+        //     $nominees_arr = [];
+        //     foreach ($nominees as $nominee) {
+        //         $extension  = $nominee->image->extension();
+        //         $imgName    = 'nominee_' . time() . '.' . $extension;
+        //         $nominee->image->move(public_path() . '/storage/nominees/', $imgName);
+
+        //         $sign       = null;
+        //         $sign_uri   = null;
+        //         if (!empty($nominee->signature)) {
+        //             $folderPath     = public_path() . '/storage/nominees/';
+        //             $image_parts    = explode(";base64,", $nominee->signature);
+        //             $image_type_aux = explode("image/", $image_parts[0]);
+        //             $image_type     = $image_type_aux[1];
+        //             $image_base64   = base64_decode($image_parts[1]);
+        //             $sign           = 'nominee_signature_' . time() . '.' . $image_type;
+        //             file_put_contents($folderPath . $sign, $image_base64);
+        //             $sign_uri       = URL::to('/storage/nominees/', $sign);
+        //         }
+
+        //         $nominee_arr[] = [
+        //             'saving_registration_id'    => $saving_registration->id,
+        //             'name'                      => $nominee->name,
+        //             'father_name'               => $nominee->father_name,
+        //             'husband_name'              => $nominee->husband_name,
+        //             'mother_name'               => $nominee->mother_name,
+        //             'nid'                       => $nominee->nid,
+        //             'dob'                       => $nominee->dob,
+        //             'occupation'                => $nominee->occupation,
+        //             'relation'                  => $nominee->relation,
+        //             'gender'                    => $nominee->gender,
+        //             'primary_phone'             => $nominee->primary_phone,
+        //             'secondary_phone'           => $nominee->secondary_phone,
+        //             'image'                     => $imgName,
+        //             'image_uri'                 => URL::to('/storage/nominees/', $imgName),
+        //             'signature'                 => $sign,
+        //             'signature_uri'             => $sign_uri,
+        //             'address'                   => $nominee->address,
+        //         ];
+        //     }
+        //     Nominee::insert($nominees_arr);
+        // });
+
+        // return create_response(__('customValidations.client.saving.successful'));
     }
 
     /**
@@ -192,6 +222,7 @@ class SavingAccountController extends Controller
                 ]
             );
             return $validated->fails();
+            // return $nominee;
             die;
             if ($validated->fails()) {
                 $errors['nominees'[$key]] = $validated->errors()->toArray();
