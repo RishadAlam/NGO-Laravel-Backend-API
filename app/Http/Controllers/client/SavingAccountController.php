@@ -68,7 +68,7 @@ class SavingAccountController extends Controller
     {
         $errors         = [];
         $data           = (object) $request->validated();
-        $nominees       = (array) json_decode($data->nominees);
+        // $nominees       = (array) json_decode($data->nominees);
         $nominees       = $data->nominees;
         return $data;
         die;
