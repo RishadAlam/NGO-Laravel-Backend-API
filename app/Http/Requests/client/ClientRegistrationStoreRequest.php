@@ -36,7 +36,7 @@ class ClientRegistrationStoreRequest extends FormRequest
             'religion'          => "required",
             'gender'            => "required",
             'primary_phone'     => "required|phone:BD",
-            'secondary_phone'   => "nullable|phone:BD",
+            'secondary_phone'   => "sometimes|phone:BD",
             'image'             => "required|mimes:jpeg,png,jpg,webp|max:5120",
             'signature'         => "nullable",
             'share'             => "required|integer",

@@ -67,41 +67,14 @@ class SavingAccountController extends Controller
     public function store(SavingAccountStoreRequest $request)
     {
         $errors         = [];
-        // $data           = (object) $request->validated();
-        // // $nominees       = (array) json_decode($data->nominees);
-        // $nominees       = $data->nominees;
-        // return $data;
-        // die;
-        try {
-            $validatedData = $request->validate();
-            // Process the validated data
-        } catch (\Illuminate\Validation\ValidationException $exception) {
-            $errors = $exception->validator->errors();
-
-            // Format error messages for nested arrays
-            $formattedErrors = [];
-            foreach ($errors->getMessages() as $field => $messages) {
-                if (strpos($field, '.') !== false) {
-                    $nestedFieldParts = explode('.', $field);
-                    $nestedFieldName = $nestedFieldParts[0];
-                    $nestedFieldKey = $nestedFieldParts[1];
-
-                    if (!isset($formattedErrors[$nestedFieldName])) {
-                        $formattedErrors[$nestedFieldName] = [];
-                    }
-
-                    $formattedErrors[$nestedFieldName][$nestedFieldKey] = $messages;
-                } else {
-                    $formattedErrors[$field] = $messages;
-                }
-            }
-
-            // Return the error response
-            return response()->json($formattedErrors, 422);
-        }
+        $data           = (object) $request->validated();
+        $nominees       = (array) json_decode($data->nominees);
+        $nominees       = $data->nominees;
+        return $data;
+        die;
         // $errors         = self::nominee_validation($nominees);
-        // $is_approved    = AppConfig::where('meta_key', 'saving_registration_approval')
-        //     ->value('meta_value');
+        $is_approved    = AppConfig::where('meta_key', 'saving_registration_approval')
+            ->value('meta_value');
 
         // if (!empty($errors)) {
         //     return response(
