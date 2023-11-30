@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\client;
 
+use App\Helpers\Helper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
@@ -17,7 +18,7 @@ class SavingAccountStoreRequest extends FormRequest
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException
      */
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator  $validator)
     {
         $errorMessages = $validator->errors()->toArray();
         // $errorCount = count($errorMessages);
@@ -25,31 +26,12 @@ class SavingAccountStoreRequest extends FormRequest
 
         foreach ($errorMessages as $field => $errors) {
             $fieldNames = explode('.', $field);
-            $formattedErrors[array_shift($fieldNames)][] = $this->createNestedArray(array_slice($fieldNames, 1), $errors);
+            Helper::createNestedArray($formattedErrors, $fieldNames, str_replace($field, array_pop($fieldNames), $errors[0]));
         }
 
         throw new HttpResponseException(
             response()->json(['errors' => $formattedErrors], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
         );
-    }
-
-    /**
-     * Create Array of index from the validation error key.
-     *
-     * @param array $fields
-     * @param array $data
-     * @return array
-     */
-    protected function createNestedArray($fields, $data)
-    {
-        if (empty($fields)) {
-            return $data;
-        }
-
-        $currentLevelName = array_shift($fields);
-        $subarray = array();
-        $subarray[!is_numeric($currentLevelName) ? $currentLevelName : (int) $currentLevelName] = $this->createNestedArray($fields, $data);
-        return $subarray;
     }
 
     /**
