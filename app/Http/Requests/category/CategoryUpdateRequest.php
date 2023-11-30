@@ -29,4 +29,20 @@ class CategoryUpdateRequest extends FormRequest
             "loan"          => "required_without:saving|required_if:saving,false|boolean",
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'name'          => __("customValidations.common.name"),
+            'group'         => __("customValidations.common.group"),
+            'description'   => __("customValidations.common.description"),
+            'saving'        => __("customValidations.common.saving"),
+            'loan'          => __("customValidations.common.loan"),
+        ];
+    }
 }

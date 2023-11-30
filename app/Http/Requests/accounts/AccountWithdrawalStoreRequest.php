@@ -30,4 +30,21 @@ class AccountWithdrawalStoreRequest extends FormRequest
             'date'                  => 'nullable'
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'account_id'        => __("customValidations.common.account_id"),
+            'amount'            => __("customValidations.common.amount"),
+            'previous_balance'  => __("customValidations.common.previous_balance"),
+            'balance'           => __("customValidations.common.balance"),
+            'description'       => __("customValidations.common.description"),
+            'date'              => __("customValidations.common.date"),
+        ];
+    }
 }

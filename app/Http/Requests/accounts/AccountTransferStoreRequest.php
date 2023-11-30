@@ -31,4 +31,22 @@ class AccountTransferStoreRequest extends FormRequest
             'date'              => 'nullable'
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'tx_acc_id'         => __("customValidations.common.tx_acc_id"),
+            'rx_acc_id'         => __("customValidations.common.rx_acc_id"),
+            'amount'            => __("customValidations.common.amount"),
+            'tx_prev_balance'   => __("customValidations.common.tx_prev_balance"),
+            'rx_prev_balance'   => __("customValidations.common.rx_prev_balance"),
+            'description'       => __("customValidations.common.description"),
+            'date'              => __("customValidations.common.date"),
+        ];
+    }
 }

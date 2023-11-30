@@ -25,4 +25,16 @@ class ApprovalsRequest extends FormRequest
             "approvals" => "required"
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'approvals'  => __("customValidations.common.approvals"),
+        ];
+    }
 }

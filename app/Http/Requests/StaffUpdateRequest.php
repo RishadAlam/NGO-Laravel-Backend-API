@@ -37,4 +37,21 @@ class StaffUpdateRequest extends FormRequest
             'role'              => 'required|integer'
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'name'              => __("customValidations.common.name"),
+            'email'             => __("customValidations.common.email"),
+            'phone'             => __("customValidations.common.phone"),
+            'role'              => __("customValidations.common.role"),
+            'password'          => __("customValidations.common.password"),
+            'confirm_password'  => __("customValidations.common.confirm_password"),
+        ];
+    }
 }

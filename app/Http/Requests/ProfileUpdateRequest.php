@@ -27,4 +27,18 @@ class ProfileUpdateRequest extends FormRequest
             'image' => 'nullable|mimes:jpeg,png,jpg,webp|max:5120'
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'name'  => __("customValidations.common.name"),
+            'phone' => __("customValidations.common.phone"),
+            'image' => __("customValidations.common.image"),
+        ];
+    }
 }

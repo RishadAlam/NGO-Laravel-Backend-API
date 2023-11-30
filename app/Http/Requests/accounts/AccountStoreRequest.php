@@ -28,4 +28,19 @@ class AccountStoreRequest extends FormRequest
             "initial_balance"   => "nullable"
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'name'              => __("customValidations.common.name"),
+            'acc_no'            => __("customValidations.common.acc_no"),
+            'acc_details'       => __("customValidations.common.acc_details"),
+            'initial_balance'   => __("customValidations.common.initial_balance"),
+        ];
+    }
 }

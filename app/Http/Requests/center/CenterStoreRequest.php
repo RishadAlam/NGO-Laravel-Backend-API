@@ -27,4 +27,18 @@ class CenterStoreRequest extends FormRequest
             "description"   => "nullable",
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'name'          => __("customValidations.common.name"),
+            'field_id'      => __("customValidations.common.field"),
+            'description'   => __("customValidations.common.description"),
+        ];
+    }
 }

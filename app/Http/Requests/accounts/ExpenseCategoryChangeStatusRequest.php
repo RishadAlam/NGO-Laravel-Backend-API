@@ -25,4 +25,16 @@ class ExpenseCategoryChangeStatusRequest extends FormRequest
             'status' => 'required|boolean'
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'status'  => __("customValidations.common.status"),
+        ];
+    }
 }

@@ -35,4 +35,18 @@ class ChangePasswordRequest extends FormRequest
             'confirm_password' => 'required|same:new_password',
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'current_password'  => __("customValidations.common.current_password"),
+            'new_password'      => __("customValidations.common.new_password"),
+            'confirm_password'  => __("customValidations.common.confirm_password"),
+        ];
+    }
 }

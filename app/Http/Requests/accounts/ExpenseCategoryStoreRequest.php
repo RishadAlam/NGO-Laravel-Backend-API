@@ -26,4 +26,17 @@ class ExpenseCategoryStoreRequest extends FormRequest
             "description"   => "nullable",
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'name'          => __("customValidations.common.name"),
+            'description'   => __("customValidations.common.description"),
+        ];
+    }
 }

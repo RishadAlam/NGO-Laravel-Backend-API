@@ -25,4 +25,16 @@ class UpdateRoleRequest extends FormRequest
             "name" => 'required|string|max:50'
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'name'  => __("customValidations.common.name"),
+        ];
+    }
 }

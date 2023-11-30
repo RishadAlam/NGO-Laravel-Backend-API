@@ -30,4 +30,21 @@ class AppSettingsRequest extends FormRequest
             "company_logo_uri"      => "nullable",
         ];
     }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'company_name'          => __("customValidations.common.company_name"),
+            'company_short_name'    => __("customValidations.common.company_short_name"),
+            'company_address'       => __("customValidations.common.company_address"),
+            'company_logo'          => __("customValidations.common.company_logo"),
+            'company_old_logo'      => __("customValidations.common.company_old_logo"),
+            'company_logo_uri'      => __("customValidations.common.company_logo_uri"),
+        ];
+    }
 }
