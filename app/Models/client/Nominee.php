@@ -15,7 +15,7 @@ class Nominee extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'saving_registration_id',
+        'saving_account_id',
         'name',
         'father_name',
         'husband_name',
@@ -33,4 +33,29 @@ class Nominee extends Model
         'signature_uri',
         'address',
     ];
+
+    /**
+     * Relationship belongs to SavingAccount model
+     *
+     * @return response()
+     */
+    public function SavingAccount()
+    {
+        return $this->belongsTo(SavingAccount::class)->withTrashed();
+    }
+    /**
+     * Mutator for address json Data
+     */
+    public function setAddressAttribute($value)
+    {
+        $this->attributes['address'] = json_encode($value);
+    }
+
+    /**
+     * accessor for json Data
+     */
+    public function getAddressAttribute($value)
+    {
+        return json_decode($value);
+    }
 }

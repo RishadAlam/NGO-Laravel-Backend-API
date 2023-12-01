@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('acc_no', 50);
             $table->date('start_date')->default(DB::raw('NOW()'));
             $table->date('duration_date');
-            $table->tinyInteger('payable_installment')->default(0);
+            $table->integer('payable_installment')->default(0);
             $table->integer('payable_deposit')->default(0);
-            $table->tinyInteger('payable_interest')->default(0)->comment('interest in "%" percentage');
+            $table->integer('payable_interest')->default(0)->comment('interest in "%" percentage');
             $table->integer('total_deposit_without_interest')->default(0);
             $table->integer('total_deposit_with_interest')->default(0);
             $table->integer('total_installment')->default(0);
