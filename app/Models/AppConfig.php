@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AppConfig extends Model
 {
@@ -37,9 +37,7 @@ class AppConfig extends Model
      */
     public static function get_config($meta_key)
     {
-        $meta_value = self::where('meta_key', $meta_key)
+        return self::where('meta_key', $meta_key)
             ->value('meta_value');
-
-        return response($meta_value, 200);
     }
 }

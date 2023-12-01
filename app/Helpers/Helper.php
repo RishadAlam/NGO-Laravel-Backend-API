@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\URL;
+
 class Helper
 {
     /**
@@ -36,5 +38,51 @@ class Helper
         //         $current[$firstProperty] = $value;
         //     }
         // }
+    }
+
+    /**
+     * Store Image
+     * 
+     * @param object $image
+     * @param string $prefix
+     * @param string $folder
+     * @return object 
+     */
+    public static function storeImage($image, $prefix, $folder)
+    {
+        $extension  = $image->extension();
+        $img_name   = $prefix . '_' . time() . '.' . $extension;
+        $image->move(public_path() . "/storage/{$folder}/", $img_name);
+        $img_uri    = URL::to("/storage/{$folder}/", $img_name);
+
+        return (object) [
+            "name"  => $img_name,
+            "uri"   => $img_uri,
+        ];
+    }
+
+    /**
+     * Store Signature
+     * 
+     * @param string $signature
+     * @param string $prefix
+     * @param string $folder
+     * @return object 
+     */
+    public static function storeSignature($signature, $prefix, $folder)
+    {
+        $folder_path    = public_path() . "/storage/{$folder}/";
+        $image_parts    = explode(";base64,", $signature);
+        $image_type_aux = explode("image/", $image_parts[0]);
+        $image_type     = $image_type_aux[1];
+        $image_base64   = base64_decode($image_parts[1]);
+        $sign           = $prefix . '_' . time() . '.' . $image_type;
+        file_put_contents($folder_path . $sign, $image_base64);
+        $sign_uri       = URL::to("/storage/{$folder}/", $sign);
+
+        return (object) [
+            "name"  => $sign,
+            "uri"   => $sign_uri,
+        ];
     }
 }

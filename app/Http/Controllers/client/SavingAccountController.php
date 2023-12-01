@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\client;
 
+use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
 use App\Models\client\Nominee;
@@ -75,29 +76,25 @@ class SavingAccountController extends Controller
         DB::transaction(function () use ($data, $is_approved, $nominees) {
             $saving_account = SavingAccount::create(self::set_saving_field_map($data, $is_approved, $data->creator_id));
 
-            $nominees_arr = [];
+            $nominees_arr   = [];
             foreach ($nominees as $nominee) {
                 $nominee    = (object) $nominee;
-                $extension  = $nominee->image->extension();
-                $img_name   = 'nominee_' . time() . '.' . $extension;
-                $nominee->image->move(public_path() . '/storage/nominees/', $img_name);
-                $img_uri    = URL::to('/storage/nominees/', $img_name);
+                $img        = Helper::storeImage($nominee->image, "nominee", "nominees");
+                $signature  = isset($nominee->signature)
+                    ? Helper::storeSignature($nominee->signature, "nominee_signature", "nominees")
+                    : (object) ["name" => null, "uri" => null];
 
-                $sign       = null;
-                $sign_uri   = null;
-                if (!empty($nominee->signature)) {
-                    $folder_path    = public_path() . '/storage/nominees/';
-                    $image_parts    = explode(";base64,", $nominee->signature);
-                    $image_type_aux = explode("image/", $image_parts[0]);
-                    $image_type     = $image_type_aux[1];
-                    $image_base64   = base64_decode($image_parts[1]);
-                    $sign           = 'nominee_signature_' . time() . '.' . $image_type;
-                    file_put_contents($folder_path . $sign, $image_base64);
-                    $sign_uri       = URL::to('/storage/nominees/', $sign);
-                }
-
-                $nominees_arr[] = self::set_nominee_field_map($saving_account->id, $nominee, true, $img_name, $img_uri, $sign, $sign_uri);
+                $nominees_arr[] = self::set_nominee_field_map(
+                    $saving_account->id,
+                    $nominee,
+                    true,
+                    $img->name,
+                    $img->uri,
+                    $signature->name,
+                    $signature->uri
+                );
             }
+
             Nominee::insert($nominees_arr);
         });
 
