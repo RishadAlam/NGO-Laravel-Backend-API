@@ -3,6 +3,7 @@
 namespace App\Http\Requests\client;
 
 use App\Helpers\Helper;
+use App\Models\AppConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
@@ -49,7 +50,7 @@ class SavingAccountStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $validations = [
             'field_id'                          => 'required|numeric',
             'center_id'                         => 'required|numeric',
             'category_id'                       => 'required|numeric',
@@ -84,6 +85,11 @@ class SavingAccountStoreRequest extends FormRequest
             'nominees.*.address.district'       => 'required',
             'nominees.*.address.division'       => 'required',
         ];
+
+        if (AppConfig::get_config('nominee_reg_sign_is_required')) {
+            $validations['nominees.*.signature'] = "required";
+        }
+        return $validations;
     }
 
     /**

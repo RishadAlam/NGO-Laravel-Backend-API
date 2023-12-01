@@ -69,70 +69,34 @@ class SavingAccountController extends Controller
         $errors         = [];
         $data           = (object) $request->validated();
         $nominees       = $data->nominees;
-        // return $data;
-        // die;
-        // $is_approved    = AppConfig::where('meta_key', 'saving_registration_approval')
-        //     ->value('meta_value');
+        $is_approved    = AppConfig::where('meta_key', 'saving_account_registration_approval')
+            ->value('meta_value');
 
-        DB::transaction(function () use ($data, $nominees) {
-            $saving_account = SavingAccount::create(
-                [
-                    'field_id'                          => $data->field_id,
-                    'center_id'                         => $data->center_id,
-                    'category_id'                       => $data->category_id,
-                    'client_registration_id'            => $data->client_registration_id,
-                    'acc_no'                            => $data->acc_no,
-                    'start_date'                        => $data->start_date,
-                    'duration_date'                     => $data->duration_date,
-                    'payable_installment'               => $data->payable_installment,
-                    'payable_deposit'                   => $data->payable_deposit,
-                    'payable_interest'                  => $data->payable_interest,
-                    'total_deposit_without_interest'    => $data->total_deposit_without_interest,
-                    'total_deposit_with_interest'       => $data->total_deposit_with_interest,
-                    'is_approved'                       => false,
-                    'creator_id'                        => $data->creator_id ?? auth()->id(),
-                ]
-            );
+        DB::transaction(function () use ($data, $is_approved, $nominees) {
+            $saving_account = SavingAccount::create(self::set_saving_field_map($data, $is_approved, $data->creator_id));
 
             $nominees_arr = [];
             foreach ($nominees as $nominee) {
                 $nominee    = (object) $nominee;
                 $extension  = $nominee->image->extension();
-                $imgName    = 'nominee_' . time() . '.' . $extension;
-                $nominee->image->move(public_path() . '/storage/nominees/', $imgName);
+                $img_name   = 'nominee_' . time() . '.' . $extension;
+                $nominee->image->move(public_path() . '/storage/nominees/', $img_name);
+                $img_uri    = URL::to('/storage/nominees/', $img_name);
 
                 $sign       = null;
                 $sign_uri   = null;
                 if (!empty($nominee->signature)) {
-                    $folderPath     = public_path() . '/storage/nominees/';
+                    $folder_path    = public_path() . '/storage/nominees/';
                     $image_parts    = explode(";base64,", $nominee->signature);
                     $image_type_aux = explode("image/", $image_parts[0]);
                     $image_type     = $image_type_aux[1];
                     $image_base64   = base64_decode($image_parts[1]);
                     $sign           = 'nominee_signature_' . time() . '.' . $image_type;
-                    file_put_contents($folderPath . $sign, $image_base64);
+                    file_put_contents($folder_path . $sign, $image_base64);
                     $sign_uri       = URL::to('/storage/nominees/', $sign);
                 }
 
-                $nominees_arr[] = [
-                    'saving_account_id'         => $saving_account->id,
-                    'name'                      => $nominee->name,
-                    'father_name'               => $nominee->father_name,
-                    'husband_name'              => isset($nominee->husband_name) ? $nominee->husband_name : '',
-                    'mother_name'               => $nominee->mother_name,
-                    'nid'                       => $nominee->nid,
-                    'dob'                       => $nominee->dob,
-                    'occupation'                => $nominee->occupation,
-                    'relation'                  => $nominee->relation,
-                    'gender'                    => $nominee->gender,
-                    'primary_phone'             => $nominee->primary_phone,
-                    'secondary_phone'           => isset($nominee->secondary_phone) ? $nominee->secondary_phone : '',
-                    'image'                     => $imgName,
-                    'image_uri'                 => URL::to('/storage/nominees/', $imgName),
-                    'signature'                 => $sign,
-                    'signature_uri'             => $sign_uri,
-                    'address'                   => json_encode($nominee->address),
-                ];
+                $nominees_arr[] = self::set_nominee_field_map($saving_account->id, $nominee, true, $img_name, $img_uri, $sign, $sign_uri);
             }
             Nominee::insert($nominees_arr);
         });
@@ -157,70 +121,6 @@ class SavingAccountController extends Controller
     }
 
     /**
-     * Nominees Validation
-     */
-    private static function nominee_validation($nominees)
-    {
-        $errors = [];
-        foreach ($nominees as $key => $nominee) {
-            $nominee = (array) $nominee;
-            $validated = Validator::make(
-                $nominee,
-                [
-                    'name'              => 'required',
-                    'father_name'       => "required",
-                    'husband_name'      => "nullable",
-                    'mother_name'       => "required|numeric",
-                    'nid'               => "required|numeric",
-                    'dob'               => "required|date",
-                    'occupation'        => "required",
-                    'relation'          => "required",
-                    'gender'            => "required",
-                    'primary_phone'     => "nullable|phone:BD",
-                    'secondary_phone'   => "nullable|phone:BD",
-                    'image'             => "required|mimes:jpeg,png,jpg,webp|max:5120",
-                    'signature'         => "nullable",
-                    'address'           => "required"
-                ]
-            );
-            return $validated->fails();
-            // return $nominee;
-            die;
-            if ($validated->fails()) {
-                $errors['nominees'[$key]] = $validated->errors()->toArray();
-            } else {
-                $result = self::address_validation((array) $nominee['address']);
-                if (!empty($result)) {
-                    $errors['nominees'[$key]] = $result;
-                }
-            }
-        }
-        return $errors;
-    }
-
-    /**
-     * Address Validation
-     */
-    private static function address_validation($address)
-    {
-        $validated = Validator::make(
-            $address,
-            [
-                'street_address'    => 'required',
-                'city'              => "required",
-                'post_office'       => "required",
-                'police_station'    => "required",
-                'state'             => "required",
-                'division'          => "required",
-            ]
-        );
-
-        if ($validated->fails()) {
-            return $validated->errors()->toArray();
-        }
-    }
-
-    /**
      * Get all Occupations
      */
     public function get_nominee_occupations()
@@ -236,5 +136,90 @@ class SavingAccountController extends Controller
     {
         $relations = Nominee::distinct('relation')->orderBy('relation', 'asc')->pluck('relation');
         return create_response(null, $relations);
+    }
+
+    /**
+     * Set Saving Acc Field Map
+     * 
+     * @param object $data
+     * @param boolean $is_approved
+     * @param integer $creator_id
+     * @return array
+     */
+    private static function set_saving_field_map($data, $is_approved = null, $creator_id = null)
+    {
+        $map = [
+            'field_id'                          => $data->field_id,
+            'center_id'                         => $data->center_id,
+            'category_id'                       => $data->category_id,
+            'client_registration_id'            => $data->client_registration_id,
+            'acc_no'                            => $data->acc_no,
+            'start_date'                        => $data->start_date,
+            'duration_date'                     => $data->duration_date,
+            'payable_installment'               => $data->payable_installment,
+            'payable_deposit'                   => $data->payable_deposit,
+            'payable_interest'                  => $data->payable_interest,
+            'total_deposit_without_interest'    => $data->total_deposit_without_interest,
+            'total_deposit_with_interest'       => $data->total_deposit_with_interest,
+            'is_approved'                       => $is_approved ?? false,
+            'creator_id'                        => $data->creator_id ?? auth()->id(),
+        ];
+
+        if (isset($is_approved)) {
+            $map['is_approved'] = $is_approved;
+        }
+        if (isset($creator_id)) {
+            $map['creator_id'] = $creator_id ?? auth()->id();
+        }
+
+        return $map;
+    }
+
+    /**
+     * Set Nominee Field Map
+     * 
+     * @param integer $saving_account_id
+     * @param object $data
+     * @param boolean $jsonAddress
+     * @param string $image
+     * @param string $image_uri
+     * @param string $signature
+     * @param string $signature_uri
+     * @return array
+     */
+    private static function set_nominee_field_map($saving_account_id, $data, $jsonAddress = false, $image = null, $image_uri = null, $signature = null, $signature_uri = null)
+    {
+        $map = [
+            'saving_account_id'         => $saving_account_id,
+            'name'                      => $data->name,
+            'father_name'               => $data->father_name,
+            'husband_name'              => isset($data->husband_name) ? $data->husband_name : '',
+            'mother_name'               => $data->mother_name,
+            'nid'                       => $data->nid,
+            'dob'                       => $data->dob,
+            'occupation'                => $data->occupation,
+            'relation'                  => $data->relation,
+            'gender'                    => $data->gender,
+            'primary_phone'             => $data->primary_phone,
+            'secondary_phone'           => isset($data->secondary_phone) ? $data->secondary_phone : '',
+            'address'                   => $data->address,
+        ];
+
+        if ($jsonAddress) {
+            $map['address'] = json_encode($data->address);
+        }
+        if (isset($image) && isset($image_uri)) {
+            $map['image'] = $image;
+            $map['image_uri'] = $image_uri;
+        }
+        if (isset($signature) && isset($signature_uri)) {
+            $map['signature'] = $signature;
+            $map['signature_uri'] = $signature_uri;
+        }
+        if (isset($creator_id)) {
+            $map['creator_id'] = $creator_id ?? auth()->id();
+        }
+
+        return $map;
     }
 }

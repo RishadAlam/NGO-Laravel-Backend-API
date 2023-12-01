@@ -58,7 +58,9 @@ class AppConfigController extends Controller
             'loan_account_registration_approval',
             'loan_account_closing_approval',
             'money_transfer_transaction',
-            'client_reg_sign_is_required'
+            'client_reg_sign_is_required',
+            'nominee_reg_sign_is_required',
+            'guarantor_reg_sign_is_required'
         ])->get(['id', 'meta_key', 'meta_value']);
 
         return response(

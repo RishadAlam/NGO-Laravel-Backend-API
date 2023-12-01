@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\AppConfig;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class AppConfigSeeder extends Seeder
 {
@@ -61,6 +61,12 @@ class AppConfigSeeder extends Seeder
                 "meta_value"    => json_encode(true)
             ], [
                 "meta_key"      => "client_reg_sign_is_required",
+                "meta_value"    => json_encode(true)
+            ], [
+                "meta_key"      => "nominee_reg_sign_is_required",
+                "meta_value"    => json_encode(true)
+            ], [
+                "meta_key"      => "guarantor_reg_sign_is_required",
                 "meta_value"    => json_encode(true)
             ], [
                 "meta_key"      => "money_transfer_transaction",
