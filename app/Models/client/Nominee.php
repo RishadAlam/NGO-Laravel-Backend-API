@@ -43,6 +43,7 @@ class Nominee extends Model
     {
         return $this->belongsTo(SavingAccount::class)->withTrashed();
     }
+
     /**
      * Mutator for address json Data
      */

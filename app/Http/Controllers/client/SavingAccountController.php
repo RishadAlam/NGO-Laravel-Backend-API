@@ -67,7 +67,6 @@ class SavingAccountController extends Controller
      */
     public function store(SavingAccountStoreRequest $request)
     {
-        $errors         = [];
         $data           = (object) $request->validated();
         $nominees       = $data->nominees;
         $is_approved    = AppConfig::where('meta_key', 'saving_account_registration_approval')

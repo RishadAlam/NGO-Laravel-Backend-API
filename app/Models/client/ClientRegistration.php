@@ -85,4 +85,36 @@ class ClientRegistration extends Model
     {
         return $this->belongsTo(Center::class)->withTrashed();
     }
+
+    /**
+     * Mutator for address json Data
+     */
+    public function setPresentAddressAttribute($value)
+    {
+        $this->attributes['present_address'] = json_encode($value);
+    }
+
+    /**
+     * Mutator for address json Data
+     */
+    public function setPermanentAddressAttribute($value)
+    {
+        $this->attributes['permanent_address'] = json_encode($value);
+    }
+
+    /**
+     * accessor for json Data
+     */
+    public function getPresentAddressAttribute($value)
+    {
+        return json_decode($value);
+    }
+
+    /**
+     * accessor for json Data
+     */
+    public function getPermanentAddressAttribute($value)
+    {
+        return json_decode($value);
+    }
 }

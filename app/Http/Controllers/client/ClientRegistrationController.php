@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\client;
 
+use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -80,66 +81,14 @@ class ClientRegistrationController extends Controller
      */
     public function store(ClientRegistrationStoreRequest $request)
     {
-        $errors                         = [];
-        $data                           = (object) $request->validated();
-        $errors['present_address']      = self::address_validation((array) json_decode($data->present_address));
-        $errors['permanent_address']    = self::address_validation((array) json_decode($data->permanent_address));
+        $data           = (object) $request->validated();
+        $is_approved    = AppConfig::where('meta_key', 'client_registration_approval')->value('meta_value');
+        $img            = Helper::storeImage($data->image, "client", "client");
+        $signature      = isset($data->signature)
+            ? Helper::storeSignature($data->signature, "client_signature", "client")
+            : (object) ["name" => null, "uri" => null];
 
-        if (!empty($errors)) {
-            return self::create_validation_error_response($errors);
-        }
-
-        $sign           = null;
-        $sign_uri       = null;
-        $is_approved    = AppConfig::where('meta_key', 'client_registration_approval')
-            ->value('meta_value');
-
-        $extension  = $data->image->extension();
-        $imgName    = 'client_' . time() . '.' . $extension;
-        $data->image->move(public_path() . '/storage/client/', $imgName);
-
-        if (!empty($data->signature)) {
-            $folderPath     = public_path() . '/storage/client/';
-            $image_parts    = explode(";base64,", $data->signature);
-            $image_type_aux = explode("image/", $image_parts[0]);
-            $image_type     = $image_type_aux[1];
-            $image_base64   = base64_decode($image_parts[1]);
-            $sign           = 'client_signature_' . time() . '.' . $image_type;
-            file_put_contents($folderPath . $sign, $image_base64);
-            $sign_uri       = URL::to('/storage/client/', $sign);
-        }
-
-        ClientRegistration::create(
-            [
-                'field_id'          => $data->field_id,
-                'center_id'         => $data->center_id,
-                'acc_no'            => $data->acc_no,
-                'name'              => $data->name,
-                'father_name'       => $data->father_name,
-                'husband_name'      => $data->husband_name,
-                'mother_name'       => $data->mother_name,
-                'nid'               => $data->nid,
-                'dob'               => date('Y-m-d', strtotime($data->dob)),
-                'occupation'        => $data->occupation,
-                'religion'          => $data->religion,
-                'gender'            => $data->gender,
-                'primary_phone'     => $data->primary_phone,
-                'secondary_phone'   => $data->secondary_phone,
-                'image'             => $imgName,
-                'image_uri'         => URL::to('/storage/client/', $imgName),
-                'signature'         => $sign,
-                'signature_uri'     => $sign_uri,
-                'annual_income'     => $data->annual_income ?? null,
-                'bank_acc_no'       => $data->bank_acc_no ?? null,
-                'bank_check_no'     => $data->bank_check_no ?? null,
-                'share'             => $data->share,
-                'present_address'   => $data->present_address,
-                'permanent_address' => $data->permanent_address,
-                'is_approved'       => $is_approved,
-                'creator_id'        => auth()->id()
-            ]
-        );
-
+        ClientRegistration::create(self::set_field_map($data, $img->name, $img->uri, $signature->name, $signature->uri, $is_approved, auth()->id()));
         return self::create_response(__('customValidations.client.registration.successful'));
     }
 
@@ -264,28 +213,6 @@ class ClientRegistrationController extends Controller
     }
 
     /**
-     * Address Validation
-     */
-    private static function address_validation($address)
-    {
-        $validated = Validator::make(
-            $address,
-            [
-                'street_address'    => 'required',
-                'city'              => "required",
-                'post_office'       => "required",
-                'police_station'    => "required",
-                'state'             => "required",
-                'division'          => "required",
-            ]
-        );
-
-        if ($validated->fails()) {
-            return $validated->errors()->toArray();
-        }
-    }
-
-    /**
      * Get all Occupations
      */
     public function get_client_occupations()
@@ -321,16 +248,51 @@ class ClientRegistrationController extends Controller
     }
 
     /**
-     * error response
+     * Set Saving Acc Field Map
+     * 
+     * @param object $data
+     * @param boolean $is_approved
+     * @param integer $creator_id
+     * @return array
      */
-    private static function create_validation_error_response($message, $code = '401', $success = false)
+    private static function set_field_map($data, $image, $image_uri, $signature = null, $signature_uri = null, $is_approved = null, $creator_id = null)
     {
-        return response(
-            [
-                'success'   => $success,
-                "errors"    => $message
-            ],
-            $code
-        );
+        $map = [
+            'field_id'          => $data->field_id,
+            'center_id'         => $data->center_id,
+            'acc_no'            => $data->acc_no,
+            'name'              => $data->name,
+            'father_name'       => $data->father_name,
+            'husband_name'      => isset($data->husband_name) ? $data->husband_name : '',
+            'mother_name'       => $data->mother_name,
+            'nid'               => $data->nid,
+            'dob'               => date('Y-m-d', strtotime($data->dob)),
+            'occupation'        => $data->occupation,
+            'religion'          => $data->religion,
+            'gender'            => $data->gender,
+            'primary_phone'     => $data->primary_phone,
+            'secondary_phone'   => isset($data->secondary_phone) ? $data->secondary_phone : '',
+            'image'             => $image,
+            'image_uri'         => $image_uri,
+            'annual_income'     => isset($data->annual_income) ? $data->annual_income : '',
+            'bank_acc_no'       => isset($data->bank_acc_no) ? $data->bank_acc_no : '',
+            'bank_check_no'     => isset($data->bank_check_no) ? $data->bank_check_no : '',
+            'share'             => $data->share,
+            'present_address'   => $data->present_address,
+            'permanent_address' => $data->permanent_address,
+        ];
+
+        if (isset($signature) && isset($signature_uri)) {
+            $map['signature'] = $signature;
+            $map['signature_uri'] = $signature_uri;
+        }
+        if (isset($is_approved)) {
+            $map['is_approved'] = $is_approved;
+        }
+        if (isset($creator_id)) {
+            $map['creator_id'] = $creator_id ?? auth()->id();
+        }
+
+        return $map;
     }
 }
