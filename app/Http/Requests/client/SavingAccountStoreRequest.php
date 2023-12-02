@@ -55,7 +55,7 @@ class SavingAccountStoreRequest extends FormRequest
             'center_id'                         => 'required|numeric',
             'category_id'                       => 'required|numeric',
             'client_registration_id'            => 'required|numeric',
-            'acc_no'                            => 'required|numeric',
+            'acc_no'                            => 'required',
             'start_date'                        => 'required|date',
             'duration_date'                     => 'required|date',
             'payable_installment'               => 'required|numeric|digits_between:1,3',
