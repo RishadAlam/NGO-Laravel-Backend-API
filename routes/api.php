@@ -129,6 +129,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('occupations');
         Route::GET('saving/nominee/occupations', [SavingAccountController::class, 'get_nominee_occupations'])->name('saving.occupations');
         Route::GET('saving/nominee/relations', [SavingAccountController::class, 'get_nominee_relations'])->name('saving.relations');
+        Route::GET('loan/guarantor/occupations', [LoanAccountController::class, 'get_guarantor_occupations'])->name('loan.occupations');
+        Route::GET('loan/guarantor/relations', [LoanAccountController::class, 'get_guarantor_relations'])->name('loan.relations');
     });
 
     // Accounts Additional Routes

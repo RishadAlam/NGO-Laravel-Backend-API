@@ -21,11 +21,12 @@ return new class extends Migration
             $table->string('acc_no', 50);
             $table->date('start_date')->default(DB::raw('NOW()'));
             $table->date('duration_date');
+            $table->date('loan_commencement_date');
             $table->integer('loan_given')->default(0);
             $table->integer('payable_deposit')->default(0);
-            $table->tinyInteger('payable_installment')->default(0);
-            $table->tinyInteger('payable_interest')->default(0)->comment('interest in "%" percentage');
-            $table->tinyInteger('total_payable_interest')->default(0)->comment('interest in "$" currency');
+            $table->integer('payable_installment')->default(0);
+            $table->integer('payable_interest')->default(0)->comment('interest in "%" percentage');
+            $table->integer('total_payable_interest')->default(0)->comment('interest in "$" currency');
             $table->integer('total_payable_loan_with_interest')->default(0);
             $table->integer('loan_installment')->default(0)->comment('The loan must be repaid in each installment');
             $table->integer('interest_installment')->default(0)->comment('The interest must be repaid in each installment');
@@ -41,6 +42,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->enum('status', [0, 1, 2])->default(1)->comment('deactivate = 0, activate = 1, hold = 2');
             $table->boolean('is_approved')->default(false);
+            $table->boolean('is_loan_approved')->default(false);
             $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();

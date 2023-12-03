@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\client;
 
 use Illuminate\Http\Request;
+use App\Models\client\Guarantor;
 use App\Models\client\LoanAccount;
 use App\Http\Controllers\Controller;
 
@@ -85,5 +86,23 @@ class LoanAccountController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Get all Occupations
+     */
+    public function get_guarantor_occupations()
+    {
+        $occupations = Guarantor::distinct('occupation')->orderBy('occupation', 'asc')->pluck('occupation');
+        return create_response(null, $occupations);
+    }
+
+    /**
+     * Get all Relation
+     */
+    public function get_guarantor_relations()
+    {
+        $relations = Guarantor::distinct('relation')->orderBy('relation', 'asc')->pluck('relation');
+        return create_response(null, $relations);
     }
 }

@@ -147,7 +147,18 @@ return [
         "nominee_info"                      => "নমিনির তথ্য",
         "add_nominee"                       => "নমিনি যোগ করুন",
         "remove_nominee"                    => "নমিনি বিয়োগ দিন",
-        "nominee"                           => "নমিনি"
+        "nominee"                           => "নমিনি",
+        "loan_info"                         => "ঋণ তথ্য",
+        "guarantor_info"                    => "গ্যারান্টার তথ্য",
+        "add_guarantor"                     => "গ্যারান্টার যোগ করুন",
+        "remove_guarantor"                  => "গ্যারান্টার বিয়োগ দিন",
+        "guarantor"                         => "গ্যারান্টার",
+        "loan_given"                        => "ঋণ দেওয়া হয়েছে",
+        "total_payable_loan_with_interest"  => "লাভসহ মোট ঋণ",
+        "loan_installment"                  => "ঋণের কিস্তি",
+        "interest_installment"              => "লাভের কিস্তি",
+        "total_payable_loan_installment"    => "মোট ঋণের কিস্তি",
+        "total_payable_interest"            => "মোট লাভ",
     ],
 
     /*

@@ -148,7 +148,18 @@ return [
         "nominee_info"                      => "Nominee Info",
         "add_nominee"                       => "Add Nominee",
         "remove_nominee"                    => "Remove Nominee",
-        "nominee"                           => "Nominee"
+        "nominee"                           => "Nominee",
+        "loan_info"                         => "Loan Info",
+        "guarantor_info"                    => "Guarantor Info",
+        "add_guarantor"                     => "Add Guarantor",
+        "remove_guarantor"                  => "Remove Guarantor",
+        "guarantor"                         => "Guarantor",
+        "loan_given"                        => "Loan Given",
+        "total_payable_loan_with_interest"  => "Total Loan with interest",
+        "loan_installment"                  => "Loan Installment",
+        "interest_installment"              => "Interest Installment",
+        "total_payable_loan_installment"    => "Total Loan Installment",
+        "total_payable_interest"            => "Total Payable Interest",
     ],
 
     /*
