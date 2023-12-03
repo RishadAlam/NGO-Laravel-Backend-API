@@ -198,6 +198,12 @@ class CategoryController extends Controller
     public function get_active_Categories()
     {
         $categories = Category::where('status', true)
+            ->when(request('saving'), function ($query) {
+                $query->where('saving', true);
+            })
+            ->when(request('loan'), function ($query) {
+                $query->where('loan', true);
+            })
             ->get(['id', 'name', 'group', 'is_default']);
 
         return response(
