@@ -107,61 +107,34 @@ class ClientRegistrationController extends Controller
     {
         $data       = (object) $request->validated();
         $client     = ClientRegistration::find($id);
-        $histData   = [];
-
-        $client->name               !== $data->name ? $histData['name'] = "<p class='text-danger'>{$client->name}</p><p class='text-success'>{$data->name}</p>" : '';
-        $client->father_name        !== $data->father_name ? $histData['father_name'] = "<p class='text-danger'>{$client->father_name}</p><p class='text-success'>{$data->father_name}</p>" : '';
-        $client->husband_name       !== $data->husband_name ? $histData['husband_name'] = "<p class='text-danger'>{$client->husband_name}</p><p class='text-success'>{$data->husband_name}</p>" : '';
-        $client->mother_name        !== $data->mother_name ? $histData['mother_name'] = "<p class='text-danger'>{$client->mother_name}</p><p class='text-success'>{$data->mother_name}</p>" : '';
-        $client->nid                !== $data->nid ? $histData['nid'] = "<p class='text-danger'>{$client->nid}</p><p class='text-success'>{$data->nid}</p>" : '';
-        $client->dob                !== $data->dob ? $histData['dob'] = "<p class='text-danger'>{$client->dob}</p><p class='text-success'>{$data->dob}</p>" : '';
-        $client->occupation         !== $data->occupation ? $histData['occupation'] = "<p class='text-danger'>{$client->occupation}</p><p class='text-success'>{$data->occupation}</p>" : '';
-        $client->religion           !== $data->religion ? $histData['religion'] = "<p class='text-danger'>{$client->religion}</p><p class='text-success'>{$data->religion}</p>" : '';
-        $client->gender             !== $data->gender ? $histData['gender'] = "<p class='text-danger'>{$client->gender}</p><p class='text-success'>{$data->gender}</p>" : '';
-        $client->primary_phone      !== $data->primary_phone ? $histData['primary_phone'] = "<p class='text-danger'>{$client->primary_phone}</p><p class='text-success'>{$data->primary_phone}</p>" : '';
-        $client->secondary_phone    !== $data->secondary_phone ? $histData['secondary_phone'] = "<p class='text-danger'>{$client->secondary_phone}</p><p class='text-success'>{$data->secondary_phone}</p>" : '';
-        $client->share              !== $data->share ? $histData['share'] = "<p class='text-danger'>{$client->share}</p><p class='text-success'>{$data->share}</p>" : '';
-        $client->present_address    !== $data->present_address ? $histData['present_address'] = "<p class='text-danger'>{$client->present_address}</p><p class='text-success'>{$data->present_address}</p>" : '';
-        $client->permanent_address  !== $data->permanent_address ? $histData['permanent_address'] = "<p class='text-danger'>{$client->permanent_address}</p><p class='text-success'>{$data->permanent_address}</p>" : '';
+        $histData   = self::set_update_hist($data, $client);
 
         DB::transaction(function () use ($id, $client, $data, $histData) {
             if (!empty($data->image)) {
                 if (!empty($client->image)) {
-                    $path = public_path('storage/client/' . $client->image);
-                    unlink($path);
+                    Helper::unlinkImage(public_path('storage/client/' . $client->image));
                 }
 
+                $img                = Helper::storeImage($data->image, "client", "client");
                 $histData['image']  = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
-                $extension          = $data->image->extension();
-                $imgName            = 'client_' . time() . '.' . $extension;
-
-                $data->image->move(public_path() . '/storage/client/', $imgName);
                 $client->update(
                     [
-                        'image'     => $imgName,
-                        'image_uri' => URL::to('/storage/client/', $imgName),
+                        'image'     => $img->name,
+                        'image_uri' => $img->uri,
                     ]
                 );
             }
             if (!empty($data->signature)) {
                 if (!empty($client->signature)) {
-                    $path = public_path('storage/client/' . $client->signature);
-                    unlink($path);
+                    Helper::unlinkImage(public_path('storage/client/' . $client->signature));
                 }
 
+                $signature              = Helper::storeSignature($data->signature, "client_signature", "client");
                 $histData['signature']  = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
-                $folderPath             = public_path() . '/storage/client/';
-                $image_parts            = explode(";base64,", $data->signature);
-                $image_type_aux         = explode("image/", $image_parts[0]);
-                $image_type             = $image_type_aux[1];
-                $image_base64           = base64_decode($image_parts[1]);
-                $sign                   = 'client_signature_' . time() . '.' . $image_type;
-
-                file_put_contents($folderPath . $sign, $image_base64);
                 $client->update(
                     [
-                        'signature'     => $sign,
-                        'signature_uri' => URL::to('/storage/client/', $sign),
+                        'signature'     => $signature->name,
+                        'signature_uri' => $signature->uri,
                     ]
                 );
             }
@@ -294,5 +267,40 @@ class ClientRegistrationController extends Controller
         }
 
         return $map;
+    }
+
+    /**
+     * Set Saving Acc update hist
+     * 
+     * @param object $data
+     * @param object $client
+     * @return array
+     */
+    private static function set_update_hist($data, $client)
+    {
+        $histData                   = [];
+        $data->present_address      = (object) $data->present_address;
+        $data->permanent_address    = (object) $data->permanent_address;
+        $fieldsToCompare            = ['name', 'husband_name', 'father_name', 'mother_name', 'nid', 'dob', 'occupation', 'religion', 'gender', 'primary_phone', 'secondary_phone', 'share', 'present_address', 'permanent_address'];
+        $addressFields              = ['street_address', 'city', 'word_no', 'post_office', 'police_station', 'district', 'division'];
+
+        foreach ($fieldsToCompare as $field) {
+            if ($field === 'present_address' || $field === 'permanent_address') {
+                $clientValue = '';
+                $dataValue = '';
+
+                foreach ($addressFields as $subField) {
+                    $clientValue = $client->{$field}->{$subField};
+                    $dataValue = $data->{$field}->{$subField};
+                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+                }
+            } else {
+                $clientValue = $client->{$field};
+                $dataValue = $data->{$field};
+                !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+            }
+        }
+
+        return $histData;
     }
 }

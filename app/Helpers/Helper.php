@@ -85,4 +85,34 @@ class Helper
             "uri"   => $sign_uri,
         ];
     }
+
+    /**
+     * Store Signature
+     * 
+     * @param string $$path
+     * @return void 
+     */
+    public static function unlinkImage($path = null)
+    {
+        if (!empty($path)) {
+            unlink($path);
+        }
+    }
+
+    /**
+     * Store Signature
+     * 
+     * @param mixed $value1
+     * @param mixed $value2
+     * @param boolean $strict
+     * @return boolean
+     */
+    public static function areValuesEqual($value1, $value2, $strict = false)
+    {
+        if ($strict) {
+            return $value1 === $value2;
+        } else {
+            return $value1 == $value2;
+        }
+    }
 }
