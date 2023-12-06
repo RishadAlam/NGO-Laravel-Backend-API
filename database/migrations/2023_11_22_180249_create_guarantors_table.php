@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('loan_account_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->string('name');
-            $table->string('father_name')->nullable();
+            $table->string('father_name');
             $table->string('husband_name')->nullable();
             $table->string('mother_name');
             $table->string('nid', 50);

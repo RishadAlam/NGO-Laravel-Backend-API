@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('acc_no', 50);
             $table->date('start_date')->default(DB::raw('NOW()'));
             $table->date('duration_date');
-            $table->date('loan_commencement_date');
             $table->integer('loan_given')->default(0);
             $table->integer('payable_deposit')->default(0);
             $table->integer('payable_installment')->default(0);
@@ -43,7 +42,7 @@ return new class extends Migration
             $table->enum('status', [0, 1, 2])->default(1)->comment('deactivate = 0, activate = 1, hold = 2');
             $table->boolean('is_approved')->default(false);
             $table->boolean('is_loan_approved')->default(false);
-            $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
+            $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });

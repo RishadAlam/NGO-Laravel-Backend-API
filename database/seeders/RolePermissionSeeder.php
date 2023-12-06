@@ -101,7 +101,7 @@ class RolePermissionSeeder extends Seeder
                     'pending_saving_acc_permanently_delete',
                 ]
             ],
-            // Pending Saving Account Registration Form
+            // Pending Loan Account Registration Form
             [
                 'groupName'     => 'pending_loan_acc_registration_form',
                 'permissions'   => [
@@ -110,6 +110,17 @@ class RolePermissionSeeder extends Seeder
                     'pending_loan_acc_approval',
                     'pending_loan_acc_update',
                     'pending_loan_acc_permanently_delete',
+                ]
+            ],
+            // Pending Loan
+            [
+                'groupName'     => 'pending_loan',
+                'permissions'   => [
+                    'pending_loan_view',
+                    'pending_loan_view_as_admin',
+                    'pending_loan_approval',
+                    'pending_loan_update',
+                    'pending_loan_permanently_delete',
                 ]
             ],
             // Account
