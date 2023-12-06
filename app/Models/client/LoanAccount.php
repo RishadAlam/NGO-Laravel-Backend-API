@@ -46,6 +46,7 @@ class LoanAccount extends Model
         'description',
         'status',
         'is_approved',
+        'is_loan_approved',
         'creator_id',
     ];
 
@@ -68,11 +69,11 @@ class LoanAccount extends Model
     }
 
     /**
-     * Relation with GuarantorRegistration Table
+     * Relation with Guarantor Table
      */
-    public function GuarantorRegistration()
+    public function Guarantor()
     {
-        return $this->hasMany(GuarantorRegistration::class);
+        return $this->hasMany(Guarantor::class);
     }
 
     /**

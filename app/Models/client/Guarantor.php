@@ -15,7 +15,7 @@ class Guarantor extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'loan_registration_id',
+        'loan_account_id',
         'name',
         'father_name',
         'husband_name',

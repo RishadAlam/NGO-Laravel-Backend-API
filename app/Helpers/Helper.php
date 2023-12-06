@@ -28,6 +28,49 @@ class Helper
     }
 
     /**
+     * Set Nominee/Guarantor Field Map
+     * 
+     * @param object $data
+     * @param string $foreignIdKey
+     * @param integer $id
+     * @param boolean $jsonAddress
+     * @param string $image
+     * @param string $image_uri
+     * @param string $signature
+     * @param string $signature_uri
+     * @return array
+     */
+    public static function set_nomi_field_map(object $data, string $foreignIdKey, int $id, bool $jsonAddress = false, string $image = null, string $image_uri = null, string $signature = null, string $signature_uri = null)
+    {
+        $map = [
+            'name'                      => $data->name,
+            'father_name'               => $data->father_name,
+            'husband_name'              => isset($data->husband_name) ? $data->husband_name : '',
+            'mother_name'               => $data->mother_name,
+            'nid'                       => $data->nid,
+            'dob'                       => $data->dob,
+            'occupation'                => $data->occupation,
+            'relation'                  => $data->relation,
+            'gender'                    => $data->gender,
+            'primary_phone'             => $data->primary_phone,
+            'secondary_phone'           => isset($data->secondary_phone) ? $data->secondary_phone : '',
+            'address'                   => $jsonAddress ? json_encode($data->address) : $data->address,
+        ];
+
+        if (isset($foreignIdKey, $id)) {
+            $map += [$foreignIdKey => $id];
+        }
+        if (isset($image, $image_uri)) {
+            $map += ['image' => $image, 'image_uri' => $image_uri];
+        }
+        if (isset($signature, $signature_uri)) {
+            $map += ['signature' => $signature, 'signature_uri' => $signature_uri];
+        }
+
+        return $map;
+    }
+
+    /**
      * Create nested array from properties in array formate.
      *
      * @param array &$rootObj

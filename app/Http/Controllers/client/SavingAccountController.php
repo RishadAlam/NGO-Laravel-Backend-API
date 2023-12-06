@@ -75,7 +75,6 @@ class SavingAccountController extends Controller
         DB::transaction(function () use ($data, $is_approved, $nominees) {
             $saving_account = SavingAccount::create(self::set_saving_field_map($data, $is_approved, $data->creator_id));
 
-            $nominees_arr   = [];
             foreach ($nominees as $nominee) {
                 $nominee    = (object) $nominee;
                 $img        = Helper::storeImage($nominee->image, "nominee", "nominees");
@@ -83,18 +82,17 @@ class SavingAccountController extends Controller
                     ? Helper::storeSignature($nominee->signature, "nominee_signature", "nominees")
                     : (object) ["name" => null, "uri" => null];
 
-                $nominees_arr[] = self::set_nominee_field_map(
-                    $saving_account->id,
+                Nominee::create(Helper::set_nomi_field_map(
                     $nominee,
-                    true,
+                    'saving_account_id',
+                    $saving_account->id,
+                    false,
                     $img->name,
                     $img->uri,
                     $signature->name,
                     $signature->uri
-                );
+                ));
             }
-
-            Nominee::insert($nominees_arr);
         });
 
         return create_response(__('customValidations.client.saving.successful'));
@@ -163,54 +161,6 @@ class SavingAccountController extends Controller
 
         if (isset($is_approved)) {
             $map['is_approved'] = $is_approved;
-        }
-        if (isset($creator_id)) {
-            $map['creator_id'] = $creator_id ?? auth()->id();
-        }
-
-        return $map;
-    }
-
-    /**
-     * Set Nominee Field Map
-     * 
-     * @param integer $saving_account_id
-     * @param object $data
-     * @param boolean $jsonAddress
-     * @param string $image
-     * @param string $image_uri
-     * @param string $signature
-     * @param string $signature_uri
-     * @return array
-     */
-    private static function set_nominee_field_map($saving_account_id, $data, $jsonAddress = false, $image = null, $image_uri = null, $signature = null, $signature_uri = null)
-    {
-        $map = [
-            'saving_account_id'         => $saving_account_id,
-            'name'                      => $data->name,
-            'father_name'               => $data->father_name,
-            'husband_name'              => isset($data->husband_name) ? $data->husband_name : '',
-            'mother_name'               => $data->mother_name,
-            'nid'                       => $data->nid,
-            'dob'                       => $data->dob,
-            'occupation'                => $data->occupation,
-            'relation'                  => $data->relation,
-            'gender'                    => $data->gender,
-            'primary_phone'             => $data->primary_phone,
-            'secondary_phone'           => isset($data->secondary_phone) ? $data->secondary_phone : '',
-            'address'                   => $data->address,
-        ];
-
-        if ($jsonAddress) {
-            $map['address'] = json_encode($data->address);
-        }
-        if (isset($image) && isset($image_uri)) {
-            $map['image'] = $image;
-            $map['image_uri'] = $image_uri;
-        }
-        if (isset($signature) && isset($signature_uri)) {
-            $map['signature'] = $signature;
-            $map['signature_uri'] = $signature_uri;
         }
         if (isset($creator_id)) {
             $map['creator_id'] = $creator_id ?? auth()->id();

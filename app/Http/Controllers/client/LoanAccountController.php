@@ -80,10 +80,11 @@ class LoanAccountController extends Controller
                     ? Helper::storeSignature($guarantor->signature, "guarantor_signature", "guarantors")
                     : (object) ["name" => null, "uri" => null];
 
-                Guarantor::create(self::set_guarantor_field_map(
-                    $loan_account->id,
+                Guarantor::create(Helper::set_nomi_field_map(
                     $guarantor,
-                    true,
+                    'loan_account_id',
+                    $loan_account->id,
+                    false,
                     $img->name,
                     $img->uri,
                     $signature->name,
@@ -169,46 +170,6 @@ class LoanAccountController extends Controller
         }
         if (isset($creator_id)) {
             $map['creator_id'] = $creator_id ?? auth()->id();
-        }
-
-        return $map;
-    }
-
-    /**
-     * Set Nominee Field Map
-     * 
-     * @param integer $loan_account_id
-     * @param object $data
-     * @param boolean $jsonAddress
-     * @param string $image
-     * @param string $image_uri
-     * @param string $signature
-     * @param string $signature_uri
-     * @return array
-     */
-    private static function set_guarantor_field_map($loan_account_id, $data, $jsonAddress = false, $image = null, $image_uri = null, $signature = null, $signature_uri = null)
-    {
-        $map = [
-            'loan_account_id'           => $loan_account_id,
-            'name'                      => $data->name,
-            'father_name'               => $data->father_name,
-            'husband_name'              => isset($data->husband_name) ? $data->husband_name : '',
-            'mother_name'               => $data->mother_name,
-            'nid'                       => $data->nid,
-            'dob'                       => $data->dob,
-            'occupation'                => $data->occupation,
-            'relation'                  => $data->relation,
-            'gender'                    => $data->gender,
-            'primary_phone'             => $data->primary_phone,
-            'secondary_phone'           => isset($data->secondary_phone) ? $data->secondary_phone : '',
-            'address'                   => $jsonAddress ? json_encode($data->address) : $data->address,
-        ];
-
-        if (isset($image, $image_uri)) {
-            $map += ['image' => $image, 'image_uri' => $image_uri];
-        }
-        if (isset($signature, $signature_uri)) {
-            $map += ['signature' => $signature, 'signature_uri' => $signature_uri];
         }
 
         return $map;
