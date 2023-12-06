@@ -7,6 +7,27 @@ use Illuminate\Support\Facades\URL;
 class Helper
 {
     /**
+     * Create Action History
+     * 
+     * @param integer $foreignId
+     * @param integer $id
+     * @param string $action
+     * @param array $histData
+     * @return array
+     */
+    public static function setActionHistory(int $foreignId, int $id, string $action, array $histData)
+    {
+        return [
+            $foreignId          => $id,
+            "author_id"         => auth()->id(),
+            "name"              => auth()->user()->name,
+            "image_uri"         => auth()->user()->image_uri,
+            "action_type"       => $action,
+            "action_details"    => $histData,
+        ];
+    }
+
+    /**
      * Create nested array from properties in array formate.
      *
      * @param array &$rootObj
