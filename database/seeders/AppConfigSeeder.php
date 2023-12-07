@@ -57,6 +57,9 @@ class AppConfigSeeder extends Seeder
                 "meta_key"      => "loan_account_registration_approval",
                 "meta_value"    => json_encode(true)
             ], [
+                "meta_key"      => "loan_approval",
+                "meta_value"    => json_encode(true)
+            ], [
                 "meta_key"      => "loan_account_closing_approval",
                 "meta_value"    => json_encode(true)
             ], [

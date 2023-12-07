@@ -65,13 +65,13 @@ class LoanAccountController extends Controller
      */
     public function store(LoanAccountStoreRequest $request)
     {
-        $data           = (object) $request->validated();
-        $guarantors       = $data->guarantors;
-        $is_approved    = AppConfig::where('meta_key', 'loan_account_registration_approval')
-            ->value('meta_value');
+        $data               = (object) $request->validated();
+        $guarantors         = $data->guarantors;
+        $is_approved        = AppConfig::get_config('loan_account_registration_approval');
+        $is_loan_approved   = AppConfig::get_config('loan_approval');
 
-        DB::transaction(function () use ($data, $is_approved, $guarantors) {
-            $loan_account = LoanAccount::create(self::set_loan_field_map($data, $is_approved, $data->creator_id));
+        DB::transaction(function () use ($data, $is_approved, $is_loan_approved, $guarantors) {
+            $loan_account = LoanAccount::create(self::set_loan_field_map($data, $is_approved, $is_loan_approved, $data->creator_id));
 
             foreach ($guarantors as $guarantor) {
                 $guarantor  = (object) $guarantor;
@@ -146,7 +146,7 @@ class LoanAccountController extends Controller
      * @param integer $creator_id
      * @return array
      */
-    private static function set_loan_field_map($data, $is_approved = null, $creator_id = null)
+    private static function set_loan_field_map($data, $is_approved = null, $is_loan_approved = null, $creator_id = null)
     {
         $map = [
             'field_id'                          => $data->field_id,
@@ -167,6 +167,9 @@ class LoanAccountController extends Controller
 
         if (isset($is_approved)) {
             $map['is_approved'] = $is_approved;
+        }
+        if (isset($is_loan_approved)) {
+            $map['is_loan_approved'] = $is_loan_approved;
         }
         if (isset($creator_id)) {
             $map['creator_id'] = $creator_id ?? auth()->id();

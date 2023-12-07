@@ -56,6 +56,7 @@ class AppConfigController extends Controller
             'saving_account_registration_approval',
             'saving_account_closing_approval',
             'loan_account_registration_approval',
+            'loan_approval',
             'loan_account_closing_approval',
             'money_transfer_transaction',
             'client_reg_sign_is_required',
