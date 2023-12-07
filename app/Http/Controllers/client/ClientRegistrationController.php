@@ -82,7 +82,7 @@ class ClientRegistrationController extends Controller
     public function store(ClientRegistrationStoreRequest $request)
     {
         $data           = (object) $request->validated();
-        $is_approved    = AppConfig::where('meta_key', 'client_registration_approval')->value('meta_value');
+        $is_approved    = AppConfig::get_config('client_registration_approval');
         $img            = Helper::storeImage($data->image, "client", "client");
         $signature      = isset($data->signature)
             ? Helper::storeSignature($data->signature, "client_signature", "client")

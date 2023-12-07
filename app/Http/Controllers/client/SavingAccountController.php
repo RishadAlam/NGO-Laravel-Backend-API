@@ -69,8 +69,7 @@ class SavingAccountController extends Controller
     {
         $data           = (object) $request->validated();
         $nominees       = $data->nominees;
-        $is_approved    = AppConfig::where('meta_key', 'saving_account_registration_approval')
-            ->value('meta_value');
+        $is_approved    = AppConfig::get_config('saving_account_registration_approval');
 
         DB::transaction(function () use ($data, $is_approved, $nominees) {
             $saving_account = SavingAccount::create(self::set_saving_field_map($data, $is_approved, $data->creator_id));
