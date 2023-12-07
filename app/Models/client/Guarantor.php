@@ -33,4 +33,30 @@ class Guarantor extends Model
         'signature_uri',
         'address',
     ];
+
+    /**
+     * Relationship belongs to LoanAccount model
+     *
+     * @return response()
+     */
+    public function LoanAccount()
+    {
+        return $this->belongsTo(LoanAccount::class)->withTrashed();
+    }
+
+    /**
+     * Mutator for address json Data
+     */
+    public function setAddressAttribute($value)
+    {
+        $this->attributes['address'] = json_encode($value);
+    }
+
+    /**
+     * accessor for json Data
+     */
+    public function getAddressAttribute($value)
+    {
+        return json_decode($value);
+    }
 }
