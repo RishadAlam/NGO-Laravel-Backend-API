@@ -36,9 +36,12 @@ class SavingAccountController extends Controller
     public function index()
     {
         $saving_accounts = SavingAccount::with('Author:id,name')
+            ->with("ClientRegistration:id,name,image_uri")
             ->with("Field:id,name")
             ->with("Center:id,name")
-            ->when(request('fetch_pending'), function ($query) {
+            ->with("Category:id,name")
+            ->with("Nominee:id,saving_account_id,name,father_name,husband_name,mother_name,nid,dob,occupation,relation,gender,primary_phone,secondary_phone,image,image_uri,signature,signature_uri,address")
+            ->when(request('fetch_pending_forms'), function ($query) {
                 $query->where('is_approved', false);
             })
             ->when(request('field_id'), function ($query) {
@@ -46,6 +49,9 @@ class SavingAccountController extends Controller
             })
             ->when(request('center_id'), function ($query) {
                 $query->where('center_id', request('center_id'));
+            })
+            ->when(request('category_id'), function ($query) {
+                $query->where('category_id', request('category_id'));
             })
             ->when(request('user_id'), function ($query) {
                 $query->where('creator_id', request('user_id'));

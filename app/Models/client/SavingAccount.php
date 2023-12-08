@@ -5,8 +5,10 @@ namespace App\Models\client;
 use App\Models\User;
 use App\Models\field\Field;
 use App\Models\center\Center;
+use App\Models\client\Nominee;
 use App\Models\category\Category;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\client\ClientRegistration;
 use App\Models\client\NomineeRegistration;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\SavingAccountActionHistory;
@@ -65,11 +67,21 @@ class SavingAccount extends Model
     }
 
     /**
-     * Relation with NomineeRegistration Table
+     * Relation with Nominee Table
      */
-    public function NomineeRegistration()
+    public function Nominee()
     {
-        return $this->hasMany(NomineeRegistration::class);
+        return $this->hasMany(Nominee::class);
+    }
+
+    /**
+     * Relationship belongs to ClientRegistration model
+     *
+     * @return response()
+     */
+    public function ClientRegistration()
+    {
+        return $this->belongsTo(ClientRegistration::class)->withTrashed();
     }
 
     /**
