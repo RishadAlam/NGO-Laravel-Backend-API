@@ -69,7 +69,7 @@ class SavingAccount extends Model
     /**
      * Relation with Nominee Table
      */
-    public function Nominee()
+    public function Nominees()
     {
         return $this->hasMany(Nominee::class);
     }

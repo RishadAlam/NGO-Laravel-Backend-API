@@ -9,16 +9,16 @@ class Helper
     /**
      * Create Action History
      * 
+     * @param string $foreignIdKey
      * @param integer $foreignId
-     * @param integer $id
      * @param string $action
      * @param array $histData
      * @return array
      */
-    public static function setActionHistory(int $foreignId, int $id, string $action, array $histData)
+    public static function setActionHistory(string $foreignIdKey, int $foreignId, string $action, array $histData = array())
     {
         return [
-            $foreignId          => $id,
+            $foreignIdKey       => $foreignId,
             "author_id"         => auth()->id(),
             "name"              => auth()->user()->name,
             "image_uri"         => auth()->user()->image_uri,
@@ -40,7 +40,7 @@ class Helper
      * @param string $signature_uri
      * @return array
      */
-    public static function set_nomi_field_map(object $data, string $foreignIdKey, int $id, bool $jsonAddress = false, string $image = null, string $image_uri = null, string $signature = null, string $signature_uri = null)
+    public static function set_nomi_field_map(object $data, string $foreignIdKey = null, int $id = null, bool $jsonAddress = false, string $image = null, string $image_uri = null, string $signature = null, string $signature_uri = null)
     {
         $map = [
             'name'                      => $data->name,

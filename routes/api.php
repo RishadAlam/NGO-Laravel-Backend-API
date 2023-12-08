@@ -188,7 +188,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * the Permanent Destroy method in resource controller
      */
     // Client Registration Permanent Destroy Routes
-    Route::prefix('client/registration')->name('client.registration.')->group(function () {
+    Route::prefix('client')->name('client.registration.')->group(function () {
         Route::DELETE('force-delete/{id}', [ClientRegistrationController::class, 'permanently_destroy'])->name('forceDelete');
         Route::DELETE('saving/force-delete/{id}', [SavingAccountController::class, 'permanently_destroy'])->name('saving.forceDelete');
         Route::DELETE('loan/force-delete/{id}', [LoanAccountController::class, 'permanently_destroy'])->name('loan.forceDelete');
