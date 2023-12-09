@@ -84,7 +84,18 @@ class SavingAccountController extends Controller
         $is_approved    = AppConfig::get_config('saving_account_registration_approval');
 
         DB::transaction(function () use ($data, $is_approved, $nominees) {
-            $saving_account = SavingAccount::create(self::set_saving_field_map($data, $is_approved, $data->creator_id));
+            $saving_account = SavingAccount::create(
+                self::set_saving_field_map(
+                    $data,
+                    $data->field_id,
+                    $data->center_id,
+                    $data->category_id,
+                    $data->acc_no,
+                    $data->client_registration_id,
+                    $is_approved,
+                    $data->creator_id
+                )
+            );
 
             foreach ($nominees as $nominee) {
                 $nominee    = (object) $nominee;
@@ -93,16 +104,18 @@ class SavingAccountController extends Controller
                     ? Helper::storeSignature($nominee->signature, "nominee_signature", "nominees")
                     : (object) ["name" => null, "uri" => null];
 
-                Nominee::create(Helper::set_nomi_field_map(
-                    $nominee,
-                    'saving_account_id',
-                    $saving_account->id,
-                    false,
-                    $img->name,
-                    $img->uri,
-                    $signature->name,
-                    $signature->uri
-                ));
+                Nominee::create(
+                    Helper::set_nomi_field_map(
+                        $nominee,
+                        'saving_account_id',
+                        $saving_account->id,
+                        false,
+                        $img->name,
+                        $img->uri,
+                        $signature->name,
+                        $signature->uri
+                    )
+                );
             }
         });
 
@@ -176,7 +189,9 @@ class SavingAccountController extends Controller
      */
     public function get_nominee_occupations()
     {
-        $occupations = Nominee::distinct('occupation')->orderBy('occupation', 'asc')->pluck('occupation');
+        $occupations = Nominee::distinct('occupation')
+            ->orderBy('occupation', 'asc')
+            ->pluck('occupation');
         return create_response(null, $occupations);
     }
 
@@ -185,7 +200,9 @@ class SavingAccountController extends Controller
      */
     public function get_nominee_relations()
     {
-        $relations = Nominee::distinct('relation')->orderBy('relation', 'asc')->pluck('relation');
+        $relations = Nominee::distinct('relation')
+            ->orderBy('relation', 'asc')
+            ->pluck('relation');
         return create_response(null, $relations);
     }
 
@@ -198,14 +215,9 @@ class SavingAccountController extends Controller
      * 
      * @return array
      */
-    private static function set_saving_field_map($data, $is_approved = null, $creator_id = null)
+    private static function set_saving_field_map($data, $field_id = null, $center_id = null, $category_id = null, $acc_no = null, $client_registration_id = null, $is_approved = null, $creator_id = null)
     {
         $map = [
-            'field_id'                          => $data->field_id,
-            'center_id'                         => $data->center_id,
-            'category_id'                       => $data->category_id,
-            'client_registration_id'            => $data->client_registration_id,
-            'acc_no'                            => $data->acc_no,
             'start_date'                        => $data->start_date,
             'duration_date'                     => $data->duration_date,
             'payable_installment'               => $data->payable_installment,
@@ -217,6 +229,18 @@ class SavingAccountController extends Controller
             'creator_id'                        => $data->creator_id ?? auth()->id(),
         ];
 
+        if (isset($field_id)) {
+            $map['field_id'] = $field_id;
+        }
+        if (isset($center_id)) {
+            $map['center_id'] = $center_id;
+        }
+        if (isset($category_id)) {
+            $map['category_id'] = $category_id;
+        }
+        if (isset($acc_no, $client_registration_id)) {
+            $map += ['acc_no' => $acc_no, 'client_registration_id' => $client_registration_id];
+        }
         if (isset($is_approved)) {
             $map['is_approved'] = $is_approved;
         }
@@ -241,8 +265,8 @@ class SavingAccountController extends Controller
         $fieldsToCompare    = ['start_date', 'duration_date', 'payable_installment', 'payable_deposit', 'payable_interest', 'total_deposit_without_interest', 'total_deposit_with_interest'];
 
         foreach ($fieldsToCompare as $field) {
-            $clientValue    = $account->{$field};
-            $dataValue      = $data->{$field};
+            $clientValue    = $account->{$field} ?? '';
+            $dataValue      = $data->{$field} ?? '';
             !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
         }
 
@@ -268,13 +292,13 @@ class SavingAccountController extends Controller
         foreach ($fieldsToCompare as $field) {
             if ($field === 'address') {
                 foreach ($addressFields as $subField) {
-                    $clientValue    = $nominee->{$field}->{$subField};
-                    $dataValue      = $nomineeData->{$field}->{$subField};
+                    $clientValue    = $nominee->{$field}->{$subField} ?? '';
+                    $dataValue      = $nomineeData->{$field}->{$subField} ?? '';
                     !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
                 }
             } else {
-                $clientValue    = $nominee->{$field};
-                $dataValue      = $nomineeData->{$field};
+                $clientValue    = $nominee->{$field} ?? '';
+                $dataValue      = $nomineeData->{$field} ?? '';
                 !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
             }
         }

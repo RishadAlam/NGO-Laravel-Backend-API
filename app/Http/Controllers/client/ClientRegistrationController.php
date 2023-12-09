@@ -21,7 +21,7 @@ class ClientRegistrationController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:pending_client_registration_list_view,pending_client_registration_list_view_as_admin')->only('index');
+        // $this->middleware('can:pending_client_registration_list_view,pending_client_registration_list_view_as_admin')->only('index');
         $this->middleware('can:client_registration')->only('store');
         $this->middleware('can:pending_client_registration_update')->only('update');
         $this->middleware('can:client_registration_soft_delete')->only('destroy');
@@ -88,7 +88,7 @@ class ClientRegistrationController extends Controller
             ? Helper::storeSignature($data->signature, "client_signature", "client")
             : (object) ["name" => null, "uri" => null];
 
-        ClientRegistration::create(self::set_field_map($data, $img->name, $img->uri, $signature->name, $signature->uri, $is_approved, auth()->id()));
+        ClientRegistration::create(self::set_field_map($data, $data->field_id, $data->center_id, $data->acc_no, $img->name, $img->uri, $signature->name, $signature->uri, $is_approved, auth()->id()));
         return self::create_response(__('customValidations.client.registration.successful'));
     }
 
@@ -110,53 +110,10 @@ class ClientRegistrationController extends Controller
         $histData   = self::set_update_hist($data, $client);
 
         DB::transaction(function () use ($id, $client, $data, $histData) {
-            if (!empty($data->image)) {
-                if (!empty($client->image)) {
-                    Helper::unlinkImage(public_path('storage/client/' . $client->image));
-                }
+            self::update_file($client, $data->image, 'image', 'image', 'image_uri', 'client', $histData);
+            self::update_file($client, $data->signature, 'signature', 'signature', 'signature_uri', 'client', $histData);
 
-                $img                = Helper::storeImage($data->image, "client", "client");
-                $histData['image']  = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
-                $client->update(
-                    [
-                        'image'     => $img->name,
-                        'image_uri' => $img->uri,
-                    ]
-                );
-            }
-            if (!empty($data->signature)) {
-                if (!empty($client->signature)) {
-                    Helper::unlinkImage(public_path('storage/client/' . $client->signature));
-                }
-
-                $signature              = Helper::storeSignature($data->signature, "client_signature", "client");
-                $histData['signature']  = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
-                $client->update(
-                    [
-                        'signature'     => $signature->name,
-                        'signature_uri' => $signature->uri,
-                    ]
-                );
-            }
-
-            $client->update(
-                [
-                    'name'              => $data->name,
-                    'father_name'       => $data->father_name,
-                    'husband_name'      => $data->husband_name,
-                    'mother_name'       => $data->mother_name,
-                    'nid'               => $data->nid,
-                    'dob'               => $data->dob,
-                    'occupation'        => $data->occupation,
-                    'religion'          => $data->religion,
-                    'gender'            => $data->gender,
-                    'primary_phone'     => $data->primary_phone,
-                    'secondary_phone'   => $data->secondary_phone,
-                    'share'             => $data->share,
-                    'present_address'   => $data->present_address,
-                    'permanent_address' => $data->permanent_address,
-                ]
-            );
+            $client->update(self::set_field_map($data));
             ClientRegistrationActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
@@ -228,12 +185,9 @@ class ClientRegistrationController extends Controller
      * @param integer $creator_id
      * @return array
      */
-    private static function set_field_map($data, $image, $image_uri, $signature = null, $signature_uri = null, $is_approved = null, $creator_id = null)
+    private static function set_field_map($data, $field_id = null, $center_id = null, $acc_no = null, $image = null, $image_uri = null, $signature = null, $signature_uri = null, $is_approved = null, $creator_id = null)
     {
         $map = [
-            'field_id'          => $data->field_id,
-            'center_id'         => $data->center_id,
-            'acc_no'            => $data->acc_no,
             'name'              => $data->name,
             'father_name'       => $data->father_name,
             'husband_name'      => isset($data->husband_name) ? $data->husband_name : '',
@@ -244,20 +198,29 @@ class ClientRegistrationController extends Controller
             'religion'          => $data->religion,
             'gender'            => $data->gender,
             'primary_phone'     => $data->primary_phone,
-            'secondary_phone'   => isset($data->secondary_phone) ? $data->secondary_phone : '',
-            'image'             => $image,
-            'image_uri'         => $image_uri,
-            'annual_income'     => isset($data->annual_income) ? $data->annual_income : '',
-            'bank_acc_no'       => isset($data->bank_acc_no) ? $data->bank_acc_no : '',
-            'bank_check_no'     => isset($data->bank_check_no) ? $data->bank_check_no : '',
+            'secondary_phone'   => $data->secondary_phone,
+            'annual_income'     => $data->annual_income,
+            'bank_acc_no'       => $data->bank_acc_no,
+            'bank_check_no'     => $data->bank_check_no,
             'share'             => $data->share,
             'present_address'   => $data->present_address,
             'permanent_address' => $data->permanent_address,
         ];
 
-        if (isset($signature) && isset($signature_uri)) {
-            $map['signature'] = $signature;
-            $map['signature_uri'] = $signature_uri;
+        if (isset($field_id)) {
+            $map['field_id'] = $field_id;
+        }
+        if (isset($center_id)) {
+            $map['center_id'] = $center_id;
+        }
+        if (isset($acc_no)) {
+            $map['acc_no'] = $acc_no;
+        }
+        if (isset($image, $image_uri)) {
+            $map += ['image' => $image, 'image_uri' => $image_uri];
+        }
+        if (isset($signature, $signature_uri)) {
+            $map += ['signature' => $signature, 'signature_uri' => $signature_uri];
         }
         if (isset($is_approved)) {
             $map['is_approved'] = $is_approved;
@@ -290,17 +253,48 @@ class ClientRegistrationController extends Controller
                 $dataValue = '';
 
                 foreach ($addressFields as $subField) {
-                    $clientValue = $client->{$field}->{$subField};
-                    $dataValue = $data->{$field}->{$subField};
-                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+                    $clientValue = $client->{$field}->{$subField} ?? '';
+                    $dataValue = $data->{$field}->{$subField} ?? '';
+                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field][$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
                 }
             } else {
-                $clientValue = $client->{$field};
-                $dataValue = $data->{$field};
+                $clientValue = $client->{$field} ?? '';
+                $dataValue = $data->{$field} ?? '';
                 !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
             }
         }
 
         return $histData;
+    }
+
+    /**
+     * Update Files
+     * 
+     * @param object $model
+     * @param object $newImg
+     * @param string $histKey
+     * @param string $fieldName
+     * @param string $uriFieldName
+     * @param string $directory
+     * 
+     * @return void
+     */
+    private static function update_file($model, $newImg, $histKey, $fieldName, $uriFieldName, $directory, &$histData)
+    {
+        if (!empty($newImg) && !empty($model->{$fieldName})) {
+            Helper::unlinkImage(public_path("storage/nominees/{$model->{$fieldName}}"));
+        }
+
+        if (!empty($newImg)) {
+            $file = $fieldName === 'image'
+                ? Helper::storeImage($newImg, $fieldName, $directory)
+                : Helper::storeSignature($newImg, $fieldName, $directory);
+            $histData[$histKey] = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
+
+            $model->update([
+                $fieldName     => $file->name,
+                $uriFieldName  => $file->uri,
+            ]);
+        }
     }
 }
