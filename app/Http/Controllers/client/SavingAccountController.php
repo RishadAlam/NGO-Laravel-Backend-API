@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\client\SavingAccountActionHistory;
 use App\Http\Requests\client\SavingAccountStoreRequest;
@@ -37,14 +38,19 @@ class SavingAccountController extends Controller
      */
     public function index()
     {
-        $saving_accounts = SavingAccount::with('Author:id,name')
-            ->with("ClientRegistration:id,acc_no,name,image_uri")
-            ->with("Field:id,name")
-            ->with("Center:id,name")
-            ->with("Category:id,name,is_default")
-            ->with("Nominees:id,saving_account_id,name,father_name,husband_name,mother_name,nid,dob,occupation,relation,gender,primary_phone,secondary_phone,image,image_uri,signature,signature_uri,address")
+        $query = SavingAccount::with([
+            'Author:id,name',
+            'ClientRegistration:id,acc_no,name,image_uri',
+            'Field:id,name',
+            'Center:id,name',
+            'Category:id,name,is_default',
+            'Nominees:id,saving_account_id,name,father_name,husband_name,mother_name,nid,dob,occupation,relation,gender,primary_phone,secondary_phone,image,image_uri,signature,signature_uri,address',
+        ])
             ->when(request('fetch_pending_forms'), function ($query) {
-                $query->where('is_approved', false);
+                $query->where('is_approved', false)
+                    ->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
+                        $query->where('creator_id', Auth::id());
+                    });
             })
             ->when(request('field_id'), function ($query) {
                 $query->where('field_id', request('field_id'));
@@ -58,16 +64,14 @@ class SavingAccountController extends Controller
             ->when(request('user_id'), function ($query) {
                 $query->where('creator_id', request('user_id'));
             })
-            ->orderBy('id', 'DESC')
-            ->get();
+            ->orderBy('id', 'DESC');
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $saving_accounts
-            ],
-            200
-        );
+        $saving_accounts = $query->get();
+
+        return response([
+            'success' => true,
+            'data' => $saving_accounts,
+        ], 200);
     }
 
     /**
@@ -118,8 +122,16 @@ class SavingAccountController extends Controller
         DB::transaction(
             function () use ($id, $saving_account, $data, $nominees, $histData) {
                 $saving_account->update(self::set_saving_field_map($data));
-                foreach ($nominees as $nominee) {
-                    self::updateNominee((object) $nominee, $histData);
+                foreach ($nominees as $index => $nomineeData) {
+                    $nomineeData                    = (object) $nomineeData;
+                    $nominee                        = Nominee::find($nomineeData->id);
+                    $histData['nominees'][$index]   = [];
+
+                    self::set_update_nominees_hist($histData['nominees'][$index], $nomineeData, $nominee);
+                    self::update_file($nominee, $nomineeData->image, 'nominee_image', 'image', 'image_uri', 'nominees', $histData['nominees'][$index]);
+                    self::update_file($nominee, $nomineeData->signature, 'nominee_signature', 'signature', 'signature_uri', 'nominees', $histData['nominees'][$index]);
+
+                    $nominee->update(Helper::set_nomi_field_map($nomineeData));
                 }
                 SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $id, 'update', $histData));
             }
@@ -183,6 +195,7 @@ class SavingAccountController extends Controller
      * @param object $data
      * @param boolean $is_approved
      * @param integer $creator_id
+     * 
      * @return array
      */
     private static function set_saving_field_map($data, $is_approved = null, $creator_id = null)
@@ -218,55 +231,77 @@ class SavingAccountController extends Controller
      * Set Saving Acc update hist
      * 
      * @param object $data
-     * @param object $client
+     * @param object $account
+     * 
      * @return array
      */
-    private static function set_update_hist($data, $client)
+    private static function set_update_hist($data, $account)
     {
-        $histData                   = [];
-        $data->present_address      = (object) $data->present_address;
-        $data->permanent_address    = (object) $data->permanent_address;
-        $fieldsToCompare            = ['name', 'husband_name', 'father_name', 'mother_name', 'nid', 'dob', 'occupation', 'religion', 'gender', 'primary_phone', 'secondary_phone', 'share', 'present_address', 'permanent_address'];
-        $addressFields              = ['street_address', 'city', 'word_no', 'post_office', 'police_station', 'district', 'division'];
+        $histData           = [];
+        $fieldsToCompare    = ['start_date', 'duration_date', 'payable_installment', 'payable_deposit', 'payable_interest', 'total_deposit_without_interest', 'total_deposit_with_interest'];
 
         foreach ($fieldsToCompare as $field) {
-            if ($field === 'present_address' || $field === 'permanent_address') {
-                $clientValue = '';
-                $dataValue = '';
-
-                foreach ($addressFields as $subField) {
-                    $clientValue = $client->{$field}->{$subField};
-                    $dataValue = $data->{$field}->{$subField};
-                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
-                }
-            } else {
-                $clientValue = $client->{$field};
-                $dataValue = $data->{$field};
-                !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
-            }
+            $clientValue    = $account->{$field};
+            $dataValue      = $data->{$field};
+            !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
         }
 
         return $histData;
     }
 
-    private static function updateNominee($nomineeData, &$histData)
+    /**
+     * Set Saving Acc update Nominee hist
+     * 
+     * @param array $histData
+     * @param object $nomineeData
+     * @param object $nominee
+     * 
+     * @return array
+     */
+    private static function set_update_nominees_hist(&$histData, $nomineeData, $nominee)
     {
-        $nominee = Nominee::find($nomineeData['id']);
+        $nomineeData->address   = (object) $nomineeData->address;
+        $nominee->address       = (object) $nominee->address;
+        $fieldsToCompare        = ['name', 'husband_name', 'father_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'address'];
+        $addressFields          = ['street_address', 'city', 'word_no', 'post_office', 'police_station', 'district', 'division'];
 
-        self::updateFile($nominee, $nomineeData['image'], 'nominee_image', 'image', 'image_uri', 'nominees', $histData);
-        self::updateFile($nominee, $nomineeData['signature'], 'nominee_signature', 'signature', 'signature_uri', 'nominees', $histData);
-
-        $nominee->update(Helper::set_nomi_field_map($nominee));
+        foreach ($fieldsToCompare as $field) {
+            if ($field === 'address') {
+                foreach ($addressFields as $subField) {
+                    $clientValue    = $nominee->{$field}->{$subField};
+                    $dataValue      = $nomineeData->{$field}->{$subField};
+                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+                }
+            } else {
+                $clientValue    = $nominee->{$field};
+                $dataValue      = $nomineeData->{$field};
+                !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+            }
+        }
     }
 
-    private static function updateFile($model, $filename, $histKey, $fieldName, $uriFieldName, $directory, &$histData)
+    /**
+     * Update Files
+     * 
+     * @param object $model
+     * @param object $newImg
+     * @param string $histKey
+     * @param string $fieldName
+     * @param string $uriFieldName
+     * @param string $directory
+     * 
+     * @return void
+     */
+    private static function update_file($model, $newImg, $histKey, $fieldName, $uriFieldName, $directory, &$histData)
     {
-        if (!empty($filename) && !empty($model->{$fieldName})) {
+        if (!empty($newImg) && !empty($model->{$fieldName})) {
             Helper::unlinkImage(public_path("storage/nominees/{$model->{$fieldName}}"));
         }
 
-        if (!empty($filename)) {
-            $file = Helper::storeImage($filename, $fieldName, $directory);
+        if (!empty($newImg)) {
+            $file = $fieldName === 'image'
+                ? Helper::storeImage($newImg, $fieldName, $directory)
+                : Helper::storeSignature($newImg, $fieldName, $directory);
             $histData[$histKey] = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
 
             $model->update([
