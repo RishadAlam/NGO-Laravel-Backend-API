@@ -88,7 +88,20 @@ class ClientRegistrationController extends Controller
             ? Helper::storeSignature($data->signature, "client_signature", "client")
             : (object) ["name" => null, "uri" => null];
 
-        ClientRegistration::create(self::set_field_map($data, $data->field_id, $data->center_id, $data->acc_no, $img->name, $img->uri, $signature->name, $signature->uri, $is_approved, auth()->id()));
+        ClientRegistration::create(
+            self::set_field_map(
+                $data,
+                $data->field_id,
+                $data->center_id,
+                $data->acc_no,
+                $img->name,
+                $img->uri,
+                $signature->name,
+                $signature->uri,
+                $is_approved,
+                auth()->id()
+            )
+        );
         return self::create_response(__('customValidations.client.registration.successful'));
     }
 

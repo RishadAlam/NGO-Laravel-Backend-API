@@ -324,8 +324,8 @@ class SavingAccountController extends Controller
 
         if (!empty($newImg)) {
             $file = $fieldName === 'image'
-                ? Helper::storeImage($newImg, $fieldName, $directory)
-                : Helper::storeSignature($newImg, $fieldName, $directory);
+                ? Helper::storeImage($newImg, $histKey, $directory)
+                : Helper::storeSignature($newImg, $histKey, $directory);
             $histData[$histKey] = "<p class='text-danger'>********</p><p class='text-success'>********</p>";
 
             $model->update([

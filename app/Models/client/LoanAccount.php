@@ -7,6 +7,7 @@ use App\Models\field\Field;
 use App\Models\center\Center;
 use App\Models\category\Category;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\client\ClientRegistration;
 use App\Models\client\GuarantorRegistration;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\LoanAccountActionHistory;
@@ -69,9 +70,19 @@ class LoanAccount extends Model
     }
 
     /**
+     * Relationship belongs to ClientRegistration model
+     *
+     * @return response()
+     */
+    public function ClientRegistration()
+    {
+        return $this->belongsTo(ClientRegistration::class)->withTrashed();
+    }
+
+    /**
      * Relation with Guarantor Table
      */
-    public function Guarantor()
+    public function Guarantors()
     {
         return $this->hasMany(Guarantor::class);
     }
