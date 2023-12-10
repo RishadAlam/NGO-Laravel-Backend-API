@@ -138,7 +138,7 @@ class LoanAccountController extends Controller
                     $guarantor                        = Guarantor::find($guarantorData->id);
                     $histData['guarantors'][$index]   = [];
 
-                    self::set_update_guarantors_hist($histData['guarantors'][$index], $guarantorData, $guarantor);
+                    Helper::set_update_nomiguarantor_hist($histData['guarantors'][$index], $guarantorData, $guarantor);
                     self::update_file($guarantor, $guarantorData->image ?? '', 'guarantor_image', 'image', 'image_uri', 'guarantors', $histData['guarantors'][$index]);
                     self::update_file($guarantor, $guarantorData->signature ?? '', 'guarantor_signature', 'signature', 'signature_uri', 'guarantors', $histData['guarantors'][$index]);
 
@@ -279,36 +279,36 @@ class LoanAccountController extends Controller
         return $histData;
     }
 
-    /**
-     * Set Saving Acc update Nominee hist
-     * 
-     * @param array $histData
-     * @param object $nomineeData
-     * @param object $nominee
-     * 
-     * @return array
-     */
-    private static function set_update_guarantors_hist(&$histData, $nomineeData, $nominee)
-    {
-        $nomineeData->address   = (object) $nomineeData->address;
-        $nominee->address       = (object) $nominee->address;
-        $fieldsToCompare        = ['name', 'husband_name', 'father_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'address'];
-        $addressFields          = ['street_address', 'city', 'word_no', 'post_office', 'police_station', 'district', 'division'];
+    // /**
+    //  * Set Saving Acc update Nominee hist
+    //  * 
+    //  * @param array $histData
+    //  * @param object $nomineeData
+    //  * @param object $nominee
+    //  * 
+    //  * @return array
+    //  */
+    // private static function set_update_guarantors_hist(&$histData, $nomineeData, $nominee)
+    // {
+    //     $nomineeData->address   = (object) $nomineeData->address;
+    //     $nominee->address       = (object) $nominee->address;
+    //     $fieldsToCompare        = ['name', 'husband_name', 'father_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'address'];
+    //     $addressFields          = ['street_address', 'city', 'word_no', 'post_office', 'police_station', 'district', 'division'];
 
-        foreach ($fieldsToCompare as $field) {
-            if ($field === 'address') {
-                foreach ($addressFields as $subField) {
-                    $clientValue    = $nominee->{$field}->{$subField} ?? '';
-                    $dataValue      = $nomineeData->{$field}->{$subField} ?? '';
-                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
-                }
-            } else {
-                $clientValue    = $nominee->{$field} ?? '';
-                $dataValue      = $nomineeData->{$field} ?? '';
-                !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
-            }
-        }
-    }
+    //     foreach ($fieldsToCompare as $field) {
+    //         if ($field === 'address') {
+    //             foreach ($addressFields as $subField) {
+    //                 $clientValue    = $nominee->{$field}->{$subField} ?? '';
+    //                 $dataValue      = $nomineeData->{$field}->{$subField} ?? '';
+    //                 !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+    //             }
+    //         } else {
+    //             $clientValue    = $nominee->{$field} ?? '';
+    //             $dataValue      = $nomineeData->{$field} ?? '';
+    //             !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+    //         }
+    //     }
+    // }
 
     /**
      * Update Files
@@ -325,7 +325,7 @@ class LoanAccountController extends Controller
     private static function update_file($model, $newImg, $histKey, $fieldName, $uriFieldName, $directory, &$histData)
     {
         if (!empty($newImg) && !empty($model->{$fieldName})) {
-            Helper::unlinkImage(public_path("storage/guarantors/{$model->{$fieldName}}"));
+            Helper::unlinkImage(public_path("storage/{$directory}/{$model->{$fieldName}}"));
         }
 
         if (!empty($newImg)) {

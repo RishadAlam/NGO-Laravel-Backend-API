@@ -295,7 +295,7 @@ class ClientRegistrationController extends Controller
     private static function update_file($model, $newImg, $histKey, $fieldName, $uriFieldName, $directory, &$histData)
     {
         if (!empty($newImg) && !empty($model->{$fieldName})) {
-            Helper::unlinkImage(public_path("storage/nominees/{$model->{$fieldName}}"));
+            Helper::unlinkImage(public_path("storage/{$directory}/{$model->{$fieldName}}"));
         }
 
         if (!empty($newImg)) {

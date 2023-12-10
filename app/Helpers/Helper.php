@@ -71,6 +71,37 @@ class Helper
     }
 
     /**
+     * Set Saving & loan Acc update Nominee/Guarantor hist
+     * 
+     * @param array $histData
+     * @param object $nomineeData
+     * @param object $nominee
+     * 
+     * @return array
+     */
+    public static function set_update_nomiguarantor_hist(&$histData, $nomineeData, $nominee)
+    {
+        $nomineeData->address   = (object) $nomineeData->address;
+        $nominee->address       = (object) $nominee->address;
+        $fieldsToCompare        = ['name', 'husband_name', 'father_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'address'];
+        $addressFields          = ['street_address', 'city', 'word_no', 'post_office', 'police_station', 'district', 'division'];
+
+        foreach ($fieldsToCompare as $field) {
+            if ($field === 'address') {
+                foreach ($addressFields as $subField) {
+                    $clientValue    = $nominee->{$field}->{$subField} ?? '';
+                    $dataValue      = $nomineeData->{$field}->{$subField} ?? '';
+                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+                }
+            } else {
+                $clientValue    = $nominee->{$field} ?? '';
+                $dataValue      = $nomineeData->{$field} ?? '';
+                !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+            }
+        }
+    }
+
+    /**
      * Create nested array from properties in array formate.
      *
      * @param array &$rootObj
