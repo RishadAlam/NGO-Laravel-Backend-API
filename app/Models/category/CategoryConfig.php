@@ -2,6 +2,7 @@
 
 namespace App\Models\category;
 
+use App\Models\accounts\Account;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,5 +50,15 @@ class CategoryConfig extends Model
     public function Category()
     {
         return $this->belongsTo(Category::class)->withTrashed();
+    }
+
+    /**
+     * Relationship belongs to Account model
+     *
+     * @return response()
+     */
+    public function saving_reg_fee_store_acc()
+    {
+        return $this->belongsTo(Account::class, 's_reg_fee_acc_id')->withTrashed();
     }
 }

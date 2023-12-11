@@ -435,6 +435,7 @@ return [
             'delete'            => 'The Saving Account has been successfully deleted.',
             'p_delete'          => 'The Saving Account has been permanently deleted.',
             'approved'          => 'The Saving Account has been successfully approved.',
+            'not_found'         => 'Saving account not found!'
         ],
 
         /*
@@ -448,6 +449,7 @@ return [
             'delete'            => 'The Loan Account has been successfully deleted.',
             'p_delete'          => 'The Loan Account has been permanently deleted.',
             'approved'          => 'The Loan Account has been successfully approved.',
+            'not_found'         => 'Loan account not found!'
         ],
     ],
 ];

@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\client;
 
+use Carbon\Carbon;
 use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
 use App\Models\client\Nominee;
+use App\Models\accounts\Income;
+use App\Models\accounts\Account;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
+use App\Models\category\CategoryConfig;
 use Illuminate\Support\Facades\Validator;
 use App\Models\client\SavingAccountActionHistory;
 use App\Http\Requests\client\SavingAccountStoreRequest;
@@ -180,7 +184,43 @@ class SavingAccountController extends Controller
      */
     public function approved(string $id)
     {
-        SavingAccount::find($id)->update(['is_approved' => true]);
+        $savingAccount = SavingAccount::with([
+            'ClientRegistration:id,name',
+            'Category:id,name,is_default'
+        ])->find($id);
+
+        if (!$savingAccount) {
+            return create_response(__('customValidations.client.saving.not_found'));
+        }
+
+        $categoryConfig = CategoryConfig::where('category_id', $savingAccount->category_id)
+            ->with('saving_reg_fee_store_acc:id,balance')
+            ->select('id', 's_reg_fee_acc_id', 'saving_acc_reg_fee')
+            ->firstOrFail();
+
+        DB::transaction(function () use ($savingAccount, $categoryConfig) {
+            if ($categoryConfig->saving_acc_reg_fee > 0) {
+                $categoryName   = !$savingAccount->category->is_default ? $savingAccount->category->name :  __("customValidations.category.default.{$savingAccount->category->name}");
+                $description    = __('customValidations.common.acc_no') . ' = ' . $savingAccount->acc_no . ', ' . __('customValidations.common.name') . ' = ' . $savingAccount->clientRegistration->name . ', '  . __('customValidations.common.saving') . __('customValidations.common.category')
+                    . ' = ' . $categoryName;
+
+                Income::create(
+                    [
+                        'account_id'            => $categoryConfig->saving_reg_fee_store_acc->id,
+                        'income_category_id'    => 1,
+                        'amount'                => $categoryConfig->saving_acc_reg_fee,
+                        'previous_balance'      => $categoryConfig->saving_reg_fee_store_acc->balance,
+                        'description'           => $description,
+                        'creator_id'            => auth()->id()
+                    ]
+                );
+                Account::find($categoryConfig->saving_reg_fee_store_acc->id)
+                    ->increment('total_deposit', $categoryConfig->saving_acc_reg_fee);
+            }
+
+            $savingAccount->update(['is_approved' => true]);
+        });
+
         return create_response(__('customValidations.client.saving.approved'));
     }
 
