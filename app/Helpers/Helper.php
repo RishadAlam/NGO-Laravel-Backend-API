@@ -210,4 +210,50 @@ class Helper
             return $value1 == $value2;
         }
     }
+
+    /**
+     * Translate Numbers
+     * 
+     * @param string $numbers
+     * @param bool $en
+     * 
+     * @return string
+     */
+    public static function tsNumbers($numbers, $en = false)
+    {
+        $bn_to_en = [
+            '১' => '1',
+            '২' => '2',
+            '৩' => '3',
+            '৪' => '4',
+            '৫' => '5',
+            '৬' => '6',
+            '৭' => '7',
+            '৮' => '8',
+            '৯' => '9',
+            '০' => '0',
+            '৳' => '$'
+        ];
+        $en_to_bn = [
+            1 => '১',
+            2 => '২',
+            3 => '৩',
+            4 => '৪',
+            5 => '৫',
+            6 => '৬',
+            7 => '৭',
+            8 => '৮',
+            9 => '৯',
+            0 => '০',
+            '$' => '৳'
+        ];
+
+        return app()->getLocale() !== 'bn' || $en
+            ? preg_replace_callback('/[১২৩৪৫৬৭৮৯০৳]/u', function ($matches) use ($bn_to_en) {
+                return $bn_to_en[$matches[0]] ?? $matches[0];
+            }, $numbers)
+            : preg_replace_callback('/[1234567890$]/u', function ($matches) use ($en_to_bn) {
+                return $en_to_bn[$matches[0]] ?? $matches[0];
+            }, $numbers);
+    }
 }

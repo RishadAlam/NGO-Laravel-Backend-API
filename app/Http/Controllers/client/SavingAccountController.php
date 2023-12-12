@@ -201,18 +201,15 @@ class SavingAccountController extends Controller
         DB::transaction(function () use ($savingAccount, $categoryConfig) {
             if ($categoryConfig->saving_acc_reg_fee > 0) {
                 $categoryName   = !$savingAccount->category->is_default ? $savingAccount->category->name :  __("customValidations.category.default.{$savingAccount->category->name}");
-                $description    = __('customValidations.common.acc_no') . ' = ' . $savingAccount->acc_no . ', ' . __('customValidations.common.name') . ' = ' . $savingAccount->clientRegistration->name . ', '  . __('customValidations.common.saving') . __('customValidations.common.category')
-                    . ' = ' . $categoryName;
+                $acc_no         = Helper::tsNumbers($savingAccount->acc_no);
+                $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.name') . ' = ' . $savingAccount->clientRegistration->name . ', '  . __('customValidations.common.saving') . ' ' . __('customValidations.common.category') . ' = ' . $categoryName;
 
-                Income::create(
-                    [
-                        'account_id'            => $categoryConfig->saving_reg_fee_store_acc->id,
-                        'income_category_id'    => 1,
-                        'amount'                => $categoryConfig->saving_acc_reg_fee,
-                        'previous_balance'      => $categoryConfig->saving_reg_fee_store_acc->balance,
-                        'description'           => $description,
-                        'creator_id'            => auth()->id()
-                    ]
+                Income::store(
+                    $categoryConfig->saving_reg_fee_store_acc->id,
+                    1,
+                    $categoryConfig->saving_acc_reg_fee,
+                    $categoryConfig->saving_reg_fee_store_acc->balance,
+                    $description
                 );
                 Account::find($categoryConfig->saving_reg_fee_store_acc->id)
                     ->increment('total_deposit', $categoryConfig->saving_acc_reg_fee);

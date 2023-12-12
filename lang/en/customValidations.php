@@ -268,6 +268,11 @@ return [
         'delete'            => 'The category has been successfully deleted.',
         'update'            => 'The category has been successfully updated.',
         'status'            => 'The category status has been successfully updated.',
+
+        "default"           => [
+            "monthly_loan"  => "Monthly Loan",
+            "dps"           => "DPS"
+        ]
     ],
 
     /*
@@ -318,10 +323,14 @@ return [
     |--------------------------------------------------------------------------
     */
     'accounts' => [
-        'successful'        => 'The account has been successfully registered.',
-        'delete'            => 'The account has been successfully deleted.',
-        'update'            => 'The account has been successfully updated.',
-        'status'            => 'The account status has been successfully updated.',
+        'successful'    => 'The account has been successfully registered.',
+        'delete'        => 'The account has been successfully deleted.',
+        'update'        => 'The account has been successfully updated.',
+        'status'        => 'The account status has been successfully updated.',
+
+        "default"       => [
+            "cash" => "Cash"
+        ]
     ],
 
     /*
