@@ -5,11 +5,14 @@ namespace App\Http\Controllers\client;
 use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
+use App\Models\accounts\Income;
+use App\Models\accounts\Account;
 use App\Models\client\Guarantor;
 use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\category\CategoryConfig;
 use App\Models\client\LoanAccountActionHistory;
 use App\Http\Requests\client\LoanAccountStoreRequest;
 use App\Http\Requests\client\LoanAccountUpdateRequest;
@@ -178,7 +181,41 @@ class LoanAccountController extends Controller
      */
     public function approved(string $id)
     {
-        LoanAccount::find($id)->update(['is_approved' => true]);
+        $LoanAccount = LoanAccount::with([
+            'ClientRegistration:id,name',
+            'Category:id,name,is_default'
+        ])->find($id);
+
+        if (!$LoanAccount) {
+            return create_response(__('customValidations.client.loan.not_found'));
+        }
+
+        $categoryConfig = CategoryConfig::where('category_id', $LoanAccount->category_id)
+            ->with('loan_reg_fee_store_acc:id,balance')
+            ->select('id', 'l_reg_fee_acc_id', 'loan_acc_reg_fee')
+            ->firstOrFail();
+
+        DB::transaction(function () use ($LoanAccount, $categoryConfig) {
+            if ($categoryConfig->loan_acc_reg_fee > 0) {
+                $categoryName   = !$LoanAccount->category->is_default ? $LoanAccount->category->name :  __("customValidations.category.default.{$LoanAccount->category->name}");
+                $acc_no         = Helper::tsNumbers($LoanAccount->acc_no);
+                $loan_given     = Helper::tsNumbers("৳{$LoanAccount->loan_given}/-");
+                $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.name') . ' = ' . $LoanAccount->clientRegistration->name . ', '  . __('customValidations.common.loan') . ' ' . __('customValidations.common.category') . ' = ' . $categoryName . ', ' . __('customValidations.common.loan') . ' = ' . $loan_given;
+
+                Income::store(
+                    $categoryConfig->loan_reg_fee_store_acc->id,
+                    1,
+                    $categoryConfig->loan_acc_reg_fee,
+                    $categoryConfig->loan_reg_fee_store_acc->balance,
+                    $description
+                );
+                Account::find($categoryConfig->loan_reg_fee_store_acc->id)
+                    ->increment('total_deposit', $categoryConfig->loan_acc_reg_fee);
+            }
+
+            $LoanAccount->update(['is_approved' => true]);
+        });
+
         return create_response(__('customValidations.client.loan.approved'));
     }
 

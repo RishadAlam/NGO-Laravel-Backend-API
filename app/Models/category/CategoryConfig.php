@@ -61,4 +61,14 @@ class CategoryConfig extends Model
     {
         return $this->belongsTo(Account::class, 's_reg_fee_acc_id')->withTrashed();
     }
+
+    /**
+     * Relationship belongs to Account model
+     *
+     * @return response()
+     */
+    public function loan_reg_fee_store_acc()
+    {
+        return $this->belongsTo(Account::class, 'l_reg_fee_acc_id')->withTrashed();
+    }
 }
