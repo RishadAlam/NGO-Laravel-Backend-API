@@ -4,13 +4,13 @@ namespace App\Http\Controllers\accounts;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\accounts\Account;
 use App\Models\accounts\Expense;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\accounts\ExpenseActionHistory;
 use App\Http\Requests\accounts\ExpenseStoreRequest;
 use App\Http\Requests\accounts\ExpenseUpdateRequest;
-use App\Models\accounts\Account;
 
 class ExpenseController extends Controller
 {
@@ -84,7 +84,6 @@ class ExpenseController extends Controller
                 [
                     'account_id'            => $data->account_id,
                     'expense_category_id'   => $data->expense_category_id,
-                    'amount'                => $data->amount,
                     'amount'                => $data->amount,
                     'previous_balance'      => $data->previous_balance,
                     'description'           => $data->description ?? null,

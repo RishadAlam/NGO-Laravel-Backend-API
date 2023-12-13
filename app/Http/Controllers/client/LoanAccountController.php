@@ -7,13 +7,17 @@ use App\Models\AppConfig;
 use Illuminate\Http\Request;
 use App\Models\accounts\Income;
 use App\Models\accounts\Account;
+use App\Models\accounts\Expense;
 use App\Models\client\Guarantor;
 use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
+use App\Models\accounts\ExpenseCategory;
 use App\Models\client\LoanAccountActionHistory;
+use App\Http\Requests\client\LoanApprovalRequest;
 use App\Http\Requests\client\LoanAccountStoreRequest;
 use App\Http\Requests\client\LoanAccountUpdateRequest;
 
@@ -50,6 +54,13 @@ class LoanAccountController extends Controller
             ->when(request('fetch_pending_forms'), function ($query) {
                 $query->where('is_approved', false)
                     ->when(!Auth::user()->can('pending_loan_acc_list_view_as_admin'), function ($query) {
+                        $query->where('creator_id', Auth::id());
+                    });
+            })
+            ->when(request('fetch_pending_loans'), function ($query) {
+                $query->where('is_approved', true)
+                    ->where('is_loan_approved', false)
+                    ->when(!Auth::user()->can('pending_loan_view_as_admin'), function ($query) {
                         $query->where('creator_id', Auth::id());
                     });
             })
@@ -197,6 +208,7 @@ class LoanAccountController extends Controller
 
         DB::transaction(function () use ($LoanAccount, $categoryConfig) {
             if ($categoryConfig->loan_acc_reg_fee > 0) {
+                $incomeCatId    = IncomeCategory::where('name', 'registration_fee')->value('id');
                 $categoryName   = !$LoanAccount->category->is_default ? $LoanAccount->category->name :  __("customValidations.category.default.{$LoanAccount->category->name}");
                 $acc_no         = Helper::tsNumbers($LoanAccount->acc_no);
                 $loan_given     = Helper::tsNumbers("৳{$LoanAccount->loan_given}/-");
@@ -204,7 +216,7 @@ class LoanAccountController extends Controller
 
                 Income::store(
                     $categoryConfig->loan_reg_fee_store_acc->id,
-                    1,
+                    $incomeCatId,
                     $categoryConfig->loan_acc_reg_fee,
                     $categoryConfig->loan_reg_fee_store_acc->balance,
                     $description
@@ -214,6 +226,52 @@ class LoanAccountController extends Controller
             }
 
             $LoanAccount->update(['is_approved' => true]);
+        });
+
+        return create_response(__('customValidations.client.loan.approved'));
+    }
+
+    /**
+     * Approved the specified loan
+     */
+    public function loan_approved(LoanApprovalRequest $request, string $id)
+    {
+        $account        = null;
+        $data           = (object) $request->validated();
+        $LoanAccount    = LoanAccount::with([
+            'ClientRegistration:id,name',
+            'Category:id,name,is_default'
+        ])->find($id);
+
+        if (!$LoanAccount) {
+            return create_validation_error_response(__('customValidations.client.loan.not_found'));
+        }
+        if (isset($data->account) && $account = Account::find($data->account)) {
+            if ($account->balance < $LoanAccount->loan_given) {
+                return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'account');
+            }
+        }
+
+
+        DB::transaction(function () use ($LoanAccount, $data, $account) {
+            if (isset($data->account) && !empty($account)) {
+                $expenseCatId   = ExpenseCategory::where('name', 'loan_given')->value('id');
+                $categoryName   = !$LoanAccount->category->is_default ? $LoanAccount->category->name :  __("customValidations.category.default.{$LoanAccount->category->name}");
+                $acc_no         = Helper::tsNumbers($LoanAccount->acc_no);
+                $loan_given     = Helper::tsNumbers("৳{$LoanAccount->loan_given}/-");
+                $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.name') . ' = ' . $LoanAccount->clientRegistration->name . ', '  . __('customValidations.common.loan') . ' ' . __('customValidations.common.category') . ' = ' . $categoryName . ', ' . __('customValidations.common.loan') . ' = ' . $loan_given;
+
+                Expense::store(
+                    $data->account,
+                    $expenseCatId,
+                    $LoanAccount->loan_given,
+                    $account->balance,
+                    $description
+                );
+                $account->increment('total_withdrawal', $LoanAccount->loan_given);
+            }
+
+            $LoanAccount->update(['is_loan_approved' => true]);
         });
 
         return create_response(__('customValidations.client.loan.approved'));

@@ -177,6 +177,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::PUT('approved/{id}', [ClientRegistrationController::class, 'approved'])->name('approved');
         Route::PUT('saving/approved/{id}', [SavingAccountController::class, 'approved'])->name('saving.approved');
         Route::PUT('loan/approved/{id}', [LoanAccountController::class, 'approved'])->name('loan.approved');
+        Route::PUT('loan/loan-approved/{id}', [LoanAccountController::class, 'loan_approved'])->name('loan.loanApproved');
     });
 
     /*

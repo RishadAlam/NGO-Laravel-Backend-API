@@ -21,3 +21,22 @@ function create_response($message = null, $data = null, $code = 200, $success = 
 
     return response($res, $code);
 }
+
+/**
+ * Create validation error Response
+ *
+ * @param $key Massage key, $message Message Body, $code Error Code, $success Message Status
+ * @return Illuminate\Http\Response
+ */
+function create_validation_error_response($message, $key = 'message', $code = '401', $success = false)
+{
+    return response(
+        [
+            'success'   => $success,
+            "errors"    => [
+                $key    => $message,
+            ],
+        ],
+        $code
+    );
+}

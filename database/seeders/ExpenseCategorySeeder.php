@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\accounts\ExpenseCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 
 class ExpenseCategorySeeder extends Seeder
 {
@@ -15,6 +15,10 @@ class ExpenseCategorySeeder extends Seeder
     {
         $categories = [
             [
+                'name'          => 'loan_given',
+                'is_default'    => true,
+                'creator_id'    => auth()->id()
+            ], [
                 'name'          => 'electricity_bill',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()

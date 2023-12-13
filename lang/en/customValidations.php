@@ -323,10 +323,11 @@ return [
     |--------------------------------------------------------------------------
     */
     'accounts' => [
-        'successful'    => 'The account has been successfully registered.',
-        'delete'        => 'The account has been successfully deleted.',
-        'update'        => 'The account has been successfully updated.',
-        'status'        => 'The account status has been successfully updated.',
+        'successful'            => 'The account has been successfully registered.',
+        'delete'                => 'The account has been successfully deleted.',
+        'update'                => 'The account has been successfully updated.',
+        'status'                => 'The account status has been successfully updated.',
+        'insufficient_balance'  => 'Insufficient Balance.',
 
         "default"       => [
             "cash" => "Cash"
