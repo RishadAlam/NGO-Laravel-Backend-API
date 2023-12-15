@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\client;
 
+use Carbon\Carbon;
 use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
@@ -43,7 +44,10 @@ class LoanAccountController extends Controller
      */
     public function index()
     {
-        $query = LoanAccount::with([
+        $month  = !empty(request('date_range')) ? Carbon::parse(request('date_range'))->month : Carbon::now()->month;
+        $year   = !empty(request('date_range')) ? Carbon::parse(request('date_range'))->year : Carbon::now()->year;
+
+        $query  = LoanAccount::with([
             'Author:id,name',
             'ClientRegistration:id,acc_no,name,image_uri',
             'Field:id,name',
@@ -59,7 +63,6 @@ class LoanAccountController extends Controller
             })
             ->when(request('fetch_pending_loans'), function ($query) {
                 $query->where('is_approved', true)
-                    ->where('is_loan_approved', false)
                     ->when(!Auth::user()->can('pending_loan_view_as_admin'), function ($query) {
                         $query->where('creator_id', Auth::id());
                     });
@@ -76,6 +79,8 @@ class LoanAccountController extends Controller
             ->when(request('user_id'), function ($query) {
                 $query->where('creator_id', request('user_id'));
             })
+            ->whereMonth('start_date', $month)
+            ->whereYear('start_date', $year)
             ->orderBy('id', 'DESC');
 
         $loan_registrations = $query->get();
