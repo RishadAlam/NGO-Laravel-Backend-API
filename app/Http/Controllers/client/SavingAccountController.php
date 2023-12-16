@@ -23,18 +23,15 @@ use App\Http\Requests\client\SavingAccountUpdateRequest;
 class SavingAccountController extends Controller
 {
     /**
-     * Action History Common Function
+     * Instantiate a new controller instance.
      */
-    private static function setActionHistory($id, $action, $histData)
+    public function __construct()
     {
-        return [
-            "saving_account_id" => $id,
-            "author_id"         => auth()->id(),
-            "name"              => auth()->user()->name,
-            "image_uri"         => auth()->user()->image_uri,
-            "action_type"       => $action,
-            "action_details"    => $histData,
-        ];
+        $this->middleware('permission:pending_saving_acc_list_view,pending_saving_acc_list_view_as_admin')->only('index');
+        $this->middleware('can:saving_acc_registration')->only('store');
+        $this->middleware('can:pending_saving_acc_update')->only('update');
+        $this->middleware('can:pending_saving_acc_permanently_delete')->only('permanently_destroy');
+        $this->middleware('can:pending_saving_acc_approval')->only('approved');
     }
 
     /**

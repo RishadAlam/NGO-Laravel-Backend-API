@@ -25,18 +25,16 @@ use App\Http\Requests\client\LoanAccountUpdateRequest;
 class LoanAccountController extends Controller
 {
     /**
-     * Action History Common Function
+     * Instantiate a new controller instance.
      */
-    private static function setActionHistory($id, $action, $histData)
+    public function __construct()
     {
-        return [
-            "loan_Account_id"   => $id,
-            "author_id"         => auth()->id(),
-            "name"              => auth()->user()->name,
-            "image_uri"         => auth()->user()->image_uri,
-            "action_type"       => $action,
-            "action_details"    => $histData,
-        ];
+        $this->middleware('permission:pending_loan_acc_list_view|pending_loan_acc_list_view_as_admin|pending_loan_view|pending_loan_view_as_admin')->only('index');
+        $this->middleware('can:loan_acc_registration')->only('store');
+        $this->middleware('can:pending_loan_acc_update')->only('update');
+        $this->middleware('can:pending_loan_acc_permanently_delete,pending_loan_permanently_delete')->only('permanently_destroy');
+        $this->middleware('can:pending_loan_acc_approval')->only('approved');
+        $this->middleware('can:pending_loan_approval')->only('loan_approved');
     }
 
     /**
