@@ -28,6 +28,6 @@ class UserSeeder extends Seeder
             $user->save();
         }
 
-        User::factory(11)->create();
+        // User::factory(11)->create();
     }
 }
