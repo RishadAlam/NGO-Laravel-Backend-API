@@ -231,9 +231,9 @@ class UserController extends Controller
     public function get_active_users()
     {
         $users = User::where('status', true)
-            ->when(!Auth::user()->can('saving_acc_creator_selection'), function ($query) {
-                $query->whereId(auth()->user()->id);
-            })
+            // ->when(!Auth::user()->can('saving_acc_creator_selection'), function ($query) {
+            //     $query->whereId(auth()->user()->id);
+            // })
             ->get(['id', 'name']);
 
         return response(

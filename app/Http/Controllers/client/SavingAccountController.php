@@ -27,7 +27,7 @@ class SavingAccountController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permission:pending_saving_acc_list_view,pending_saving_acc_list_view_as_admin')->only('index');
+        $this->middleware('permission:pending_saving_acc_list_view|pending_saving_acc_list_view_as_admin')->only('index');
         $this->middleware('can:saving_acc_registration')->only('store');
         $this->middleware('can:pending_saving_acc_update')->only('update');
         $this->middleware('can:pending_saving_acc_permanently_delete')->only('permanently_destroy');
