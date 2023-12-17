@@ -59,11 +59,13 @@ class LoanAccountController extends Controller
                         $query->where('creator_id', Auth::id());
                     });
             })
-            ->when(request('fetch_pending_loans'), function ($query) {
+            ->when(request('fetch_pending_loans'), function ($query) use ($month, $year) {
                 $query->where('is_approved', true)
                     ->when(!Auth::user()->can('pending_loan_view_as_admin'), function ($query) {
                         $query->where('creator_id', Auth::id());
-                    });
+                    })
+                    ->whereMonth('start_date', $month)
+                    ->whereYear('start_date', $year);
             })
             ->when(request('field_id'), function ($query) {
                 $query->where('field_id', request('field_id'));
@@ -77,8 +79,6 @@ class LoanAccountController extends Controller
             ->when(request('user_id'), function ($query) {
                 $query->where('creator_id', request('user_id'));
             })
-            ->whereMonth('start_date', $month)
-            ->whereYear('start_date', $year)
             ->orderBy('id', 'DESC');
 
         $loan_registrations = $query->get();

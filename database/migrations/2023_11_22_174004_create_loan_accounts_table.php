@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('client_registration_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->string('acc_no', 50);
-            $table->date('start_date')->default(DB::raw('NOW()'));
+            $table->date('start_date');
             $table->date('duration_date');
             $table->integer('loan_given')->default(0);
             $table->integer('payable_deposit')->default(0);
