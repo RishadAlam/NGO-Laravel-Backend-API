@@ -55,7 +55,7 @@ class LoanAccountUpdateRequest extends FormRequest
             'duration_date'                         => 'required|date',
             'loan_given'                            => 'required|numeric',
             'payable_installment'                   => 'required|numeric|digits_between:1,3',
-            'payable_deposit'                       => 'required|numeric|digits_between:1,6',
+            'payable_deposit'                       => 'required|numeric',
             'payable_interest'                      => 'required|numeric|digits_between:1,3',
             'total_payable_interest'                => 'required|numeric',
             'total_payable_loan_with_interest'      => 'required|numeric',

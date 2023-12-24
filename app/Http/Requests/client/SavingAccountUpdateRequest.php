@@ -54,7 +54,7 @@ class SavingAccountUpdateRequest extends FormRequest
             'start_date'                        => 'required|date',
             'duration_date'                     => 'required|date',
             'payable_installment'               => 'required|numeric|digits_between:1,3',
-            'payable_deposit'                   => 'required|numeric|digits_between:1,4',
+            'payable_deposit'                   => 'required|numeric',
             'payable_interest'                  => 'required|numeric|digits_between:1,3',
             'total_deposit_without_interest'    => 'required|numeric',
             'total_deposit_with_interest'       => 'required|numeric',
