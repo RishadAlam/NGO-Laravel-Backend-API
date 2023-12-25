@@ -115,10 +115,12 @@ class LoanAccountController extends Controller
 
             foreach ($guarantors as $guarantor) {
                 $guarantor  = (object) $guarantor;
-                $img        = Helper::storeImage($guarantor->image, "guarantor", "guarantors");
+                $img        = isset($guarantor->image)
+                    ? Helper::storeImage($guarantor->image, "guarantor", "guarantors")
+                    : (object) ["name" => null, "uri" => $guarantor->image_uri ?? null];
                 $signature  = isset($guarantor->signature)
                     ? Helper::storeSignature($guarantor->signature, "guarantor_signature", "guarantors")
-                    : (object) ["name" => null, "uri" => null];
+                    : (object) ["name" => null, "uri" => $guarantor->signature_uri ?? null];
 
                 Guarantor::create(Helper::set_nomi_field_map(
                     $guarantor,

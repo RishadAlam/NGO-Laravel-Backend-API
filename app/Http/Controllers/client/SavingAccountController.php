@@ -100,10 +100,12 @@ class SavingAccountController extends Controller
 
             foreach ($nominees as $nominee) {
                 $nominee    = (object) $nominee;
-                $img        = Helper::storeImage($nominee->image, "nominee", "nominees");
-                $signature  = !empty($nominee->signature)
+                $img        = isset($nominee->image)
+                    ? Helper::storeImage($nominee->image, "nominee", "nominees")
+                    : (object) ["name" => null, "uri" => $nominee->image_uri ?? null];
+                $signature  = isset($nominee->signature)
                     ? Helper::storeSignature($nominee->signature, "nominee_signature", "nominees")
-                    : (object) ["name" => null, "uri" => null];
+                    : (object) ["name" => null, "uri" => $nominee->signature_uri ?? null];
 
                 Nominee::create(
                     Helper::set_nomi_field_map(
