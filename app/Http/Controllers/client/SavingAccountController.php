@@ -39,35 +39,36 @@ class SavingAccountController extends Controller
      */
     public function index()
     {
-        $query = SavingAccount::with([
-            'Author:id,name',
-            'ClientRegistration:id,acc_no,name,image_uri',
-            'Field:id,name',
-            'Center:id,name',
-            'Category:id,name,is_default',
-            'Nominees:id,saving_account_id,name,father_name,husband_name,mother_name,nid,dob,occupation,relation,gender,primary_phone,secondary_phone,image,image_uri,signature,signature_uri,address',
-        ])
-            ->when(request('fetch_pending_forms'), function ($query) {
-                $query->where('is_approved', false)
-                    ->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
-                        $query->where('creator_id', Auth::id());
-                    });
-            })
-            ->when(request('field_id'), function ($query) {
-                $query->where('field_id', request('field_id'));
-            })
-            ->when(request('center_id'), function ($query) {
-                $query->where('center_id', request('center_id'));
-            })
-            ->when(request('category_id'), function ($query) {
-                $query->where('category_id', request('category_id'));
-            })
-            ->when(request('user_id'), function ($query) {
-                $query->where('creator_id', request('user_id'));
-            })
-            ->orderBy('id', 'DESC');
+        // $query = SavingAccount::with([
+        //     'Author:id,name',
+        //     'ClientRegistration:id,acc_no,name,image_uri',
+        //     'Field:id,name',
+        //     'Center:id,name',
+        //     'Category:id,name,is_default',
+        //     'Nominees:id,saving_account_id,name,father_name,husband_name,mother_name,nid,dob,occupation,relation,gender,primary_phone,secondary_phone,image,image_uri,signature,signature_uri,address',
+        // ])
+        //     ->when(request('fetch_pending_forms'), function ($query) {
+        //         $query->where('is_approved', false)
+        //             ->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
+        //                 $query->where('creator_id', Auth::id());
+        //             });
+        //     })
+        //     ->when(request('field_id'), function ($query) {
+        //         $query->where('field_id', request('field_id'));
+        //     })
+        //     ->when(request('center_id'), function ($query) {
+        //         $query->where('center_id', request('center_id'));
+        //     })
+        //     ->when(request('category_id'), function ($query) {
+        //         $query->where('category_id', request('category_id'));
+        //     })
+        //     ->when(request('user_id'), function ($query) {
+        //         $query->where('creator_id', request('user_id'));
+        //     })
+        //     ->orderBy('id', 'DESC');
 
-        $saving_accounts = $query->get();
+        // $saving_accounts = $query->get();
+        $saving_accounts = SavingAccount::fetchPendingForms()->get();
 
         return response([
             'success' => true,

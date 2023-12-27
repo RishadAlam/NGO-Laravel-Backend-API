@@ -5,18 +5,16 @@ namespace App\Models\client;
 use App\Models\User;
 use App\Models\field\Field;
 use App\Models\center\Center;
-use App\Models\client\Nominee;
 use App\Models\category\Category;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\client\ClientRegistration;
-use App\Models\client\NomineeRegistration;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\client\SavingAccountActionHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SavingAccount extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -49,7 +47,7 @@ class SavingAccount extends Model
     ];
 
     /**
-     * Relationship belongs to User model
+     * Relationship belongs to User model.
      *
      * @return response()
      */
@@ -59,7 +57,7 @@ class SavingAccount extends Model
     }
 
     /**
-     * Relation with SavingAccountActionHistory Table
+     * Relation with SavingAccountActionHistory Table.
      */
     public function SavingAccountActionHistory()
     {
@@ -67,7 +65,7 @@ class SavingAccount extends Model
     }
 
     /**
-     * Relation with Nominee Table
+     * Relation with Nominee Table.
      */
     public function Nominees()
     {
@@ -75,7 +73,7 @@ class SavingAccount extends Model
     }
 
     /**
-     * Relationship belongs to ClientRegistration model
+     * Relationship belongs to ClientRegistration model.
      *
      * @return response()
      */
@@ -85,7 +83,7 @@ class SavingAccount extends Model
     }
 
     /**
-     * Relationship belongs to Field model
+     * Relationship belongs to Field model.
      *
      * @return response()
      */
@@ -95,7 +93,7 @@ class SavingAccount extends Model
     }
 
     /**
-     * Relationship belongs to Center model
+     * Relationship belongs to Center model.
      *
      * @return response()
      */
@@ -105,12 +103,101 @@ class SavingAccount extends Model
     }
 
     /**
-     * Relationship belongs to Category model
+     * Relationship belongs to Category model.
      *
      * @return response()
      */
     public function Category()
     {
         return $this->belongsTo(Category::class)->withTrashed();
+    }
+
+    /**
+     * Field Relation Scope
+     */
+    public function scopeField($query, ...$arg)
+    {
+        return $query->with("Field", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
+     * Center Relation Scope
+     */
+    public function scopeCenter($query, ...$arg)
+    {
+        return $query->with("Center", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
+     * Category Relation Scope
+     */
+    public function scopeCategory($query, ...$arg)
+    {
+        return $query->with("Category", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
+     * Author Relation Scope
+     */
+    public function scopeAuthor($query, ...$arg)
+    {
+        return $query->with("Author", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
+     * ClientRegistration Relation Scope
+     */
+    public function scopeClientRegistration($query, ...$arg)
+    {
+        return $query->with("ClientRegistration", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
+     * Nominee Relation Scope
+     */
+    public function scopeNominees($query, ...$arg)
+    {
+        return $query->with("Nominees", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
+     * Creators Data
+     */
+    public function scopeCreatedBy($query, $id)
+    {
+        return $query->where('creator_id', $id ?? Auth::id());
+    }
+
+    /**
+     * Pending Saving Registration Forms Scope.
+     */
+    public function scopeFetchPendingForms($query)
+    {
+        return $query->where('is_approved', false)
+            ->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
+                $query->createdBy();
+            })
+            ->when(request('user_id'), function ($query) {
+                $query->createdBy(request('user_id'));
+            })
+            ->Field('id', 'name')
+            ->Center('id', 'name')
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
+            ->Nominees('id', 'saving_account_id', 'name', 'father_name', 'husband_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'image', 'image_uri', 'signature', 'signature_uri', 'address')
+            ->orderBy('id', 'DESC');
     }
 }
