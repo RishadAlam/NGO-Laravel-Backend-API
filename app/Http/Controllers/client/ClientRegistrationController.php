@@ -48,30 +48,31 @@ class ClientRegistrationController extends Controller
      */
     public function index()
     {
-        $client_registrations = ClientRegistration::with('Author:id,name')
-            ->with("Field:id,name")
-            ->with("Center:id,name")
-            ->when(request('fetch_pending'), function ($query) {
-                $query->where('is_approved', false);
-                if (!Auth::user()->can('pending_client_registration_list_view_as_admin')) {
-                    $query->where('creator_id', Auth::user()->id);
-                }
-            })
-            ->when(request('field_id'), function ($query) {
-                $query->where('field_id', request('field_id'));
-            })
-            ->when(request('center_id'), function ($query) {
-                $query->where('center_id', request('center_id'));
-            })
-            ->when(request('user_id'), function ($query) {
-                $query->where('creator_id', request('user_id'));
-            })
-            ->when(request('form'), function ($query) {
-                $query->select('id', 'acc_no', 'name', 'image_uri');
-            })
-            ->orderBy('id', 'DESC')
-            ->get();
+        // $client_registrations = ClientRegistration::with('Author:id,name')
+        //     ->with("Field:id,name")
+        //     ->with("Center:id,name")
+        //     ->when(request('fetch_pending'), function ($query) {
+        //         $query->where('is_approved', false);
+        //         if (!Auth::user()->can('pending_client_registration_list_view_as_admin')) {
+        //             $query->where('creator_id', Auth::user()->id);
+        //         }
+        //     })
+        //     ->when(request('field_id'), function ($query) {
+        //         $query->where('field_id', request('field_id'));
+        //     })
+        //     ->when(request('center_id'), function ($query) {
+        //         $query->where('center_id', request('center_id'));
+        //     })
+        //     ->when(request('user_id'), function ($query) {
+        //         $query->where('creator_id', request('user_id'));
+        //     })
+        //     ->when(request('form'), function ($query) {
+        //         $query->select('id', 'acc_no', 'name', 'image_uri');
+        //     })
+        //     ->orderBy('id', 'DESC')
+        //     ->get();
 
+        $client_registrations = ClientRegistration::fetchPendingForms()->get();
         return self::create_response(null, $client_registrations);
     }
 

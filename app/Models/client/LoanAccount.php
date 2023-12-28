@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\field\Field;
 use App\Models\center\Center;
 use App\Models\category\Category;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\client\ClientRegistration;
 use App\Models\client\GuarantorRegistration;
@@ -15,7 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanAccount extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HelperScopesTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -115,5 +117,53 @@ class LoanAccount extends Model
     public function Category()
     {
         return $this->belongsTo(Category::class)->withTrashed();
+    }
+
+    /**
+     * Guarantor Relation Scope
+     */
+    public function scopeGuarantors($query, ...$arg)
+    {
+        return $query->with("Guarantors", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
+     * Pending Saving Registration Forms Scope.
+     */
+    public function scopeFetchPendingForms($query)
+    {
+        return $query->Field('id', 'name')
+            ->Center('id', 'name')
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
+            ->Guarantors('id', 'loan_account_id', 'name', 'father_name', 'husband_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'image', 'image_uri', 'signature', 'signature_uri', 'address')
+            ->where('is_approved', false)
+            ->filter()
+            ->orderedBy();
+    }
+
+    /**
+     * Filter Scope
+     */
+    public function scopeFilter($query)
+    {
+        $query->when(request('user_id'), function ($query) {
+            $query->createdBy(request('user_id'));
+        })
+            ->when(!Auth::user()->can('pending_loan_acc_list_view_as_admin'), function ($query) {
+                $query->createdBy();
+            })
+            ->when(request('field_id'), function ($query) {
+                $query->fieldID(request('field_id'));
+            })
+            ->when(request('center_id'), function ($query) {
+                $query->CenterID(request('center_id'));
+            })
+            ->when(request('category_id'), function ($query) {
+                $query->CategoryID(request('category_id'));
+            });
     }
 }

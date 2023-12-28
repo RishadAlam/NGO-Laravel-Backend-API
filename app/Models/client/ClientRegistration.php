@@ -5,6 +5,8 @@ namespace App\Models\client;
 use App\Models\User;
 use App\Models\field\Field;
 use App\Models\center\Center;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\ClientRegistrationActionHistory;
@@ -12,7 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ClientRegistration extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HelperScopesTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -116,5 +118,37 @@ class ClientRegistration extends Model
     public function getPermanentAddressAttribute($value)
     {
         return json_decode($value);
+    }
+
+    /**
+     * Pending Saving Registration Forms Scope.
+     */
+    public function scopeFetchPendingForms($query)
+    {
+        return $query->Field('id', 'name')
+            ->Center('id', 'name')
+            ->Author('id', 'name')
+            ->where('is_approved', false)
+            ->filter()
+            ->orderedBy();
+    }
+
+    /**
+     * Filter Scope
+     */
+    public function scopeFilter($query)
+    {
+        $query->when(request('user_id'), function ($query) {
+            $query->createdBy(request('user_id'));
+        })
+            ->when(!Auth::user()->can('pending_client_registration_list_view_as_admin'), function ($query) {
+                $query->createdBy();
+            })
+            ->when(request('field_id'), function ($query) {
+                $query->fieldID(request('field_id'));
+            })
+            ->when(request('center_id'), function ($query) {
+                $query->CenterID(request('center_id'));
+            });
     }
 }

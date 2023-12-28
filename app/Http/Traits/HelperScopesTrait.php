@@ -57,11 +57,35 @@ trait HelperScopesTrait
     }
 
     /**
-     * Creators Data
+     * Data by user id
      */
     public function scopeCreatedBy($query, $id)
     {
         return $query->where('creator_id', $id ?? Auth::id());
+    }
+
+    /**
+     * Data by field id
+     */
+    public function scopeFieldID($query, $id)
+    {
+        return $query->where('field_id', $id);
+    }
+
+    /**
+     * Data by Center id
+     */
+    public function scopeCenterID($query, $id)
+    {
+        return $query->where('center_id', $id);
+    }
+
+    /**
+     * Data by Category id
+     */
+    public function scopeCategoryID($query, $id)
+    {
+        return $query->where('category_id', $id);
     }
 
     /**
