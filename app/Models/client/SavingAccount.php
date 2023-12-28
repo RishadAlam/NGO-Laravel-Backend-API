@@ -7,14 +7,14 @@ use App\Models\field\Field;
 use App\Models\center\Center;
 use App\Models\category\Category;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SavingAccount extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes, HelperScopesTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -113,56 +113,6 @@ class SavingAccount extends Model
     }
 
     /**
-     * Field Relation Scope
-     */
-    public function scopeField($query, ...$arg)
-    {
-        return $query->with("Field", function ($query) use ($arg) {
-            $query->select(...$arg);
-        });
-    }
-
-    /**
-     * Center Relation Scope
-     */
-    public function scopeCenter($query, ...$arg)
-    {
-        return $query->with("Center", function ($query) use ($arg) {
-            $query->select(...$arg);
-        });
-    }
-
-    /**
-     * Category Relation Scope
-     */
-    public function scopeCategory($query, ...$arg)
-    {
-        return $query->with("Category", function ($query) use ($arg) {
-            $query->select(...$arg);
-        });
-    }
-
-    /**
-     * Author Relation Scope
-     */
-    public function scopeAuthor($query, ...$arg)
-    {
-        return $query->with("Author", function ($query) use ($arg) {
-            $query->select(...$arg);
-        });
-    }
-
-    /**
-     * ClientRegistration Relation Scope
-     */
-    public function scopeClientRegistration($query, ...$arg)
-    {
-        return $query->with("ClientRegistration", function ($query) use ($arg) {
-            $query->select(...$arg);
-        });
-    }
-
-    /**
      * Nominee Relation Scope
      */
     public function scopeNominees($query, ...$arg)
@@ -170,14 +120,6 @@ class SavingAccount extends Model
         return $query->with("Nominees", function ($query) use ($arg) {
             $query->select(...$arg);
         });
-    }
-
-    /**
-     * Creators Data
-     */
-    public function scopeCreatedBy($query, $id)
-    {
-        return $query->where('creator_id', $id ?? Auth::id());
     }
 
     /**
@@ -198,6 +140,6 @@ class SavingAccount extends Model
             ->Author('id', 'name')
             ->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
             ->Nominees('id', 'saving_account_id', 'name', 'father_name', 'husband_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'image', 'image_uri', 'signature', 'signature_uri', 'address')
-            ->orderBy('id', 'DESC');
+            ->orderedBy();
     }
 }
