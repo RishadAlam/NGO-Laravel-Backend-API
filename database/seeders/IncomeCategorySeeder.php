@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\accounts\IncomeCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 
 class IncomeCategorySeeder extends Seeder
 {
@@ -18,15 +18,15 @@ class IncomeCategorySeeder extends Seeder
                 'name'          => 'registration_fee',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
-            ],[
+            ], [
                 'name'          => 'closing_fee',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
-            ],[
+            ], [
                 'name'          => 'withdrawal_fee',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
-            ],[
+            ], [
                 'name'          => 'money_transfer_transaction_fee',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
@@ -34,6 +34,6 @@ class IncomeCategorySeeder extends Seeder
         ];
 
         IncomeCategory::insert($categories);
-        // IncomeCategory::factory(5)->create();
+        IncomeCategory::factory(5)->create();
     }
 }

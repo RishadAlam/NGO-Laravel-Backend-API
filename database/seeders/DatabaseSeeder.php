@@ -5,7 +5,6 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\CategorySeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,15 +21,17 @@ class DatabaseSeeder extends Seeder
                 AccountSeeder::class,
                 IncomeCategorySeeder::class,
                 ExpenseCategorySeeder::class,
-                // IncomeSeeder::class,
-                // ExpenseSeeder::class,
-                // AccountWithdrawalSeeder::class,
-                // FieldSeeder::class,
-                // CenterSeeder::class,
+                IncomeSeeder::class,
+                ExpenseSeeder::class,
+                AccountWithdrawalSeeder::class,
+                FieldSeeder::class,
+                CenterSeeder::class,
                 CategorySeeder::class,
-                // ClientRegistrationSeeder::class,
-                // SavingAccountSeeder::class,
-                // LoanAccountSeeder::class
+                ClientRegistrationSeeder::class,
+                SavingAccountSeeder::class,
+                LoanAccountSeeder::class,
+                SavingCollectionSeeder::class,
+                LoanCollectionSeeder::class
             ]
         );
     }

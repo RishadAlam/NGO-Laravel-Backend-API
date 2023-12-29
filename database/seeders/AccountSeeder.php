@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\accounts\Account;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 
 class AccountSeeder extends Seeder
 {
@@ -19,6 +19,6 @@ class AccountSeeder extends Seeder
             'creator_id'    => auth()->id()
         ]);
 
-        // Account::factory(5)->create();
+        Account::factory(5)->create();
     }
 }

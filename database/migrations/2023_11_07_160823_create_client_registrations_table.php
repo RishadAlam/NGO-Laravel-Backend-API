@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('field_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('center_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
+            $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->string('acc_no', 50)->unique();
             $table->string('name');
             $table->string('father_name')->nullable();
@@ -38,7 +40,6 @@ return new class extends Migration
             $table->json('present_address');
             $table->json('permanent_address');
             $table->boolean('is_approved')->default(false);
-            $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

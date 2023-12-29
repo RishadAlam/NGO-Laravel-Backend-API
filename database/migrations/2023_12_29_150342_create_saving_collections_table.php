@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -12,31 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('saving_accounts', function (Blueprint $table) {
+        Schema::create('saving_collections', function (Blueprint $table) {
             $table->id();
             $table->foreignId('field_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('center_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('category_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('client_registration_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
+            $table->foreignId('saving_account_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->string('acc_no', 50);
-            $table->date('start_date');
-            $table->date('duration_date');
-            $table->integer('payable_installment')->default(0);
-            $table->integer('payable_deposit')->default(0);
-            $table->integer('payable_interest')->default(0)->comment('interest in "%" percentage');
-            $table->integer('total_deposit_without_interest')->default(0);
-            $table->integer('total_deposit_with_interest')->default(0);
-            $table->integer('total_installment')->default(0);
-            $table->integer('total_deposited')->default(0);
-            $table->integer('total_withdrawn')->default(0);
-            $table->integer('balance')->storedAs('total_deposited - total_withdrawn')->comment('balance = total_deposited - total_withdrawn');
-            $table->integer('closing_balance')->nullable();
-            $table->integer('closing_interest')->nullable();
-            $table->integer('closing_balance_with_interest')->nullable();
+            $table->integer('installment')->default(1);
+            $table->integer('deposit');
             $table->string('description')->nullable();
-            $table->enum('status', [0, 1, 2])->default(1)->comment('deactivate = 0, activate = 1, hold = 2');
             $table->boolean('is_approved')->default(false);
             $table->timestamps();
             $table->softDeletes();
@@ -48,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('saving_accounts');
+        Schema::dropIfExists('saving_collections');
     }
 };

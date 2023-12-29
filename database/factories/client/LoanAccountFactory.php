@@ -24,12 +24,12 @@ class LoanAccountFactory extends Factory
         $field_id       = Field::inRandomOrder()->first()->id;
         $center_id      = Center::inRandomOrder()->where('field_id', $field_id)->first()->id;
         $category_id    = Category::inRandomOrder()->first()->id;
-        $register       = ClientRegistration::inRandomOrder()->where('field_id', $field_id)->where('center_id', $center_id)->first();
+        $register       = ClientRegistration::inRandomOrder()->where('field_id', $field_id)->orWhere('center_id', $center_id)->first();
         $user_id        = User::inRandomOrder()->first()->id;
 
         return [
-            'field_id'                          => $field_id,
-            'center_id'                         => $center_id,
+            'field_id'                          => $register->field_id,
+            'center_id'                         => $register->center_id,
             'category_id'                       => $category_id,
             'client_registration_id'            => $register->id,
             'acc_no'                            => $register->acc_no,
@@ -44,6 +44,8 @@ class LoanAccountFactory extends Factory
             'loan_installment'                  => fake()->numberBetween(1000, 10000),
             'interest_installment'              => fake()->numberBetween(1000, 10000),
             'status'                            => 1,
+            'is_approved'                       => fake()->numberBetween(0, 1),
+            'is_loan_approved'                  => fake()->numberBetween(0, 1),
             'creator_id'                        => $user_id,
         ];
     }
