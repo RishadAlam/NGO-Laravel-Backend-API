@@ -172,8 +172,14 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Here you can see all the API routes that have been additionally added to
      * the Approval method in resource controller
      */
-    // Registration Approval Routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
+        // Registration Pending Fetch Routes
+        Route::GET('pending-forms', [ClientRegistrationController::class, 'pending_forms'])->name('pendingForms');
+        Route::GET('saving/pending-forms', [SavingAccountController::class, 'pending_forms'])->name('saving.pendingForms');
+        Route::GET('loan/pending-forms', [LoanAccountController::class, 'pending_forms'])->name('loan.pendingForms');
+        Route::GET('loan/pending-loans', [LoanAccountController::class, 'pending_loans'])->name('loan.pendingLoans');
+
+        // Registration Approval Routes
         Route::PUT('approved/{id}', [ClientRegistrationController::class, 'approved'])->name('approved');
         Route::PUT('saving/approved/{id}', [SavingAccountController::class, 'approved'])->name('saving.approved');
         Route::PUT('loan/approved/{id}', [LoanAccountController::class, 'approved'])->name('loan.approved');

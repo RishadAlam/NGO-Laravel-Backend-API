@@ -29,10 +29,11 @@ class LoanAccountController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permission:pending_loan_acc_list_view|pending_loan_acc_list_view_as_admin|pending_loan_view|pending_loan_view_as_admin')->only('index');
+        $this->middleware('permission:pending_loan_acc_list_view|pending_loan_acc_list_view_as_admin')->only('pending_forms');
+        $this->middleware('permission:pending_loan_view|pending_loan_view_as_admin')->only('pending_loans');
         $this->middleware('can:loan_acc_registration')->only('store');
         $this->middleware('can:pending_loan_acc_update')->only('update');
-        $this->middleware('can:pending_loan_acc_permanently_delete,pending_loan_permanently_delete')->only('permanently_destroy');
+        $this->middleware('permission:pending_loan_acc_permanently_delete|pending_loan_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_loan_acc_approval')->only('approved');
         $this->middleware('can:pending_loan_approval')->only('loan_approved');
     }
@@ -82,11 +83,11 @@ class LoanAccountController extends Controller
         //     ->orderBy('id', 'DESC');
 
         // $loan_registrations = $query->get();
-        $loan_registrations = LoanAccount::fetchPendingForms()->get();
-        return response([
-            'success' => true,
-            'data' => $loan_registrations,
-        ], 200);
+        // $loan_registrations = LoanAccount::fetchPendingForms()->get();
+        // return response([
+        //     'success' => true,
+        //     'data' => $loan_registrations,
+        // ], 200);
     }
 
     /**
@@ -191,6 +192,33 @@ class LoanAccountController extends Controller
     {
         LoanAccount::find($id)->forceDelete();
         return create_response(__('customValidations.client.loan.p_delete'));
+    }
+
+    /**
+     * Pending Forms
+     */
+    public function pending_forms()
+    {
+        $pending_forms = LoanAccount::fetchPendingForms()->get();
+        return response([
+            'success' => true,
+            'data' => $pending_forms,
+        ], 200);
+    }
+
+    /**
+     * Pending Forms
+     */
+    public function pending_loans()
+    {
+        $month  = !empty(request('date_range')) ? Carbon::parse(request('date_range'))->month : Carbon::now()->month;
+        $year   = !empty(request('date_range')) ? Carbon::parse(request('date_range'))->year : Carbon::now()->year;
+
+        $pending_loans = LoanAccount::fetchPendingLoans($month, $year)->get();
+        return response([
+            'success' => true,
+            'data' => $pending_loans,
+        ], 200);
     }
 
     /**

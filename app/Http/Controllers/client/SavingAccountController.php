@@ -39,11 +39,11 @@ class SavingAccountController extends Controller
      */
     public function index()
     {
-        $saving_accounts = SavingAccount::fetchPendingForms()->get();
-        return response([
-            'success'   => true,
-            'data'      => $saving_accounts,
-        ], 200);
+        // $saving_accounts = SavingAccount::fetchPendingForms()->get();
+        // return response([
+        //     'success'   => true,
+        //     'data'      => $saving_accounts,
+        // ], 200);
     }
 
     /**
@@ -147,6 +147,18 @@ class SavingAccountController extends Controller
     {
         SavingAccount::find($id)->forceDelete();
         return create_response(__('customValidations.client.saving.p_delete'));
+    }
+
+    /**
+     * Pending Forms
+     */
+    public function pending_forms()
+    {
+        $pending_forms = SavingAccount::fetchPendingForms()->get();
+        return response([
+            'success'   => true,
+            'data'      => $pending_forms,
+        ], 200);
     }
 
     /**

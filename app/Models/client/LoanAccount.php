@@ -130,6 +130,25 @@ class LoanAccount extends Model
     }
 
     /**
+     * Filter Scope
+     */
+    public function scopeFilter($query)
+    {
+        $query->when(request('user_id'), function ($query) {
+            $query->createdBy(request('user_id'));
+        })
+            ->when(request('field_id'), function ($query) {
+                $query->fieldID(request('field_id'));
+            })
+            ->when(request('center_id'), function ($query) {
+                $query->CenterID(request('center_id'));
+            })
+            ->when(request('category_id'), function ($query) {
+                $query->CategoryID(request('category_id'));
+            });
+    }
+
+    /**
      * Pending Saving Registration Forms Scope.
      */
     public function scopeFetchPendingForms($query)
@@ -141,29 +160,51 @@ class LoanAccount extends Model
             ->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
             ->Guarantors('id', 'loan_account_id', 'name', 'father_name', 'husband_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'image', 'image_uri', 'signature', 'signature_uri', 'address')
             ->where('is_approved', false)
+            ->when(!Auth::user()->can('pending_loan_acc_list_view_as_admin'), function ($query) {
+                $query->createdBy();
+            })
             ->filter()
             ->orderedBy();
     }
 
     /**
-     * Filter Scope
+     * Pending Saving Registration Forms Scope.
      */
-    public function scopeFilter($query)
+    public function scopeFetchPendingLoans($query, $month, $year)
     {
-        $query->when(request('user_id'), function ($query) {
-            $query->createdBy(request('user_id'));
-        })
-            ->when(!Auth::user()->can('pending_loan_acc_list_view_as_admin'), function ($query) {
+        return $query->Field('id', 'name')
+            ->Center('id', 'name')
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->ClientRegistration('id', 'name')
+            ->where('is_approved', true)
+            ->when(!Auth::user()->can('pending_loan_view_as_admin'), function ($query) {
                 $query->createdBy();
             })
-            ->when(request('field_id'), function ($query) {
-                $query->fieldID(request('field_id'));
-            })
-            ->when(request('center_id'), function ($query) {
-                $query->CenterID(request('center_id'));
-            })
-            ->when(request('category_id'), function ($query) {
-                $query->CategoryID(request('category_id'));
-            });
+            ->whereMonth('start_date', $month)
+            ->whereYear('start_date', $year)
+            ->filter()
+            ->orderedBy()
+            ->select(
+                'id',
+                'acc_no',
+                'field_id',
+                'center_id',
+                'category_id',
+                'client_registration_id',
+                'creator_id',
+                'start_date',
+                'duration_date',
+                'loan_given',
+                'payable_deposit',
+                'payable_installment',
+                'payable_interest',
+                'total_payable_interest',
+                'total_payable_loan_with_interest',
+                'loan_installment',
+                'interest_installment',
+                'is_loan_approved',
+                'created_at'
+            );
     }
 }

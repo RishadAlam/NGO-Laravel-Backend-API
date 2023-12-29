@@ -72,8 +72,8 @@ class ClientRegistrationController extends Controller
         //     ->orderBy('id', 'DESC')
         //     ->get();
 
-        $client_registrations = ClientRegistration::fetchPendingForms()->get();
-        return self::create_response(null, $client_registrations);
+        // $client_registrations = ClientRegistration::fetchPendingForms()->get();
+        // return self::create_response(null, $client_registrations);
     }
 
     /**
@@ -162,6 +162,18 @@ class ClientRegistrationController extends Controller
     {
         $occupations = ClientRegistration::distinct('occupation')->orderBy('occupation', 'asc')->pluck('occupation');
         return self::create_response(null, $occupations);
+    }
+
+    /**
+     * Pending Forms
+     */
+    public function pending_forms()
+    {
+        $pending_forms = ClientRegistration::fetchPendingForms()->get();
+        return response([
+            'success'   => true,
+            'data'      => $pending_forms,
+        ], 200);
     }
 
     /**
