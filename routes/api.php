@@ -23,6 +23,8 @@ use App\Http\Controllers\accounts\AccountTransferController;
 use App\Http\Controllers\accounts\ExpenseCategoryController;
 use App\Http\Controllers\client\ClientRegistrationController;
 use App\Http\Controllers\accounts\AccountWithdrawalController;
+use App\Http\Controllers\Collections\LoanCollectionController;
+use App\Http\Controllers\Collections\SavingCollectionController;
 
 /*
  * ------------------------------------------------------------------------
@@ -203,6 +205,31 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     /*
      * -------------------------------------------------------------------------
+     * Api Resources Collection Additional Routes
+     * -------------------------------------------------------------------------
+     *
+     * Here you can see all the API routes that have been additionally added to
+     * the Collection Additional Routes in resource controller
+     */
+    Route::prefix('collection')->group(function () {
+        Route::prefix('saving')->name('saving.')->group(function () {
+            Route::prefix('regular/collection-sheet')->name('regular.')->group(function () {
+                Route::GET('category', [SavingCollectionController::class, 'regularCategoryReport'])->name('regularCategoryReport');
+                Route::GET('{category_id}', [SavingCollectionController::class, 'regularFieldReport'])->name('regularFieldReport');
+                Route::GET('{category_id}/{field_id}', [SavingCollectionController::class, 'regularCollectionSheet'])->name('regularCollectionSheet');
+            });
+        });
+        Route::prefix('loan')->name('loan.')->group(function () {
+            Route::prefix('regular/collection-sheet')->name('regular.')->group(function () {
+                Route::GET('category', [LoanCollectionController::class, 'regularCategoryReport'])->name('regularCategoryReport');
+                Route::GET('{category_id}', [LoanCollectionController::class, 'regularFieldReport'])->name('regularFieldReport');
+                Route::GET('{category_id}/{field_id}', [LoanCollectionController::class, 'regularCollectionSheet'])->name('regularCollectionSheet');
+            });
+        });
+    });
+
+    /*
+     * -------------------------------------------------------------------------
      * Api Resources Controllers & Routes
      * -------------------------------------------------------------------------
      *
@@ -216,6 +243,20 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('fields', FieldController::class)->except('show');
     Route::apiResource('centers', CenterController::class)->except('show');
     Route::apiResource('categories', CategoryController::class)->except('show');
+    Route::apiResource('saving-collection', SavingCollectionController::class)->except('show');
+
+    // Client Routes
+    Route::prefix('client/registration')->name('client.registration.')->group(function () {
+        Route::apiResource('/', ClientRegistrationController::class)->except('show')->parameter('', 'registration');
+        Route::apiResource('saving', SavingAccountController::class)->except('show');
+        Route::apiResource('loan', LoanAccountController::class)->except('show');
+    });
+
+    // Collection Routes
+    Route::prefix('collection')->group(function () {
+        Route::apiResource('saving', SavingCollectionController::class)->except('show');
+        Route::apiResource('loan', LoanCollectionController::class)->except('show');
+    });
 
     // Accounts Routes
     Route::prefix('accounts')->name('accounts.')->group(function () {
@@ -234,13 +275,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
             Route::apiResource('/', ExpenseController::class)->except('show')->parameter('', 'expense');
             Route::apiResource('categories', ExpenseCategoryController::class)->except('show');
         });
-    });
-
-    // Client Routes
-    Route::prefix('client/registration')->name('client.registration.')->group(function () {
-        Route::apiResource('/', ClientRegistrationController::class)->except('show')->parameter('', 'registration');
-        Route::apiResource('saving', SavingAccountController::class)->except('show');
-        Route::apiResource('loan', LoanAccountController::class)->except('show');
     });
 
     /*

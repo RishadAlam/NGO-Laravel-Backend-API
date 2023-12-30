@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -37,7 +37,6 @@ return new class extends Migration
             $table->smallInteger('inactive_saving_acc_disable_time_period')->default(0);
             $table->smallInteger('inactive_loan_acc_disable_time_period')->default(0);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

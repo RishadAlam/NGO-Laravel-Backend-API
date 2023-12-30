@@ -127,13 +127,13 @@ class SavingAccount extends Model
      */
     public function scopeFetchPendingForms($query)
     {
-        return $query->Field('id', 'name')
-            ->Center('id', 'name')
-            ->Category('id', 'name', 'is_default')
-            ->Author('id', 'name')
-            ->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
-            ->Nominees('id', 'saving_account_id', 'name', 'father_name', 'husband_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'image', 'image_uri', 'signature', 'signature_uri', 'address')
-            ->where('is_approved', false)
+        return $query->field('id', 'name')
+            ->center('id', 'name')
+            ->category('id', 'name', 'is_default')
+            ->author('id', 'name')
+            ->clientRegistration('id', 'acc_no', 'name', 'image_uri')
+            ->nominees('id', 'saving_account_id', 'name', 'father_name', 'husband_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'image', 'image_uri', 'signature', 'signature_uri', 'address')
+            ->pending()
             ->filter()
             ->orderedBy();
     }
@@ -153,10 +153,10 @@ class SavingAccount extends Model
                 $query->fieldID(request('field_id'));
             })
             ->when(request('center_id'), function ($query) {
-                $query->CenterID(request('center_id'));
+                $query->centerID(request('center_id'));
             })
             ->when(request('category_id'), function ($query) {
-                $query->CategoryID(request('category_id'));
+                $query->categoryID(request('category_id'));
             });
     }
 }

@@ -95,4 +95,28 @@ trait HelperScopesTrait
     {
         return $query->orderBy($key, $sort);
     }
+
+    /**
+     * Active
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', true);
+    }
+
+    /**
+     * Active
+     */
+    public function scopePending($query, $key = "is_approved")
+    {
+        return $query->where($key, false);
+    }
+
+    /**
+     * Active
+     */
+    public function scopeToday($query, $key = "created_at")
+    {
+        return $query->whereDate($key, date('Y-m-d'));
+    }
 }
