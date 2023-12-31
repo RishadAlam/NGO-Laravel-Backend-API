@@ -21,7 +21,7 @@ class ClientRegistrationController extends Controller
      */
     public function __construct()
     {
-        // $this->middleware('permission:pending_client_registration_list_view|pending_client_registration_list_view_as_admin')->only('index');
+        $this->middleware('permission:pending_client_registration_list_view|pending_client_registration_list_view_as_admin')->only('pending_forms');
         $this->middleware('can:client_registration')->only('store');
         $this->middleware('can:pending_client_registration_update')->only('update');
         $this->middleware('can:pending_client_registration_permanently_delete')->only('permanently_destroy');
@@ -106,14 +106,6 @@ class ClientRegistrationController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(ClientRegistrationUpdateRequest $request, string $id)
@@ -160,7 +152,10 @@ class ClientRegistrationController extends Controller
      */
     public function get_client_occupations()
     {
-        $occupations = ClientRegistration::distinct('occupation')->orderBy('occupation', 'asc')->pluck('occupation');
+        $occupations = ClientRegistration::distinct('occupation')
+            ->orderBy('occupation', 'asc')
+            ->pluck('occupation');
+
         return self::create_response(null, $occupations);
     }
 
@@ -169,10 +164,37 @@ class ClientRegistrationController extends Controller
      */
     public function pending_forms()
     {
-        $pending_forms = ClientRegistration::fetchPendingForms()->get();
+        $pendingForms = ClientRegistration::fetchPendingForms()->get();
         return response([
             'success'   => true,
-            'data'      => $pending_forms,
+            'data'      => $pendingForms,
+        ], 200);
+    }
+
+    /**
+     * Pending Forms
+     */
+    public function clientAccounts($field_id = null, $center_id = null)
+    {
+        $clientAccounts = ClientRegistration::fetchAccounts($field_id, $center_id)
+            ->get(['id', 'acc_no', 'name', 'image_uri']);
+
+        return response([
+            'success'   => true,
+            'data'      => $clientAccounts,
+        ], 200);
+    }
+
+    /**
+     * Pending Forms
+     */
+    public function clientInfo()
+    {
+        $clientInfo = ClientRegistration::info()->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $clientInfo,
         ], 200);
     }
 

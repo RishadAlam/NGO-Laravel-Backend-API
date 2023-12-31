@@ -9,12 +9,22 @@ use App\Models\category\Category;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToFieldTrait;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Http\Traits\BelongsToCenterTrait;
+use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SavingAccount extends Model
 {
-    use HasFactory, SoftDeletes, HelperScopesTrait;
+    use HasFactory,
+        SoftDeletes,
+        HelperScopesTrait,
+        BelongsToFieldTrait,
+        BelongsToCenterTrait,
+        BelongsToCategoryTrait,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -47,16 +57,6 @@ class SavingAccount extends Model
     ];
 
     /**
-     * Relationship belongs to User model.
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
-    }
-
-    /**
      * Relation with SavingAccountActionHistory Table.
      */
     public function SavingAccountActionHistory()
@@ -80,36 +80,6 @@ class SavingAccount extends Model
     public function ClientRegistration()
     {
         return $this->belongsTo(ClientRegistration::class)->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to Field model.
-     *
-     * @return response()
-     */
-    public function Field()
-    {
-        return $this->belongsTo(Field::class)->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to Center model.
-     *
-     * @return response()
-     */
-    public function Center()
-    {
-        return $this->belongsTo(Center::class)->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to Category model.
-     *
-     * @return response()
-     */
-    public function Category()
-    {
-        return $this->belongsTo(Category::class)->withTrashed();
     }
 
     /**

@@ -4,12 +4,15 @@ namespace App\Models\accounts;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToAuthorTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AccountTransfer extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,
+        SoftDeletes,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -28,16 +31,6 @@ class AccountTransfer extends Model
         'date',
         'creator_id'
     ];
-
-    /**
-     * Relationship belongs to User model
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
-    }
 
     /**
      * Relationship belongs to Account model

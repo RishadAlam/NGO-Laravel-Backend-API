@@ -115,6 +115,14 @@ trait HelperScopesTrait
     /**
      * Active
      */
+    public function scopeApprove($query, $key = "is_approved")
+    {
+        return $query->where($key, true);
+    }
+
+    /**
+     * Active
+     */
     public function scopeToday($query, $key = "created_at")
     {
         return $query->whereDate($key, date('Y-m-d'));

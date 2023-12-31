@@ -3,15 +3,22 @@
 namespace App\Models\accounts;
 
 use App\Models\User;
+use App\Models\accounts\Account;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\accounts\ExpenseCategory;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Http\Traits\BelongsToAccountTrait;
 use App\Models\accounts\AccountActionHistory;
+use App\Models\accounts\ExpenseActionHistory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Expense extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,
+        SoftDeletes,
+        BelongsToAccountTrait,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -37,17 +44,6 @@ class Expense extends Model
         $this->attributes['date'] =  date('Y-m-d h:m:s', strtotime($value));
     }
 
-
-    /**
-     * Relationship belongs to Account model
-     *
-     * @return response()
-     */
-    public function Account()
-    {
-        return $this->belongsTo(Account::class)->withTrashed();
-    }
-
     /**
      * Relationship belongs to Expense Category model
      *
@@ -56,17 +52,6 @@ class Expense extends Model
     public function ExpenseCategory()
     {
         return $this->belongsTo(ExpenseCategory::class)->withTrashed();
-    }
-
-
-    /**
-     * Relationship belongs to User model
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
     }
 
     /**

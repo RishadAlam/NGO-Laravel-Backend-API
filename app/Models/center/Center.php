@@ -2,15 +2,23 @@
 
 namespace App\Models\center;
 
-use App\Models\field\Field;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\field\Field;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToFieldTrait;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Models\center\CenterActionHistory;
+use App\Models\Collections\LoanCollection;
+use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Center extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,
+        SoftDeletes,
+        BelongsToFieldTrait,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -24,30 +32,26 @@ class Center extends Model
     ];
 
     /**
-     * Relationship belongs to User model
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to Field model
-     *
-     * @return response()
-     */
-    public function Field()
-    {
-        return $this->belongsTo(Field::class)->withTrashed();
-    }
-
-    /**
      * Relation with CenterActionHistory Table
      */
     public function CenterActionHistory()
     {
         return $this->hasMany(CenterActionHistory::class);
+    }
+
+    /**
+     * Relation with Saving Collection Table
+     */
+    public function SavingCollection()
+    {
+        return $this->hasMany(SavingCollection::class)->withTrashed();
+    }
+
+    /**
+     * Relation with Loan Collection Table
+     */
+    public function LoanCollection()
+    {
+        return $this->hasMany(LoanCollection::class)->withTrashed();
     }
 }

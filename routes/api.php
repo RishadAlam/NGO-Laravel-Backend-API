@@ -176,6 +176,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      */
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
         // Registration Pending Fetch Routes
+        Route::GET('info', [ClientRegistrationController::class, 'clientInfo'])->name('clientInfo');
+        Route::GET('accounts/{field_id?}/{center_id?}', [ClientRegistrationController::class, 'clientAccounts'])->name('clientAccounts');
         Route::GET('pending-forms', [ClientRegistrationController::class, 'pending_forms'])->name('pendingForms');
         Route::GET('saving/pending-forms', [SavingAccountController::class, 'pending_forms'])->name('saving.pendingForms');
         Route::GET('loan/pending-forms', [LoanAccountController::class, 'pending_forms'])->name('loan.pendingForms');

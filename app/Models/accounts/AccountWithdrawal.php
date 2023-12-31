@@ -5,13 +5,18 @@ namespace App\Models\accounts;
 use App\Models\User;
 use App\Models\accounts\Account;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Http\Traits\BelongsToAccountTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\accounts\AccountWithdrawalActionHistory;
 
 class AccountWithdrawal extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,
+        SoftDeletes,
+        BelongsToAccountTrait,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -34,26 +39,6 @@ class AccountWithdrawal extends Model
     public function setDateAttribute($value)
     {
         $this->attributes['date'] =  date('Y-m-d h:m:s', strtotime($value));
-    }
-
-    /**
-     * Relationship belongs to Account model
-     *
-     * @return response()
-     */
-    public function Account()
-    {
-        return $this->belongsTo(Account::class)->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to User model
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
     }
 
     /**

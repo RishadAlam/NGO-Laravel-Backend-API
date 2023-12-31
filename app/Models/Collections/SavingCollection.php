@@ -10,14 +10,24 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToFieldTrait;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Http\Traits\BelongsToCenterTrait;
 use App\Models\client\ClientRegistration;
+use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Collections\SavingCollectionActionHistory;
 
 class SavingCollection extends Model
 {
-    use HasFactory, SoftDeletes, HelperScopesTrait;
+    use HasFactory,
+        SoftDeletes,
+        HelperScopesTrait,
+        BelongsToFieldTrait,
+        BelongsToCenterTrait,
+        BelongsToCategoryTrait,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.

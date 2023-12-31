@@ -4,12 +4,22 @@ namespace App\Models\Collections;
 
 use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToFieldTrait;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Http\Traits\BelongsToCenterTrait;
+use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanCollection extends Model
 {
-    use HasFactory, SoftDeletes, HelperScopesTrait;
+    use HasFactory,
+        SoftDeletes,
+        HelperScopesTrait,
+        BelongsToFieldTrait,
+        BelongsToCenterTrait,
+        BelongsToCategoryTrait,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.

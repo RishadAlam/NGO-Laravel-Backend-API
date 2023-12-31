@@ -4,13 +4,16 @@ namespace App\Models\accounts;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToAuthorTrait;
 use App\Models\accounts\AccountActionHistory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Account extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,
+        SoftDeletes,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -28,16 +31,6 @@ class Account extends Model
         'status',
         'creator_id'
     ];
-
-    /**
-     * Relationship belongs to User model
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
-    }
 
     /**
      * Relation with AccountActionHistory Table

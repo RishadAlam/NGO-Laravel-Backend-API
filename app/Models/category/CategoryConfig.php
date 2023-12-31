@@ -4,11 +4,12 @@ namespace App\Models\category;
 
 use App\Models\accounts\Account;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CategoryConfig extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCategoryTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -40,16 +41,6 @@ class CategoryConfig extends Model
         'inactive_saving_acc_disable_time_period',
         'inactive_loan_acc_disable_time_period',
     ];
-
-    /**
-     * Relationship belongs to User model
-     *
-     * @return response()
-     */
-    public function Category()
-    {
-        return $this->belongsTo(Category::class)->withTrashed();
-    }
 
     /**
      * Relationship belongs to Account model

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Collections;
 
 use Illuminate\Http\Request;
+use App\Models\category\Category;
 use App\Http\Controllers\Controller;
+use App\Models\Collections\SavingCollection;
 
 class SavingCollectionController extends Controller
 {
@@ -52,5 +54,11 @@ class SavingCollectionController extends Controller
      */
     public function regularCategoryReport()
     {
+        $categoryReport = Category::regularCategoryReport()->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $categoryReport
+        ], 200);
     }
 }

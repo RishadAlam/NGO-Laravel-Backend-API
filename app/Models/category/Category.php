@@ -3,13 +3,18 @@
 namespace App\Models\category;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Models\Collections\LoanCollection;
+use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,
+        SoftDeletes,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -26,16 +31,6 @@ class Category extends Model
     ];
 
     /**
-     * Relationship belongs to User model
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
-    }
-
-    /**
      * Relation with CenterActionHistory Table
      */
     public function CategoryActionHistory()
@@ -49,5 +44,21 @@ class Category extends Model
     public function CategoryConfig()
     {
         return $this->hasMany(CategoryConfig::class)->withTrashed();
+    }
+
+    /**
+     * Relation with Saving Collection Table
+     */
+    public function SavingCollection()
+    {
+        return $this->hasMany(SavingCollection::class)->withTrashed();
+    }
+
+    /**
+     * Relation with Loan Collection Table
+     */
+    public function LoanCollection()
+    {
+        return $this->hasMany(LoanCollection::class)->withTrashed();
     }
 }

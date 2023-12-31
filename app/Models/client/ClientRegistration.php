@@ -2,19 +2,24 @@
 
 namespace App\Models\client;
 
-use App\Models\User;
-use App\Models\field\Field;
-use App\Models\center\Center;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToFieldTrait;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Http\Traits\BelongsToCenterTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\ClientRegistrationActionHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ClientRegistration extends Model
 {
-    use HasFactory, SoftDeletes, HelperScopesTrait;
+    use HasFactory,
+        SoftDeletes,
+        HelperScopesTrait,
+        BelongsToFieldTrait,
+        BelongsToCenterTrait,
+        BelongsToAuthorTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -51,41 +56,11 @@ class ClientRegistration extends Model
     ];
 
     /**
-     * Relationship belongs to User model
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
-    }
-
-    /**
      * Relation with ClientRegistrationActionHistory Table
      */
     public function ClientRegistrationActionHistory()
     {
         return $this->hasMany(ClientRegistrationActionHistory::class);
-    }
-
-    /**
-     * Relationship belongs to Field model
-     *
-     * @return response()
-     */
-    public function Field()
-    {
-        return $this->belongsTo(Field::class)->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to Center model
-     *
-     * @return response()
-     */
-    public function Center()
-    {
-        return $this->belongsTo(Center::class)->withTrashed();
     }
 
     /**
@@ -123,14 +98,38 @@ class ClientRegistration extends Model
     /**
      * Pending Saving Registration Forms Scope.
      */
+    public function scopeInfo($query)
+    {
+        return $query->approve()
+            ->filter()
+            ->orderedBy('acc_no', 'ASC');
+    }
+
+    /**
+     * Pending Saving Registration Forms Scope.
+     */
     public function scopeFetchPendingForms($query)
     {
         return $query->Field('id', 'name')
             ->Center('id', 'name')
             ->Author('id', 'name')
-            ->where('is_approved', false)
+            ->pending()
+            ->when(!Auth::user()->can('pending_client_registration_list_view_as_admin'), function ($query) {
+                $query->createdBy();
+            })
             ->filter()
             ->orderedBy();
+    }
+
+    /**
+     * Pending Saving Registration Forms Scope.
+     */
+    public function scopeFetchAccounts($query, $field_id, $center_id)
+    {
+        return $query->fieldID($field_id)
+            ->centerID($center_id)
+            ->approve()
+            ->orderedBy('acc_no', 'ASC');
     }
 
     /**
@@ -141,9 +140,6 @@ class ClientRegistration extends Model
         $query->when(request('user_id'), function ($query) {
             $query->createdBy(request('user_id'));
         })
-            ->when(!Auth::user()->can('pending_client_registration_list_view_as_admin'), function ($query) {
-                $query->createdBy();
-            })
             ->when(request('field_id'), function ($query) {
                 $query->fieldID(request('field_id'));
             })
