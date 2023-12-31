@@ -123,6 +123,28 @@ class RolePermissionSeeder extends Seeder
                     'pending_loan_permanently_delete',
                 ]
             ],
+            // Regular Saving Collection
+            [
+                'groupName'     => 'regular_saving_collection',
+                'permissions'   => [
+                    'regular_saving_collection_list_view',
+                    'regular_saving_collection_list_view_as_admin',
+                    'regular_saving_collection_approval',
+                    'regular_saving_collection_update',
+                    'regular_saving_collection_permanently_delete',
+                ]
+            ],
+            // Regular Loan Collection
+            [
+                'groupName'     => 'regular_loan_collection',
+                'permissions'   => [
+                    'regular_loan_collection_list_view',
+                    'regular_loan_collection_list_view_as_admin',
+                    'regular_loan_collection_approval',
+                    'regular_loan_collection_update',
+                    'regular_loan_collection_permanently_delete',
+                ]
+            ],
             // Account
             [
                 'groupName'     => 'account_management',

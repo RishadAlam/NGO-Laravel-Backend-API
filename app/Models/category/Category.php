@@ -3,6 +3,9 @@
 namespace App\Models\category;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Models\Collections\LoanCollection;
@@ -14,6 +17,7 @@ class Category extends Model
 {
     use HasFactory,
         SoftDeletes,
+        HelperScopesTrait,
         BelongsToAuthorTrait;
 
     /**
@@ -60,5 +64,38 @@ class Category extends Model
     public function LoanCollection()
     {
         return $this->hasMany(LoanCollection::class)->withTrashed();
+    }
+
+    /**
+     * Regular Category report.
+     */
+    public function scopeRegularCategoryReport($query)
+    {
+        return $query->where('saving', true)
+            ->active()
+            ->with(
+                [
+                    'SavingCollection' => function ($query) {
+                        $query->select(
+                            'category_id',
+                            DB::raw('SUM(deposit) AS deposit')
+                        );
+                        $query->groupBy('category_id');
+                        $query->pending();
+                        // $query->today();
+                        $query->permission();
+                    }
+                ]
+            );
+    }
+
+    /**
+     * Permission
+     */
+    public function scopePermission($query)
+    {
+        $query->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
+            $query->createdBy();
+        });
     }
 }

@@ -108,29 +108,6 @@ class SavingCollection extends Model
     }
 
     /**
-     * Regular Category report.
-     */
-    public function scopeRegularCategoryReport($query)
-    {
-        return $query->where('saving', true)
-            ->active()
-            ->with(
-                [
-                    'SavingCollection' => function ($query) {
-                        $query->select(
-                            'category_id',
-                            DB::raw('SUM(deposit) AS deposit')
-                        );
-                        $query->groupBy('category_id');
-                        $query->pending();
-                        $query->today();
-                        $query->filter();
-                    }
-                ]
-            );
-    }
-
-    /**
      * Regular Field report.
      */
     public function scopeRegularFieldReport($query, $category_id)
@@ -147,7 +124,7 @@ class SavingCollection extends Model
                         $query->categoryID($category_id);
                         $query->pending();
                         $query->today();
-                        $query->filter();
+                        $query->permission();
                     }
                 ]
             );
@@ -179,6 +156,7 @@ class SavingCollection extends Model
                                 $query->today();
                                 $query->categoryID($category_id);
                                 $query->filter();
+                                $query->permission();
                             }
                         ]);
                     }
@@ -195,9 +173,6 @@ class SavingCollection extends Model
         $query->when(request('user_id'), function ($query) {
             $query->createdBy(request('user_id'));
         })
-            ->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
-                $query->createdBy();
-            })
             ->when(request('field_id'), function ($query) {
                 $query->fieldID(request('field_id'));
             })
@@ -207,5 +182,15 @@ class SavingCollection extends Model
             ->when(request('category_id'), function ($query) {
                 $query->categoryID(request('category_id'));
             });
+    }
+
+    /**
+     * Permission
+     */
+    public function scopePermission($query)
+    {
+        $query->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
+            $query->createdBy();
+        });
     }
 }

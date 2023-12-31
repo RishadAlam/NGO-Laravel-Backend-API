@@ -216,14 +216,14 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::prefix('collection')->group(function () {
         Route::prefix('saving')->name('saving.')->group(function () {
             Route::prefix('regular/collection-sheet')->name('regular.')->group(function () {
-                Route::GET('category', [SavingCollectionController::class, 'regularCategoryReport'])->name('regularCategoryReport');
+                Route::GET('/', [SavingCollectionController::class, 'regularCategoryReport'])->name('regularCategoryReport');
                 Route::GET('{category_id}', [SavingCollectionController::class, 'regularFieldReport'])->name('regularFieldReport');
                 Route::GET('{category_id}/{field_id}', [SavingCollectionController::class, 'regularCollectionSheet'])->name('regularCollectionSheet');
             });
         });
         Route::prefix('loan')->name('loan.')->group(function () {
             Route::prefix('regular/collection-sheet')->name('regular.')->group(function () {
-                Route::GET('category', [LoanCollectionController::class, 'regularCategoryReport'])->name('regularCategoryReport');
+                Route::GET('/', [LoanCollectionController::class, 'regularCategoryReport'])->name('regularCategoryReport');
                 Route::GET('{category_id}', [LoanCollectionController::class, 'regularFieldReport'])->name('regularFieldReport');
                 Route::GET('{category_id}/{field_id}', [LoanCollectionController::class, 'regularCollectionSheet'])->name('regularCollectionSheet');
             });
