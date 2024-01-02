@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Collections;
 
-use App\Http\Controllers\Controller;
+use App\Models\field\Field;
 use Illuminate\Http\Request;
+use App\Models\center\Center;
+use App\Models\category\Category;
+use App\Http\Controllers\Controller;
 
 class LoanCollectionController extends Controller
 {
@@ -45,5 +48,45 @@ class LoanCollectionController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Regular Category Report
+     */
+    public function regularCategoryReport()
+    {
+        $categoryReport = Category::RegularCategoryLoanReport()
+            ->get(['id', 'name', 'is_default']);
+
+        return response([
+            'success'   => true,
+            'data'      => $categoryReport
+        ], 200);
+    }
+
+    /**
+     * Regular Field Report
+     */
+    public function regularFieldReport($category_id)
+    {
+        $fieldReport = Field::regularFieldLoanReport($category_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $fieldReport
+        ], 200);
+    }
+
+    /**
+     * Regular Collection Sheet
+     */
+    public function regularCollectionSheet($category_id, $field_id)
+    {
+        $collections = Center::scopeRegularCollectionSheet($category_id, $field_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $collections
+        ], 200);
     }
 }

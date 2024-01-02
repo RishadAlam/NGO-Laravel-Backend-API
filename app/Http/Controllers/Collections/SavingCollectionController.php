@@ -57,7 +57,7 @@ class SavingCollectionController extends Controller
      */
     public function regularCategoryReport()
     {
-        $categoryReport = Category::regularCategoryReport()
+        $categoryReport = Category::regularCategorySavingReport()
             ->get(['id', 'name', 'is_default']);
 
         return response([
@@ -71,7 +71,7 @@ class SavingCollectionController extends Controller
      */
     public function regularFieldReport($category_id)
     {
-        $fieldReport = Field::regularFieldReport($category_id)->get();
+        $fieldReport = Field::regularFieldSavingReport($category_id)->get();
 
         return response([
             'success'   => true,

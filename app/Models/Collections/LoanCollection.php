@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToFieldTrait;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
+use App\Models\client\ClientRegistration;
 use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Collections\LoanCollectionActionHistory;
 
 class LoanCollection extends Model
 {
@@ -19,7 +22,8 @@ class LoanCollection extends Model
         BelongsToFieldTrait,
         BelongsToCenterTrait,
         BelongsToCategoryTrait,
-        BelongsToAuthorTrait;
+        BelongsToAuthorTrait,
+        BelongsToClientRegistrationTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -43,4 +47,12 @@ class LoanCollection extends Model
         'description',
         'is_approved'
     ];
+
+    /**
+     * Relation with LoanCollectionActionHistory Table.
+     */
+    public function LoanCollectionActionHistory()
+    {
+        return $this->hasMany(LoanCollectionActionHistory::class);
+    }
 }

@@ -11,7 +11,7 @@ trait HelperScopesTrait
      */
     public function scopeField($query, ...$arg)
     {
-        return $query->with("Field", function ($query) use ($arg) {
+        $query->with("Field", function ($query) use ($arg) {
             $query->select(...$arg);
         });
     }
@@ -21,7 +21,7 @@ trait HelperScopesTrait
      */
     public function scopeCenter($query, ...$arg)
     {
-        return $query->with("Center", function ($query) use ($arg) {
+        $query->with("Center", function ($query) use ($arg) {
             $query->select(...$arg);
         });
     }
@@ -31,7 +31,7 @@ trait HelperScopesTrait
      */
     public function scopeCategory($query, ...$arg)
     {
-        return $query->with("Category", function ($query) use ($arg) {
+        $query->with("Category", function ($query) use ($arg) {
             $query->select(...$arg);
         });
     }
@@ -41,7 +41,7 @@ trait HelperScopesTrait
      */
     public function scopeAuthor($query, ...$arg)
     {
-        return $query->with("Author", function ($query) use ($arg) {
+        $query->with("Author", function ($query) use ($arg) {
             $query->select(...$arg);
         });
     }
@@ -51,7 +51,7 @@ trait HelperScopesTrait
      */
     public function scopeClientRegistration($query, ...$arg)
     {
-        return $query->with("ClientRegistration", function ($query) use ($arg) {
+        $query->with("ClientRegistration", function ($query) use ($arg) {
             $query->select(...$arg);
         });
     }
@@ -61,7 +61,7 @@ trait HelperScopesTrait
      */
     public function scopeCreatedBy($query, $id)
     {
-        return $query->where('creator_id', $id ?? Auth::id());
+        $query->where('creator_id', $id ?? Auth::id());
     }
 
     /**
@@ -69,7 +69,7 @@ trait HelperScopesTrait
      */
     public function scopeFieldID($query, $id)
     {
-        return $query->where('field_id', $id);
+        $query->where('field_id', $id);
     }
 
     /**
@@ -77,7 +77,7 @@ trait HelperScopesTrait
      */
     public function scopeCenterID($query, $id)
     {
-        return $query->where('center_id', $id);
+        $query->where('center_id', $id);
     }
 
     /**
@@ -85,7 +85,7 @@ trait HelperScopesTrait
      */
     public function scopeCategoryID($query, $id)
     {
-        return $query->where('category_id', $id);
+        $query->where('category_id', $id);
     }
 
     /**
@@ -93,7 +93,7 @@ trait HelperScopesTrait
      */
     public function scopeOrderedBy($query, $key = 'id', $sort = 'DESC')
     {
-        return $query->orderBy($key, $sort);
+        $query->orderBy($key, $sort);
     }
 
     /**
@@ -101,7 +101,7 @@ trait HelperScopesTrait
      */
     public function scopeActive($query)
     {
-        return $query->where('status', true);
+        $query->where('status', true);
     }
 
     /**
@@ -109,7 +109,7 @@ trait HelperScopesTrait
      */
     public function scopePending($query, $key = "is_approved")
     {
-        return $query->where($key, false);
+        $query->where($key, false);
     }
 
     /**
@@ -117,7 +117,7 @@ trait HelperScopesTrait
      */
     public function scopeApprove($query, $key = "is_approved")
     {
-        return $query->where($key, true);
+        $query->where($key, true);
     }
 
     /**
@@ -125,6 +125,6 @@ trait HelperScopesTrait
      */
     public function scopeToday($query, $key = "created_at")
     {
-        return $query->whereDate($key, date('Y-m-d'));
+        $query->whereDate($key, date('Y-m-d'));
     }
 }

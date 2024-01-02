@@ -16,6 +16,7 @@ use App\Http\Traits\BelongsToCenterTrait;
 use App\Models\client\ClientRegistration;
 use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Collections\SavingCollectionActionHistory;
 
@@ -27,7 +28,8 @@ class SavingCollection extends Model
         BelongsToFieldTrait,
         BelongsToCenterTrait,
         BelongsToCategoryTrait,
-        BelongsToAuthorTrait;
+        BelongsToAuthorTrait,
+        BelongsToClientRegistrationTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -50,56 +52,6 @@ class SavingCollection extends Model
     ];
 
     /**
-     * Relationship belongs to User model.
-     *
-     * @return response()
-     */
-    public function Author()
-    {
-        return $this->belongsTo(User::class, 'creator_id', 'id')->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to ClientRegistration model.
-     *
-     * @return response()
-     */
-    public function ClientRegistration()
-    {
-        return $this->belongsTo(ClientRegistration::class)->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to Field model.
-     *
-     * @return response()
-     */
-    public function Field()
-    {
-        return $this->belongsTo(Field::class)->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to Center model.
-     *
-     * @return response()
-     */
-    public function Center()
-    {
-        return $this->belongsTo(Center::class)->withTrashed();
-    }
-
-    /**
-     * Relationship belongs to Category model.
-     *
-     * @return response()
-     */
-    public function Category()
-    {
-        return $this->belongsTo(Category::class)->withTrashed();
-    }
-
-    /**
      * Relation with SavingCollectionActionHistory Table.
      */
     public function SavingCollectionActionHistory()
@@ -112,7 +64,7 @@ class SavingCollection extends Model
      */
     public function scopeRegularCollectionSheet($query, $category_id, $field_id)
     {
-        return $query->active()
+        $query->active()
             ->fieldID($field_id)
             ->with(
                 [

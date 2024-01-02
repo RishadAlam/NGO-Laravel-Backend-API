@@ -6,11 +6,13 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
+use App\Models\category\CategoryConfig;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Models\Collections\LoanCollection;
 use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\category\CategoryActionHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends Model
@@ -69,9 +71,9 @@ class Category extends Model
     /**
      * Regular Category report.
      */
-    public function scopeRegularCategoryReport($query)
+    public function scopeRegularCategorySavingReport($query)
     {
-        return $query->where('saving', true)
+        $query->where('saving', true)
             ->active()
             ->with(
                 [
@@ -83,19 +85,39 @@ class Category extends Model
                         $query->groupBy('category_id');
                         $query->pending();
                         $query->today();
-                        $query->permission();
+                        $query->when(!Auth::user()->can('regular_saving_collection_list_view_as_admin'), function ($query) {
+                            $query->createdBy();
+                        });
                     }
                 ]
             );
     }
 
     /**
-     * Permission
+     * Regular Category report.
      */
-    public function scopePermission($query)
+    public function scopeRegularCategoryLoanReport($query)
     {
-        $query->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
-            $query->createdBy();
-        });
+        $query->where('loan', true)
+            ->active()
+            ->with(
+                [
+                    'LoanCollection' => function ($query) {
+                        $query->select(
+                            'category_id',
+                            DB::raw('SUM(deposit) AS deposit'),
+                            DB::raw('SUM(loan) AS loan'),
+                            DB::raw('SUM(interest) AS interest'),
+                            DB::raw('SUM(total) AS total'),
+                        );
+                        $query->groupBy('category_id');
+                        $query->pending();
+                        $query->today();
+                        $query->when(!Auth::user()->can('regular_loan_collection_list_view_as_admin'), function ($query) {
+                            $query->createdBy();
+                        });
+                    }
+                ]
+            );
     }
 }

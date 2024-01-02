@@ -58,9 +58,9 @@ class Field extends Model
     /**
      * Regular Field report.
      */
-    public function scopeRegularFieldReport($query, $category_id)
+    public function scopeRegularFieldSavingReport($query, $category_id)
     {
-        return $query->with(
+        $query->with(
             [
                 'SavingCollection' => function ($query) use ($category_id) {
                     $query->select(
@@ -71,19 +71,38 @@ class Field extends Model
                     $query->categoryID($category_id);
                     $query->pending();
                     $query->today();
-                    $query->permission();
+                    $query->when(!Auth::user()->can('regular_saving_collection_list_view_as_admin'), function ($query) {
+                        $query->createdBy();
+                    });
                 }
             ]
         );
     }
 
     /**
-     * Permission
+     * Regular Field report.
      */
-    public function scopePermission($query)
+    public function scopeRegularFieldLoanReport($query, $category_id)
     {
-        $query->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
-            $query->createdBy();
-        });
+        $query->with(
+            [
+                'LoanCollection' => function ($query) use ($category_id) {
+                    $query->select(
+                        'field_id',
+                        DB::raw('SUM(deposit) AS deposit'),
+                        DB::raw('SUM(loan) AS loan'),
+                        DB::raw('SUM(interest) AS interest'),
+                        DB::raw('SUM(total) AS total'),
+                    );
+                    $query->groupBy('field_id');
+                    $query->categoryID($category_id);
+                    $query->pending();
+                    $query->today();
+                    $query->when(!Auth::user()->can('regular_loan_collection_list_view_as_admin'), function ($query) {
+                        $query->createdBy();
+                    });
+                }
+            ]
+        );
     }
 }
