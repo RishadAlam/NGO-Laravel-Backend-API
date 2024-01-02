@@ -7,6 +7,7 @@ use App\Models\field\Field;
 use App\Models\center\Center;
 use App\Models\category\Category;
 use Illuminate\Support\Facades\DB;
+use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
@@ -60,6 +61,14 @@ class SavingCollection extends Model
     }
 
     /**
+     * Relation with Saving Account Table
+     */
+    public function SavingAccount()
+    {
+        return $this->belongsTo(SavingAccount::class)->withTrashed();
+    }
+
+    /**
      * Regular Collection Sheet.
      */
     public function scopeRegularCollectionSheet($query, $category_id, $field_id)
@@ -94,24 +103,6 @@ class SavingCollection extends Model
     }
 
 
-    /**
-     * Filter Scope
-     */
-    public function scopeFilter($query)
-    {
-        $query->when(request('user_id'), function ($query) {
-            $query->createdBy(request('user_id'));
-        })
-            ->when(request('field_id'), function ($query) {
-                $query->fieldID(request('field_id'));
-            })
-            ->when(request('center_id'), function ($query) {
-                $query->centerID(request('center_id'));
-            })
-            ->when(request('category_id'), function ($query) {
-                $query->categoryID(request('category_id'));
-            });
-    }
 
     /**
      * Permission

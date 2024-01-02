@@ -13,6 +13,7 @@ use App\Http\Traits\BelongsToFieldTrait;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
+use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -70,6 +71,14 @@ class SavingAccount extends Model
     public function Nominees()
     {
         return $this->hasMany(Nominee::class);
+    }
+
+    /**
+     * Relation with Saving Collection Table
+     */
+    public function SavingCollection()
+    {
+        return $this->hasMany(SavingCollection::class)->withTrashed();
     }
 
     /**
