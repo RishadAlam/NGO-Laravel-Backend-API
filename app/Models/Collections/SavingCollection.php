@@ -108,29 +108,6 @@ class SavingCollection extends Model
     }
 
     /**
-     * Regular Field report.
-     */
-    public function scopeRegularFieldReport($query, $category_id)
-    {
-        return $query->active()
-            ->with(
-                [
-                    'SavingCollection' => function ($query) use ($category_id) {
-                        $query->select(
-                            'field_id',
-                            DB::raw('SUM(deposit) AS deposit')
-                        );
-                        $query->groupBy('field_id');
-                        $query->categoryID($category_id);
-                        $query->pending();
-                        $query->today();
-                        $query->permission();
-                    }
-                ]
-            );
-    }
-
-    /**
      * Regular Collection Sheet.
      */
     public function scopeRegularCollectionSheet($query, $category_id, $field_id)

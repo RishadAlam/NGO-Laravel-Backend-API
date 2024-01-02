@@ -82,7 +82,7 @@ class Category extends Model
                         );
                         $query->groupBy('category_id');
                         $query->pending();
-                        // $query->today();
+                        $query->today();
                         $query->permission();
                     }
                 ]
