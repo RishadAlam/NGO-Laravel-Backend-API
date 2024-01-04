@@ -60,23 +60,24 @@ class Field extends Model
      */
     public function scopeRegularFieldSavingReport($query, $category_id)
     {
-        $query->with(
-            [
-                'SavingCollection' => function ($query) use ($category_id) {
-                    $query->select(
-                        'field_id',
-                        DB::raw('SUM(deposit) AS deposit')
-                    );
-                    $query->groupBy('field_id');
-                    $query->categoryID($category_id);
-                    $query->pending();
-                    $query->today();
-                    $query->when(!Auth::user()->can('regular_saving_collection_list_view_as_admin'), function ($query) {
-                        $query->createdBy();
-                    });
-                }
-            ]
-        );
+        $query->active()
+            ->with(
+                [
+                    'SavingCollection' => function ($query) use ($category_id) {
+                        $query->select(
+                            'field_id',
+                            DB::raw('SUM(deposit) AS deposit')
+                        );
+                        $query->groupBy('field_id');
+                        $query->categoryID($category_id);
+                        $query->pending();
+                        $query->today();
+                        $query->when(!Auth::user()->can('regular_saving_collection_list_view_as_admin'), function ($query) {
+                            $query->createdBy();
+                        });
+                    }
+                ]
+            );
     }
 
     /**

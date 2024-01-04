@@ -27,9 +27,11 @@ class SavingCollectionStoreRequest extends FormRequest
             'category_id'               => 'required|numeric',
             'saving_account_id'         => 'required|numeric',
             'client_registration_id'    => 'required|numeric',
+            'account_id'                => 'required|numeric',
             'acc_no'                    => 'required|numeric',
             'installment'               => 'required|numeric',
-            'deposit'                   => 'required|numeric'
+            'deposit'                   => 'required|numeric',
+            'description'               => 'sometimes|nullable'
         ];
     }
 }

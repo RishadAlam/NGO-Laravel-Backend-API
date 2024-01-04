@@ -76,7 +76,7 @@ class Center extends Model
             ->active()
             ->with(
                 [
-                    'SavingAccount' => function ($query) use ($category_id) {
+                    'SavingAccount' => function ($query) use ($category_id, $field_id) {
                         $query->select(
                             'id',
                             'field_id',
@@ -86,14 +86,17 @@ class Center extends Model
                             'acc_no',
                             'payable_deposit'
                         );
+                        $query->fieldID($field_id);
                         $query->categoryID($category_id);
                         $query->ClientRegistration('id', 'name', 'image_uri');
                         $query->with([
-                            'SavingCollection' => function ($query) use ($category_id) {
+                            'SavingCollection' => function ($query) use ($category_id, $field_id) {
                                 $query->author('id', 'name');
-                                $query->select('id', 'saving_account_id', 'deposit', 'description', 'creator_id', 'created_at');
-                                // $query->pending();
+                                $query->account('id', 'name', 'is_default');
+                                $query->select('id', 'saving_account_id', 'account_id', 'installment', 'deposit', 'description', 'creator_id', 'created_at');
+                                $query->pending();
                                 $query->today();
+                                $query->fieldID($field_id);
                                 $query->categoryID($category_id);
                                 $query->when(request('user_id'), function ($query) {
                                     $query->createdBy(request('user_id'));

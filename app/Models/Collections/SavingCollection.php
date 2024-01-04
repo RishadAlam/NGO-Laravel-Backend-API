@@ -15,6 +15,7 @@ use App\Http\Traits\BelongsToFieldTrait;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
 use App\Models\client\ClientRegistration;
+use App\Http\Traits\BelongsToAccountTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Traits\BelongsToClientRegistrationTrait;
@@ -30,6 +31,7 @@ class SavingCollection extends Model
         BelongsToCenterTrait,
         BelongsToCategoryTrait,
         BelongsToAuthorTrait,
+        BelongsToAccountTrait,
         BelongsToClientRegistrationTrait;
 
     /**
@@ -43,6 +45,7 @@ class SavingCollection extends Model
         'category_id',
         'client_registration_id',
         'saving_account_id',
+        'account_id',
         'creator_id',
         'approved_by',
         'acc_no',

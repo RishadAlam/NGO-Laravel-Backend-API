@@ -6,6 +6,7 @@ use App\Models\AppConfig;
 use App\Models\field\Field;
 use Illuminate\Http\Request;
 use App\Models\center\Center;
+use App\Models\accounts\Account;
 use App\Models\category\Category;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -35,6 +36,7 @@ class SavingCollectionController extends Controller
             'category_id'               => $data->category_id,
             'saving_account_id'         => $data->saving_account_id,
             'client_registration_id'    => $data->client_registration_id,
+            'account_id'                => $data->account_id,
             'acc_no'                    => $data->acc_no,
             'installment'               => $data->installment,
             'deposit'                   => $data->deposit,
@@ -46,9 +48,16 @@ class SavingCollectionController extends Controller
         if ($is_approved) {
             $field_map['is_approved'] = $is_approved;
             $field_map['approved_by'] = auth()->id();
+
+            DB::transaction(function () use ($field_map, $data) {
+                SavingCollection::create($field_map);
+                Account::find($data->account_id)
+                    ->increment('total_deposit', $data->deposit);
+            });
+        } else {
+            SavingCollection::create($field_map);
         }
 
-        SavingCollection::create($field_map);
         return create_response(__('customValidations.client.collection.successful'));
     }
 

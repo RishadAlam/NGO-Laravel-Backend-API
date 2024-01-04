@@ -47,6 +47,16 @@ trait HelperScopesTrait
     }
 
     /**
+     * Account Relation Scope
+     */
+    public function scopeAccount($query, ...$arg)
+    {
+        $query->with("Account", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
      * ClientRegistration Relation Scope
      */
     public function scopeClientRegistration($query, ...$arg)
