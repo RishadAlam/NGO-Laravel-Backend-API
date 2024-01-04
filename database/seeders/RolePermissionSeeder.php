@@ -127,6 +127,7 @@ class RolePermissionSeeder extends Seeder
             [
                 'groupName'     => 'regular_saving_collection',
                 'permissions'   => [
+                    'permission_to_do_saving_collection',
                     'regular_saving_collection_list_view',
                     'regular_saving_collection_list_view_as_admin',
                     'regular_saving_collection_approval',
@@ -138,6 +139,7 @@ class RolePermissionSeeder extends Seeder
             [
                 'groupName'     => 'regular_loan_collection',
                 'permissions'   => [
+                    'permission_to_do_loan_collection',
                     'regular_loan_collection_list_view',
                     'regular_loan_collection_list_view_as_admin',
                     'regular_loan_collection_approval',

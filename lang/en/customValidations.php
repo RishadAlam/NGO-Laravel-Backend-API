@@ -461,5 +461,19 @@ return [
             'approved'          => 'The Loan Account has been successfully approved.',
             'not_found'         => 'Loan account not found!'
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Loan registration Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'collection' => [
+            'successful'        => 'The Collection has been successfully registered.',
+            'update'            => 'The Collection has been successfully updated.',
+            'delete'            => 'The Collection has been successfully deleted.',
+            'p_delete'          => 'The Collection has been permanently deleted.',
+            'approved'          => 'The Collection has been successfully approved.',
+            'not_found'         => 'Collection not found!'
+        ],
     ],
 ];

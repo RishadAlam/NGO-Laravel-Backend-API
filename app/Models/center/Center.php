@@ -79,18 +79,21 @@ class Center extends Model
                     'SavingAccount' => function ($query) use ($category_id) {
                         $query->select(
                             'id',
+                            'field_id',
                             'center_id',
+                            'category_id',
                             'client_registration_id',
                             'acc_no',
                             'payable_deposit'
                         );
+                        $query->categoryID($category_id);
                         $query->ClientRegistration('id', 'name', 'image_uri');
                         $query->with([
                             'SavingCollection' => function ($query) use ($category_id) {
                                 $query->author('id', 'name');
                                 $query->select('id', 'saving_account_id', 'deposit', 'description', 'creator_id', 'created_at');
-                                $query->pending();
-                                // $query->today();
+                                // $query->pending();
+                                $query->today();
                                 $query->categoryID($category_id);
                                 $query->when(request('user_id'), function ($query) {
                                     $query->createdBy(request('user_id'));

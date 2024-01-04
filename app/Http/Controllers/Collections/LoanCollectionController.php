@@ -69,7 +69,7 @@ class LoanCollectionController extends Controller
      */
     public function regularFieldReport($category_id)
     {
-        $fieldReport = Field::regularFieldLoanReport($category_id)->get();
+        $fieldReport = Field::regularFieldLoanReport($category_id)->get(['id', 'name']);
 
         return response([
             'success'   => true,
@@ -82,7 +82,7 @@ class LoanCollectionController extends Controller
      */
     public function regularCollectionSheet($category_id, $field_id)
     {
-        $collections = Center::scopeRegularCollectionSheet($category_id, $field_id)->get();
+        $collections = Center::scopeRegularCollectionSheet($category_id, $field_id)->get(['id', 'name']);
 
         return response([
             'success'   => true,

@@ -205,6 +205,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::DELETE('loan/force-delete/{id}', [LoanAccountController::class, 'permanently_destroy'])->name('loan.forceDelete');
     });
 
+    // Collection Permanent Destroy Routes
+    Route::prefix('collection')->group(function () {
+        Route::DELETE('saving/force-delete/{id}', [SavingCollectionController::class, 'permanently_destroy'])->name('saving.forceDelete');
+        Route::DELETE('loan/force-delete/{id}', [LoanCollectionController::class, 'permanently_destroy'])->name('loan.forceDelete');
+    });
+
     /*
      * -------------------------------------------------------------------------
      * Api Resources Collection Additional Routes
