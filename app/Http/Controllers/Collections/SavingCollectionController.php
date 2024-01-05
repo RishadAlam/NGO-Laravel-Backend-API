@@ -16,6 +16,7 @@ use App\Models\Collections\SavingCollection;
 use App\Models\Collections\SavingCollectionActionHistory;
 use App\Http\Requests\collection\SavingCollectionStoreRequest;
 use App\Http\Requests\collection\SavingCollectionUpdateRequest;
+use App\Http\Requests\collection\SavingCollectionApprovedRequest;
 
 class SavingCollectionController extends Controller
 {
@@ -133,6 +134,33 @@ class SavingCollectionController extends Controller
             'success'   => true,
             'data'      => $collections
         ], 200);
+    }
+
+    /**
+     * Approved Collections
+     */
+    public function approved(SavingCollectionApprovedRequest $request)
+    {
+        $approvedList = $request->validated()['approvedList'];
+        $collections = SavingCollection::whereIn('id', $approvedList)
+            ->get(['id', 'saving_account_id', 'account_id', 'deposit', 'installment']);
+
+        DB::transaction(function () use ($collections, $approvedList) {
+            SavingCollection::whereIn('id', $approvedList)
+                ->update(['is_approved' => true, 'approved_by' => auth()->id()]);
+
+            foreach ($collections as  $collection) {
+                SavingAccount::find($collection->saving_account_id)
+                    ->incrementEach([
+                        'total_installment' => $collection->installment,
+                        'total_deposited'   => $collection->deposit,
+                    ]);
+                Account::find($collection->account_id)
+                    ->increment('total_deposit', $collection->deposit);
+            }
+        });
+
+        return create_response(__('customValidations.client.collection.approved'));
     }
 
     /**

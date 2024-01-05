@@ -93,7 +93,7 @@ class Center extends Model
                             'SavingCollection' => function ($query) use ($category_id, $field_id) {
                                 $query->author('id', 'name');
                                 $query->account('id', 'name', 'is_default');
-                                $query->select('id', 'saving_account_id', 'account_id', 'installment', 'deposit', 'description', 'creator_id', 'created_at');
+                                $query->select('id', 'saving_account_id', 'account_id', 'installment', 'deposit', 'description', 'is_approved', 'creator_id', 'created_at');
                                 $query->pending();
                                 $query->today();
                                 $query->fieldID($field_id);

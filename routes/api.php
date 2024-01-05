@@ -189,6 +189,11 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::PUT('loan/approved/{id}', [LoanAccountController::class, 'approved'])->name('loan.approved');
         Route::PUT('loan/loan-approved/{id}', [LoanAccountController::class, 'loan_approved'])->name('loan.loanApproved');
     });
+    // Collection Permanent Destroy Routes
+    Route::prefix('collection')->group(function () {
+        Route::POST('saving/approved', [SavingCollectionController::class, 'approved'])->name('saving.approved');
+        Route::POST('loan/approved', [LoanCollectionController::class, 'approved'])->name('loan.approved');
+    });
 
     /*
      * -------------------------------------------------------------------------
