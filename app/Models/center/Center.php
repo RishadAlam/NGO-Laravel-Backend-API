@@ -4,6 +4,7 @@ namespace App\Models\center;
 
 use App\Models\User;
 use App\Models\field\Field;
+use App\Models\client\LoanAccount;
 use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
@@ -52,6 +53,14 @@ class Center extends Model
     }
 
     /**
+     * Relation with loan Account Table
+     */
+    public function LoanAccount()
+    {
+        return $this->hasMany(LoanAccount::class)->withTrashed();
+    }
+
+    /**
      * Relation with Saving Collection Table
      */
     public function SavingCollection()
@@ -68,9 +77,9 @@ class Center extends Model
     }
 
     /**
-     * Regular Collection Sheet.
+     * Regular Saving Collection Sheet.
      */
-    public function scopeRegularCollectionSheet($query, $category_id, $field_id)
+    public function scopeRegularSavingCollectionSheet($query, $category_id, $field_id)
     {
         $query->fieldID($field_id)
             ->active()
@@ -102,6 +111,52 @@ class Center extends Model
                                     $query->createdBy(request('user_id'));
                                 });
                                 $query->when(!Auth::user()->can('regular_saving_collection_list_view_as_admin'), function ($query) {
+                                    $query->createdBy();
+                                });
+                            }
+                        ]);
+                    }
+                ]
+            );
+    }
+
+    /**
+     * Regular Loan Collection Sheet.
+     */
+    public function scopeRegularLoanCollectionSheet($query, $category_id, $field_id)
+    {
+        $query->fieldID($field_id)
+            ->active()
+            ->with(
+                [
+                    'LoanAccount' => function ($query) use ($category_id, $field_id) {
+                        $query->select(
+                            'id',
+                            'field_id',
+                            'center_id',
+                            'category_id',
+                            'client_registration_id',
+                            'acc_no',
+                            'payable_deposit',
+                            'loan_installment',
+                            'interest_installment'
+                        );
+                        $query->fieldID($field_id);
+                        $query->categoryID($category_id);
+                        $query->ClientRegistration('id', 'name', 'image_uri');
+                        $query->with([
+                            'LoanCollection' => function ($query) use ($category_id, $field_id) {
+                                $query->author('id', 'name');
+                                $query->account('id', 'name', 'is_default');
+                                $query->select('id', 'loan_account_id', 'account_id', 'installment', 'deposit', 'loan', 'interest', 'total', 'description', 'is_approved', 'creator_id', 'created_at');
+                                $query->pending();
+                                $query->today();
+                                $query->fieldID($field_id);
+                                $query->categoryID($category_id);
+                                $query->when(request('user_id'), function ($query) {
+                                    $query->createdBy(request('user_id'));
+                                });
+                                $query->when(!Auth::user()->can('regular_loan_collection_list_view_as_admin'), function ($query) {
                                     $query->createdBy();
                                 });
                             }

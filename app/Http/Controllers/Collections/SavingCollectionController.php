@@ -128,7 +128,7 @@ class SavingCollectionController extends Controller
      */
     public function regularCollectionSheet($category_id, $field_id)
     {
-        $collections = Center::regularCollectionSheet($category_id, $field_id)->get(['id', 'name']);
+        $collections = Center::regularSavingCollectionSheet($category_id, $field_id)->get(['id', 'name']);
 
         return response([
             'success'   => true,

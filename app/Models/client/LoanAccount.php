@@ -14,6 +14,7 @@ use App\Http\Traits\BelongsToFieldTrait;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
 use App\Models\client\ClientRegistration;
+use App\Models\Collections\LoanCollection;
 use App\Http\Traits\BelongsToCategoryTrait;
 use App\Models\client\GuarantorRegistration;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -70,6 +71,14 @@ class LoanAccount extends Model
     public function LoanAccountActionHistory()
     {
         return $this->hasMany(LoanAccountActionHistory::class);
+    }
+
+    /**
+     * Relation with Loan Collection Table
+     */
+    public function LoanCollection()
+    {
+        return $this->hasMany(LoanCollection::class)->withTrashed();
     }
 
     /**
