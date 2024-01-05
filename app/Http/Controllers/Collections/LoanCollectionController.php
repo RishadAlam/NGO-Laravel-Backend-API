@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Collections;
 
+use App\Helpers\Helper;
 use App\Models\AppConfig;
 use App\Models\field\Field;
 use Illuminate\Http\Request;
@@ -12,7 +13,9 @@ use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Collections\LoanCollection;
+use App\Models\Collections\LoanCollectionActionHistory;
 use App\Http\Requests\collection\LoanCollectionStoreRequest;
+use App\Http\Requests\collection\LoanCollectionUpdateRequest;
 use App\Http\Requests\collection\LoanCollectionApprovedRequest;
 
 class LoanCollectionController extends Controller
@@ -62,9 +65,20 @@ class LoanCollectionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(LoanCollectionUpdateRequest $request, string $id)
     {
-        //
+        $data       = (object) $request->validated();
+        $collection = LoanCollection::find($id);
+        $histData   = self::set_update_hist($data, $collection);
+
+        DB::transaction(
+            function () use ($id, $collection, $data, $histData) {
+                $collection->update(self::set_field_map($data));
+                LoanCollectionActionHistory::create(Helper::setActionHistory('loan_collection_id', $id, 'update', $histData));
+            }
+        );
+
+        return create_response(__('customValidations.client.collection.update'));
     }
 
     /**
@@ -151,6 +165,28 @@ class LoanCollectionController extends Controller
             'success'   => true,
             'data'      => $collections
         ], 200);
+    }
+
+    /**
+     * Set Loan Collection update hist
+     * 
+     * @param object $data
+     * @param object $collection
+     * 
+     * @return array
+     */
+    private static function set_update_hist($data, $collection)
+    {
+        $histData           = [];
+        $fieldsToCompare    = ['installment', 'deposit', 'loan', 'interest', 'total', 'description'];
+
+        foreach ($fieldsToCompare as $field) {
+            $clientValue    = $collection->{$field} ?? '';
+            $dataValue      = $data->{$field} ?? '';
+            !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+        }
+
+        return $histData;
     }
 
     /**

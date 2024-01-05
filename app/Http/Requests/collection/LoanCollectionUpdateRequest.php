@@ -4,7 +4,7 @@ namespace App\Http\Requests\collection;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SavingCollectionUpdateRequest extends FormRequest
+class LoanCollectionUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,12 @@ class SavingCollectionUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'installment'   => 'required|numeric',
-            'deposit'       => 'required|numeric',
-            'description'   => 'sometimes|nullable'
+            'installment'               => 'required|numeric',
+            'deposit'                   => 'required|numeric',
+            'loan'                      => 'required|numeric',
+            'interest'                  => 'required|numeric',
+            'total'                     => 'required|numeric',
+            'description'               => 'sometimes|nullable'
         ];
     }
 }
