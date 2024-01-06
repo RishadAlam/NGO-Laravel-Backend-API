@@ -69,7 +69,7 @@ trait HelperScopesTrait
     /**
      * Data by user id
      */
-    public function scopeCreatedBy($query, $id)
+    public function scopeCreatedBy($query, $id = null)
     {
         $query->where('creator_id', $id ?? Auth::id());
     }

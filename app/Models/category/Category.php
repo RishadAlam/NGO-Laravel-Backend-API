@@ -98,7 +98,7 @@ class Category extends Model
     /**
      * Regular Category report.
      */
-    public function scopeRegularCategoryLoanReport($query, $isRegular = true)
+    public function scopeCategoryLoanReport($query, $isRegular = true)
     {
         $query->where('loan', true)
             ->active()
@@ -114,7 +114,9 @@ class Category extends Model
                         );
                         $query->groupBy('category_id');
                         $query->pending();
-                        $query->today();
+                        $query->when($isRegular, function ($query) {
+                            $query->today();
+                        });
                         $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_loan_collection_list_view_as_admin'), function ($query) {
                             $query->createdBy();
                         });

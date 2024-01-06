@@ -85,7 +85,7 @@ class Field extends Model
     /**
      * Regular Field report.
      */
-    public function scopeRegularFieldLoanReport($query, $category_id, $isRegular = true)
+    public function scopeFieldLoanReport($query, $category_id, $isRegular = true)
     {
         $query->with(
             [
@@ -100,7 +100,9 @@ class Field extends Model
                     $query->groupBy('field_id');
                     $query->categoryID($category_id);
                     $query->pending();
-                    $query->today();
+                    $query->when($isRegular, function ($query) {
+                        $query->today();
+                    });
                     $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_loan_collection_list_view_as_admin'), function ($query) {
                         $query->createdBy();
                     });
