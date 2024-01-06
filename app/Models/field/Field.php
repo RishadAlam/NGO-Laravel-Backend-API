@@ -58,12 +58,12 @@ class Field extends Model
     /**
      * Regular Field report.
      */
-    public function scopeRegularFieldSavingReport($query, $category_id)
+    public function scopeFieldSavingReport($query, $category_id, $isRegular = true)
     {
         $query->active()
             ->with(
                 [
-                    'SavingCollection' => function ($query) use ($category_id) {
+                    'SavingCollection' => function ($query) use ($category_id, $isRegular) {
                         $query->select(
                             'field_id',
                             DB::raw('SUM(deposit) AS deposit')
@@ -71,8 +71,10 @@ class Field extends Model
                         $query->groupBy('field_id');
                         $query->categoryID($category_id);
                         $query->pending();
-                        $query->today();
-                        $query->when(!Auth::user()->can('regular_saving_collection_list_view_as_admin'), function ($query) {
+                        $query->when($isRegular, function ($query) {
+                            $query->today();
+                        });
+                        $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_saving_collection_list_view_as_admin'), function ($query) {
                             $query->createdBy();
                         });
                     }
@@ -83,11 +85,11 @@ class Field extends Model
     /**
      * Regular Field report.
      */
-    public function scopeRegularFieldLoanReport($query, $category_id)
+    public function scopeRegularFieldLoanReport($query, $category_id, $isRegular = true)
     {
         $query->with(
             [
-                'LoanCollection' => function ($query) use ($category_id) {
+                'LoanCollection' => function ($query) use ($category_id, $isRegular) {
                     $query->select(
                         'field_id',
                         DB::raw('SUM(deposit) AS deposit'),
@@ -99,7 +101,7 @@ class Field extends Model
                     $query->categoryID($category_id);
                     $query->pending();
                     $query->today();
-                    $query->when(!Auth::user()->can('regular_loan_collection_list_view_as_admin'), function ($query) {
+                    $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_loan_collection_list_view_as_admin'), function ($query) {
                         $query->createdBy();
                     });
                 }

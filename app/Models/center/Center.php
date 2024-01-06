@@ -79,13 +79,13 @@ class Center extends Model
     /**
      * Regular Saving Collection Sheet.
      */
-    public function scopeRegularSavingCollectionSheet($query, $category_id, $field_id)
+    public function scopeSavingCollectionSheet($query, $category_id, $field_id, $user_id = null, $isRegular = true, $date = null)
     {
         $query->fieldID($field_id)
             ->active()
             ->with(
                 [
-                    'SavingAccount' => function ($query) use ($category_id, $field_id) {
+                    'SavingAccount' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date) {
                         $query->select(
                             'id',
                             'field_id',
@@ -99,18 +99,23 @@ class Center extends Model
                         $query->categoryID($category_id);
                         $query->ClientRegistration('id', 'name', 'image_uri');
                         $query->with([
-                            'SavingCollection' => function ($query) use ($category_id, $field_id) {
+                            'SavingCollection' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date) {
                                 $query->author('id', 'name');
                                 $query->account('id', 'name', 'is_default');
                                 $query->select('id', 'saving_account_id', 'account_id', 'installment', 'deposit', 'description', 'is_approved', 'creator_id', 'created_at');
                                 $query->pending();
-                                $query->today();
                                 $query->fieldID($field_id);
                                 $query->categoryID($category_id);
-                                $query->when(request('user_id'), function ($query) {
-                                    $query->createdBy(request('user_id'));
+                                $query->when($isRegular, function ($query) {
+                                    $query->today();
                                 });
-                                $query->when(!Auth::user()->can('regular_saving_collection_list_view_as_admin'), function ($query) {
+                                $query->when(!$isRegular, function ($query) use ($date) {
+                                    $query->whereDate('created_at', $date);
+                                });
+                                $query->when($user_id, function ($query) use ($user_id) {
+                                    $query->createdBy($user_id);
+                                });
+                                $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . "_saving_collection_list_view_as_admin"), function ($query) {
                                     $query->createdBy();
                                 });
                             }

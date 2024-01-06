@@ -71,21 +71,23 @@ class Category extends Model
     /**
      * Regular Category report.
      */
-    public function scopeRegularCategorySavingReport($query)
+    public function scopeCategorySavingReport($query, $isRegular = true)
     {
         $query->where('saving', true)
             ->active()
             ->with(
                 [
-                    'SavingCollection' => function ($query) {
+                    'SavingCollection' => function ($query) use ($isRegular) {
                         $query->select(
                             'category_id',
                             DB::raw('SUM(deposit) AS deposit')
                         );
                         $query->groupBy('category_id');
                         $query->pending();
-                        $query->today();
-                        $query->when(!Auth::user()->can('regular_saving_collection_list_view_as_admin'), function ($query) {
+                        $query->when($isRegular, function ($query) {
+                            $query->today();
+                        });
+                        $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_saving_collection_list_view_as_admin'), function ($query) {
                             $query->createdBy();
                         });
                     }
@@ -96,13 +98,13 @@ class Category extends Model
     /**
      * Regular Category report.
      */
-    public function scopeRegularCategoryLoanReport($query)
+    public function scopeRegularCategoryLoanReport($query, $isRegular = true)
     {
         $query->where('loan', true)
             ->active()
             ->with(
                 [
-                    'LoanCollection' => function ($query) {
+                    'LoanCollection' => function ($query) use ($isRegular) {
                         $query->select(
                             'category_id',
                             DB::raw('SUM(deposit) AS deposit'),
@@ -113,7 +115,7 @@ class Category extends Model
                         $query->groupBy('category_id');
                         $query->pending();
                         $query->today();
-                        $query->when(!Auth::user()->can('regular_loan_collection_list_view_as_admin'), function ($query) {
+                        $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_loan_collection_list_view_as_admin'), function ($query) {
                             $query->createdBy();
                         });
                     }

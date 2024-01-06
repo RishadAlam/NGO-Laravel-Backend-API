@@ -226,17 +226,31 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      */
     Route::prefix('collection')->group(function () {
         Route::prefix('saving')->name('saving.')->group(function () {
+            // Regular Collection
             Route::prefix('regular/collection-sheet')->name('regular.')->group(function () {
                 Route::GET('/', [SavingCollectionController::class, 'regularCategoryReport'])->name('regularCategoryReport');
                 Route::GET('{category_id}', [SavingCollectionController::class, 'regularFieldReport'])->name('regularFieldReport');
                 Route::GET('{category_id}/{field_id}', [SavingCollectionController::class, 'regularCollectionSheet'])->name('regularCollectionSheet');
             });
+            // Pending Collection
+            Route::prefix('pending/collection-sheet')->name('pending.')->group(function () {
+                Route::GET('/', [SavingCollectionController::class, 'pendingCategoryReport'])->name('pendingCategoryReport');
+                Route::GET('{category_id}', [SavingCollectionController::class, 'pendingFieldReport'])->name('pendingFieldReport');
+                Route::GET('{category_id}/{field_id}', [SavingCollectionController::class, 'pendingCollectionSheet'])->name('pendingCollectionSheet');
+            });
         });
         Route::prefix('loan')->name('loan.')->group(function () {
+            // Regular Collection
             Route::prefix('regular/collection-sheet')->name('regular.')->group(function () {
                 Route::GET('/', [LoanCollectionController::class, 'regularCategoryReport'])->name('regularCategoryReport');
                 Route::GET('{category_id}', [LoanCollectionController::class, 'regularFieldReport'])->name('regularFieldReport');
                 Route::GET('{category_id}/{field_id}', [LoanCollectionController::class, 'regularCollectionSheet'])->name('regularCollectionSheet');
+            });
+            // Pending COllection
+            Route::prefix('pending/collection-sheet')->name('pending.')->group(function () {
+                Route::GET('/', [LoanCollectionController::class, 'pendingCategoryReport'])->name('pendingCategoryReport');
+                Route::GET('{category_id}', [LoanCollectionController::class, 'pendingFieldReport'])->name('pendingFieldReport');
+                Route::GET('{category_id}/{field_id}', [LoanCollectionController::class, 'pendingCollectionSheet'])->name('pendingCollectionSheet');
             });
         });
     });

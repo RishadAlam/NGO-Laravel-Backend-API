@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Collections;
 
+use Carbon\Carbon;
 use App\Helpers\Helper;
 use App\Models\AppConfig;
 use App\Models\field\Field;
@@ -101,7 +102,21 @@ class SavingCollectionController extends Controller
      */
     public function regularCategoryReport()
     {
-        $categoryReport = Category::regularCategorySavingReport()
+        $categoryReport = Category::categorySavingReport()
+            ->get(['id', 'name', 'is_default']);
+
+        return response([
+            'success'   => true,
+            'data'      => $categoryReport
+        ], 200);
+    }
+
+    /**
+     * Pending Category Report
+     */
+    public function pendingCategoryReport()
+    {
+        $categoryReport = Category::categorySavingReport(false)
             ->get(['id', 'name', 'is_default']);
 
         return response([
@@ -115,7 +130,20 @@ class SavingCollectionController extends Controller
      */
     public function regularFieldReport($category_id)
     {
-        $fieldReport = Field::regularFieldSavingReport($category_id)->get(['id', 'name']);
+        $fieldReport = Field::fieldSavingReport($category_id)->get(['id', 'name']);
+
+        return response([
+            'success'   => true,
+            'data'      => $fieldReport
+        ], 200);
+    }
+
+    /**
+     * Pending Field Report
+     */
+    public function pendingFieldReport($category_id)
+    {
+        $fieldReport = Field::fieldSavingReport($category_id, false)->get(['id', 'name']);
 
         return response([
             'success'   => true,
@@ -128,7 +156,27 @@ class SavingCollectionController extends Controller
      */
     public function regularCollectionSheet($category_id, $field_id)
     {
-        $collections = Center::regularSavingCollectionSheet($category_id, $field_id)->get(['id', 'name']);
+        $collections = Center::savingCollectionSheet($category_id, $field_id, request('user_id'))->get(['id', 'name']);
+
+        return response([
+            'success'   => true,
+            'data'      => $collections
+        ], 200);
+    }
+
+    /**
+     * Pending Collection Sheet
+     */
+    public function pendingCollectionSheet($category_id, $field_id)
+    {
+        $collections = Center::savingCollectionSheet(
+            $category_id,
+            $field_id,
+            request('user_id'),
+            false,
+            request('date') ? Carbon::parse(request('date'))->format('y-m-d') : Carbon::yesterday()->format('y-m-d')
+        )
+            ->get(['id', 'name']);
 
         return response([
             'success'   => true,

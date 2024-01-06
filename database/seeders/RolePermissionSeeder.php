@@ -140,11 +140,34 @@ class RolePermissionSeeder extends Seeder
                 'groupName'     => 'regular_loan_collection',
                 'permissions'   => [
                     'permission_to_do_loan_collection',
+                    'permission_to_do_edit_loan_interest',
                     'regular_loan_collection_list_view',
                     'regular_loan_collection_list_view_as_admin',
                     'regular_loan_collection_approval',
                     'regular_loan_collection_update',
                     'regular_loan_collection_permanently_delete',
+                ]
+            ],
+            // Pending Saving Collection
+            [
+                'groupName'     => 'pending_saving_collection',
+                'permissions'   => [
+                    'pending_saving_collection_list_view',
+                    'pending_saving_collection_list_view_as_admin',
+                    'pending_saving_collection_approval',
+                    'pending_saving_collection_update',
+                    'pending_saving_collection_permanently_delete',
+                ]
+            ],
+            // Pending Loan Collection
+            [
+                'groupName'     => 'pending_loan_collection',
+                'permissions'   => [
+                    'pending_loan_collection_list_view',
+                    'pending_loan_collection_list_view_as_admin',
+                    'pending_loan_collection_approval',
+                    'pending_loan_collection_update',
+                    'pending_loan_collection_permanently_delete',
                 ]
             ],
             // Account
