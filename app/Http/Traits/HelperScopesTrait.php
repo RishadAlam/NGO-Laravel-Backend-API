@@ -47,6 +47,16 @@ trait HelperScopesTrait
     }
 
     /**
+     * Author Relation Scope
+     */
+    public function scopeApprover($query, ...$arg)
+    {
+        $query->with("Approver", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
      * Account Relation Scope
      */
     public function scopeAccount($query, ...$arg)
@@ -109,9 +119,9 @@ trait HelperScopesTrait
     /**
      * Active
      */
-    public function scopeActive($query)
+    public function scopeActive($query, $key = "status")
     {
-        $query->where('status', true);
+        $query->where($key, true);
     }
 
     /**
@@ -120,6 +130,23 @@ trait HelperScopesTrait
     public function scopePending($query, $key = "is_approved")
     {
         $query->where($key, false);
+    }
+
+    /**
+     * Hold Account
+     */
+    public function scopeHold($query, $key = "status")
+    {
+        $query->where($key, false)
+            ->approve();
+    }
+
+    /**
+     * Closed Account
+     */
+    public function scopeClosed($query)
+    {
+        $query->onlyTrashed();
     }
 
     /**
@@ -136,5 +163,13 @@ trait HelperScopesTrait
     public function scopeToday($query, $key = "created_at")
     {
         $query->whereDate($key, date('Y-m-d'));
+    }
+
+    /**
+     * Client Registration
+     */
+    public function scopeClientRegistrationID($query, $client_registration_id)
+    {
+        $query->where('client_registration_id', $client_registration_id);
     }
 }

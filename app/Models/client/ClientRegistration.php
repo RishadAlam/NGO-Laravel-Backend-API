@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToFieldTrait;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
+use App\Http\Traits\BelongsToApproverTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\ClientRegistrationActionHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +20,8 @@ class ClientRegistration extends Model
         HelperScopesTrait,
         BelongsToFieldTrait,
         BelongsToCenterTrait,
-        BelongsToAuthorTrait;
+        BelongsToAuthorTrait,
+        BelongsToApproverTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -53,6 +55,7 @@ class ClientRegistration extends Model
         'permanent_address',
         'is_approved',
         'creator_id',
+        'approved_by'
     ];
 
     /**
@@ -146,5 +149,17 @@ class ClientRegistration extends Model
             ->when(request('center_id'), function ($query) {
                 $query->CenterID(request('center_id'));
             });
+    }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopeClient($query)
+    {
+        $query->approve()
+            ->Field('id', 'name')
+            ->Center('id', 'name')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
     }
 }

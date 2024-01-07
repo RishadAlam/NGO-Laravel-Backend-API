@@ -305,7 +305,7 @@ class LoanAccountController extends Controller
                 $account->increment('total_withdrawal', $LoanAccount->loan_given);
             }
 
-            $LoanAccount->update(['is_loan_approved' => true]);
+            $LoanAccount->update(['is_loan_approved' => true, 'approved_by' => auth()->id()]);
         });
 
         return create_response(__('customValidations.client.loan.approved'));
@@ -368,7 +368,7 @@ class LoanAccountController extends Controller
             $map['is_approved'] = $is_approved;
         }
         if (isset($is_loan_approved)) {
-            $map['is_loan_approved'] = $is_loan_approved;
+            $map += ['is_approved' => $is_approved, 'approved_by' => auth()->id()];
         }
         if (isset($creator_id)) {
             $map['creator_id'] = $creator_id ?? auth()->id();

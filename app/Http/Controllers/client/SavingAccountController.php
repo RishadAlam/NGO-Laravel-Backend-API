@@ -197,7 +197,7 @@ class SavingAccountController extends Controller
                     ->increment('total_deposit', $categoryConfig->saving_acc_reg_fee);
             }
 
-            $savingAccount->update(['is_approved' => true]);
+            $savingAccount->update(['is_approved' => true, 'approved_by' => auth()->id()]);
         });
 
         return create_response(__('customValidations.client.saving.approved'));
@@ -261,7 +261,7 @@ class SavingAccountController extends Controller
             $map += ['acc_no' => $acc_no, 'client_registration_id' => $client_registration_id];
         }
         if (isset($is_approved)) {
-            $map['is_approved'] = $is_approved;
+            $$map += ['is_approved' => $is_approved, 'approved_by' => auth()->id()];
         }
         if (isset($creator_id)) {
             $map['creator_id'] = $creator_id ?? auth()->id();

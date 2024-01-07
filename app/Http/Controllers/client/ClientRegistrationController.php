@@ -4,9 +4,11 @@ namespace App\Http\Controllers\client;
 
 use App\Helpers\Helper;
 use App\Models\AppConfig;
+use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
+use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Models\client\ClientRegistration;
 use Illuminate\Support\Facades\Validator;
@@ -74,6 +76,19 @@ class ClientRegistrationController extends Controller
 
         // $client_registrations = ClientRegistration::fetchPendingForms()->get();
         // return self::create_response(null, $client_registrations);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function show(string $id)
+    {
+        $client = ClientRegistration::client()->find($id);
+
+        return response([
+            'success'   => true,
+            'data'      => $client,
+        ], 200);
     }
 
     /**
@@ -148,6 +163,29 @@ class ClientRegistrationController extends Controller
     }
 
     /**
+     * Count All Account
+     */
+    public function countAccounts(string $id)
+    {
+        $data = (object) [
+            "activeSavings"  => SavingAccount::clientRegistrationID($id)->active()->count(),
+            "pendingSavings" => SavingAccount::clientRegistrationID($id)->pending()->count(),
+            "holdSavings"    => SavingAccount::clientRegistrationID($id)->hold()->count(),
+            "closedSavings"  => SavingAccount::clientRegistrationID($id)->closed()->count(),
+
+            "activeLoans"    => LoanAccount::clientRegistrationID($id)->active()->count(),
+            "pendingLoans"   => LoanAccount::clientRegistrationID($id)->pending()->count(),
+            "holdLoans"      => LoanAccount::clientRegistrationID($id)->hold()->count(),
+            "closedLoans"    => LoanAccount::clientRegistrationID($id)->closed()->count(),
+        ];
+
+        return response([
+            'success'   => true,
+            'data'      => $data,
+        ], 200);
+    }
+
+    /**
      * Get all Occupations
      */
     public function get_client_occupations()
@@ -203,7 +241,7 @@ class ClientRegistrationController extends Controller
      */
     public function approved(string $id)
     {
-        ClientRegistration::find($id)->update(['is_approved' => true]);
+        ClientRegistration::find($id)->update(['is_approved' => true, 'approved_by' => auth()->id()]);
         return self::create_response(__('customValidations.client.registration.approved'));
     }
 
@@ -270,7 +308,7 @@ class ClientRegistrationController extends Controller
             $map += ['signature' => $signature, 'signature_uri' => $signature_uri];
         }
         if (isset($is_approved)) {
-            $map['is_approved'] = $is_approved;
+            $map += ['is_approved' => $is_approved, 'approved_by' => auth()->id()];
         }
         if (isset($creator_id)) {
             $map['creator_id'] = $creator_id ?? auth()->id();

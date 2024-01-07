@@ -128,6 +128,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     // Registration form additional routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
+        Route::GET('count-accounts/{id}', [ClientRegistrationController::class, 'countAccounts'])->name('count_accounts');
         Route::GET('occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('occupations');
         Route::GET('saving/nominee/occupations', [SavingAccountController::class, 'get_nominee_occupations'])->name('saving.occupations');
         Route::GET('saving/nominee/relations', [SavingAccountController::class, 'get_nominee_relations'])->name('saving.relations');
@@ -274,9 +275,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     // Client Routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
-        Route::apiResource('/', ClientRegistrationController::class)->except('show')->parameter('', 'registration');
-        Route::apiResource('saving', SavingAccountController::class)->except('show');
-        Route::apiResource('loan', LoanAccountController::class)->except('show');
+        Route::apiResource('/', ClientRegistrationController::class)->parameter('', 'registration');
+        Route::apiResource('saving', SavingAccountController::class);
+        Route::apiResource('loan', LoanAccountController::class);
     });
 
     // Collection Routes
