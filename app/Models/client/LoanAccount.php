@@ -189,4 +189,55 @@ class LoanAccount extends Model
                 'created_at'
             );
     }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopeActiveLoan($query, $id)
+    {
+        $query->ClientRegistrationID($id)
+            ->approve()
+            ->active()
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
+    }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopePendingLoan($query, $id)
+    {
+        $query->ClientRegistrationID($id)
+            ->pending()
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
+    }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopeHoldLoan($query, $id)
+    {
+        $query->ClientRegistrationID($id)
+            ->approve()
+            ->hold()
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
+    }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopeClosedLoan($query, $id)
+    {
+        $query->ClientRegistrationID($id)
+            ->approve()
+            ->closed()
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
+    }
 }

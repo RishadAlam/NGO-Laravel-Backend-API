@@ -312,6 +312,58 @@ class LoanAccountController extends Controller
     }
 
     /**
+     * Show the specified resource from storage.
+     */
+    public function activeAccount(string $client_id)
+    {
+        $loan = LoanAccount::with('Guarantors')->activeLoan($client_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $loan,
+        ], 200);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function pendingAccount(string $client_id)
+    {
+        $loan = LoanAccount::with('Guarantors')->pendingLoan($client_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $loan,
+        ], 200);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function holdAccount(string $client_id)
+    {
+        $loan = LoanAccount::with('Guarantors')->holdLoan($client_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $loan,
+        ], 200);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function closedAccount(string $client_id)
+    {
+        $loan = LoanAccount::with('Guarantors')->closedLoan($client_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $loan,
+        ], 200);
+    }
+
+    /**
      * Get all Occupations
      */
     public function get_guarantor_occupations()
