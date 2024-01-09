@@ -177,6 +177,14 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      */
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
         // Registration Pending Fetch Routes
+        Route::GET('saving/active/{client_id}', [SavingAccountController::class, 'activeAccount'])->name('saving.activeAccount');
+        Route::GET('saving/pending/{client_id}', [SavingAccountController::class, 'pendingAccount'])->name('saving.pendingAccount');
+        Route::GET('saving/hold/{client_id}', [SavingAccountController::class, 'holdAccount'])->name('saving.holdAccount');
+        Route::GET('saving/closed/{client_id}', [SavingAccountController::class, 'closedAccount'])->name('saving.closedAccount');
+        Route::GET('loan/active/{client_id}', [LoanAccountController::class, 'activeAccount'])->name('loan.activeAccount');
+        Route::GET('loan/pending/{client_id}', [LoanAccountController::class, 'pendingAccount'])->name('loan.pendingAccount');
+        Route::GET('loan/hold/{client_id}', [LoanAccountController::class, 'holdAccount'])->name('loan.holdAccount');
+        Route::GET('loan/closed/{client_id}', [LoanAccountController::class, 'closedAccount'])->name('loan.closedAccount');
         Route::GET('info', [ClientRegistrationController::class, 'clientInfo'])->name('clientInfo');
         Route::GET('accounts/{field_id?}/{center_id?}', [ClientRegistrationController::class, 'clientAccounts'])->name('clientAccounts');
         Route::GET('pending-forms', [ClientRegistrationController::class, 'pending_forms'])->name('pendingForms');

@@ -47,6 +47,19 @@ class SavingAccountController extends Controller
     }
 
     /**
+     * Show the specified resource from storage.
+     */
+    public function show(string $id)
+    {
+        // $saving = SavingAccount::with('Nominees')->single($id)->get();
+
+        // return response([
+        //     'success'   => true,
+        //     'data'      => $saving,
+        // ], 200);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(SavingAccountStoreRequest $request)
@@ -201,6 +214,58 @@ class SavingAccountController extends Controller
         });
 
         return create_response(__('customValidations.client.saving.approved'));
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function activeAccount(string $client_id)
+    {
+        $saving = SavingAccount::with('Nominees')->activeSaving($client_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $saving,
+        ], 200);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function pendingAccount(string $client_id)
+    {
+        $saving = SavingAccount::with('Nominees')->pendingSaving($client_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $saving,
+        ], 200);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function holdAccount(string $client_id)
+    {
+        $saving = SavingAccount::with('Nominees')->holdSaving($client_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $saving,
+        ], 200);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function closedAccount(string $client_id)
+    {
+        $saving = SavingAccount::with('Nominees')->closedSaving($client_id)->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $saving,
+        ], 200);
     }
 
     /**

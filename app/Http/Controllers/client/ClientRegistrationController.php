@@ -168,15 +168,15 @@ class ClientRegistrationController extends Controller
     public function countAccounts(string $id)
     {
         $data = (object) [
-            "activeSavings"  => SavingAccount::clientRegistrationID($id)->active()->count(),
+            "activeSavings"  => SavingAccount::clientRegistrationID($id)->approve()->active()->count(),
             "pendingSavings" => SavingAccount::clientRegistrationID($id)->pending()->count(),
-            "holdSavings"    => SavingAccount::clientRegistrationID($id)->hold()->count(),
-            "closedSavings"  => SavingAccount::clientRegistrationID($id)->closed()->count(),
+            "holdSavings"    => SavingAccount::clientRegistrationID($id)->approve()->hold()->count(),
+            "closedSavings"  => SavingAccount::clientRegistrationID($id)->approve()->closed()->count(),
 
-            "activeLoans"    => LoanAccount::clientRegistrationID($id)->active()->count(),
+            "activeLoans"    => LoanAccount::clientRegistrationID($id)->approve()->active()->count(),
             "pendingLoans"   => LoanAccount::clientRegistrationID($id)->pending()->count(),
-            "holdLoans"      => LoanAccount::clientRegistrationID($id)->hold()->count(),
-            "closedLoans"    => LoanAccount::clientRegistrationID($id)->closed()->count(),
+            "holdLoans"      => LoanAccount::clientRegistrationID($id)->approve()->hold()->count(),
+            "closedLoans"    => LoanAccount::clientRegistrationID($id)->approve()->closed()->count(),
         ];
 
         return response([

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToFieldTrait;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
+use App\Http\Traits\BelongsToApproverTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
 use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,7 +26,8 @@ class SavingAccount extends Model
         BelongsToFieldTrait,
         BelongsToCenterTrait,
         BelongsToCategoryTrait,
-        BelongsToAuthorTrait;
+        BelongsToAuthorTrait,
+        BelongsToApproverTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -137,5 +139,56 @@ class SavingAccount extends Model
             ->when(request('category_id'), function ($query) {
                 $query->categoryID(request('category_id'));
             });
+    }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopeActiveSaving($query, $id)
+    {
+        $query->ClientRegistrationID($id)
+            ->approve()
+            ->active()
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
+    }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopePendingSaving($query, $id)
+    {
+        $query->ClientRegistrationID($id)
+            ->pending()
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
+    }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopeHoldSaving($query, $id)
+    {
+        $query->ClientRegistrationID($id)
+            ->approve()
+            ->hold()
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
+    }
+
+    /**
+     * Get Specific resource
+     */
+    public function scopeClosedSaving($query, $id)
+    {
+        $query->ClientRegistrationID($id)
+            ->approve()
+            ->closed()
+            ->Category('id', 'name', 'is_default')
+            ->Author('id', 'name')
+            ->Approver('id', 'name');
     }
 }
