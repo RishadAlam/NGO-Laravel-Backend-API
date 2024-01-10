@@ -51,12 +51,19 @@ class SavingAccountController extends Controller
      */
     public function show(string $id)
     {
-        // $saving = SavingAccount::with('Nominees')->single($id)->get();
+        $saving = SavingAccount::approve()
+            ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
+            ->field('id', 'name',)
+            ->center('id', 'name',)
+            ->category('id', 'name', 'is_default')
+            ->author('id', 'name')
+            ->approver('id', 'name')
+            ->find($id);
 
-        // return response([
-        //     'success'   => true,
-        //     'data'      => $saving,
-        // ], 200);
+        return response([
+            'success'   => true,
+            'data'      => $saving,
+        ], 200);
     }
 
     /**
