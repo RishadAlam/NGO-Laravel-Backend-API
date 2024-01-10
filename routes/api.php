@@ -24,7 +24,9 @@ use App\Http\Controllers\accounts\ExpenseCategoryController;
 use App\Http\Controllers\client\ClientRegistrationController;
 use App\Http\Controllers\accounts\AccountWithdrawalController;
 use App\Http\Controllers\Collections\LoanCollectionController;
+use App\Http\Controllers\Withdrawal\SavingWithdrawalController;
 use App\Http\Controllers\Collections\SavingCollectionController;
+use App\Http\Controllers\Withdrawal\LoanSavingWithdrawalController;
 
 /*
  * ------------------------------------------------------------------------
@@ -288,10 +290,17 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::apiResource('loan', LoanAccountController::class);
     });
 
-    // Collection Routes
+    // Collection / Withdrawal Routes
     Route::prefix('collection')->group(function () {
+        // Collection
         Route::apiResource('saving', SavingCollectionController::class)->except('show');
         Route::apiResource('loan', LoanCollectionController::class)->except('show');
+
+        // Withdrawal
+        Route::prefix('withdrawal')->group(function () {
+            Route::apiResource('saving', SavingWithdrawalController::class)->except('show');
+            Route::apiResource('loan-saving', LoanSavingWithdrawalController::class)->except('show');
+        });
     });
 
     // Accounts Routes

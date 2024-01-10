@@ -11,27 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loan_collections', function (Blueprint $table) {
+        Schema::create('loan_saving_withdrawals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('field_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('center_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('category_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
-            $table->foreignId('client_registration_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('loan_account_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->foreignId('account_id')->nullable()->constrained()->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->string('acc_no', 50);
-            $table->integer('installment')->default(1);
-            $table->integer('deposit');
-            $table->integer('loan')->default(0);
-            $table->integer('interest')->default(0);
-            $table->integer('total');
+            $table->integer('balance');
+            $table->integer('amount');
+            $table->integer('balance_remaining');
             $table->string('description')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -40,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loan_collections');
+        Schema::dropIfExists('loan_saving_withdrawals');
     }
 };

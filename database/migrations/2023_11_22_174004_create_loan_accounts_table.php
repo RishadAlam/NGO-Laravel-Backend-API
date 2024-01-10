@@ -44,6 +44,8 @@ return new class extends Migration
             $table->boolean('status')->default(true)->comment('hold = false, activate = true');
             $table->boolean('is_approved')->default(false);
             $table->boolean('is_loan_approved')->default(false);
+            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('is_loan_approved_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
