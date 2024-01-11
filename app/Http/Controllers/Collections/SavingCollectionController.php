@@ -54,7 +54,8 @@ class SavingCollectionController extends Controller
         if ($is_approved) {
             $field_map += [
                 'is_approved' => $is_approved,
-                'approved_by' => auth()->id()
+                'approved_by' => auth()->id(),
+                'approved_at' => Carbon::now('Asia/Dhaka')
             ];
 
             DB::transaction(function () use ($field_map, $data) {
@@ -208,7 +209,7 @@ class SavingCollectionController extends Controller
 
         DB::transaction(function () use ($collections, $approvedList) {
             SavingCollection::whereIn('id', $approvedList)
-                ->update(['is_approved' => true, 'approved_by' => auth()->id()]);
+                ->update(['is_approved' => true, 'approved_by' => auth()->id(), 'approved_at' => Carbon::now('Asia/Dhaka')]);
 
             foreach ($collections as  $collection) {
                 SavingAccount::find($collection->saving_account_id)

@@ -475,5 +475,19 @@ return [
             'approved'          => 'The Collection has been successfully approved.',
             'not_found'         => 'Collection not found!'
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Withdrawal Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'withdrawal' => [
+            'successful'        => 'The withdrawal has been successfully registered.',
+            'update'            => 'The withdrawal has been successfully updated.',
+            'delete'            => 'The withdrawal has been successfully deleted.',
+            'p_delete'          => 'The withdrawal has been permanently deleted.',
+            'approved'          => 'The withdrawal has been successfully approved.',
+            'not_found'         => 'withdrawal not found!'
+        ],
     ],
 ];

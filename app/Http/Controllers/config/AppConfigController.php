@@ -91,6 +91,7 @@ class AppConfigController extends Controller
 
             $extension  = $data->company_logo->extension();
             $imgName    = 'logo_' . time() . '.' . $extension;
+
             $data->company_logo->move(public_path() . '/storage/config/', $imgName);
             $data->company_logo     = $imgName;
             $data->company_logo_uri = URL::to('/storage/config/', $data->company_logo);

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('acc_no', 50);
             $table->integer('balance');
             $table->integer('amount');
-            $table->integer('balance_remaining');
+            $table->integer('balance_remaining')->storedAs('balance - amount');
             $table->string('description')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->timestamp('approved_at')->nullable();
