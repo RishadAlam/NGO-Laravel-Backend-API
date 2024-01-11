@@ -22,6 +22,19 @@ use App\Http\Requests\collection\LoanCollectionApprovedRequest;
 class LoanCollectionController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('permission:regular_loan_collection_list_view|regular_loan_collection_list_view_as_admin')->only(['regularCategoryReport', 'regularFieldReport', 'regularCollectionSheet']);
+        $this->middleware('permission:pending_loan_collection_list_view|pending_loan_collection_list_view_as_admin')->only(['pendingCategoryReport', 'pendingFieldReport', 'pendingCollectionSheet']);
+        $this->middleware('can:permission_to_do_loan_collection')->only('store');
+        $this->middleware('permission:regular_loan_collection_update|pending_loan_collection_update')->only('update');
+        $this->middleware('permission:regular_loan_collection_permanently_delete|pending_loan_collection_permanently_delete')->only('permanently_destroy');
+        $this->middleware('permission:regular_loan_collection_approval|pending_loan_collection_approval')->only('approved');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
