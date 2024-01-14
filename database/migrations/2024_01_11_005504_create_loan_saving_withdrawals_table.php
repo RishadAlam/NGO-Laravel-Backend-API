@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('balance');
             $table->integer('amount');
             $table->integer('balance_remaining')->storedAs('balance - amount');
-            $table->string('description')->nullable();
+            $table->mediumText('description')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();

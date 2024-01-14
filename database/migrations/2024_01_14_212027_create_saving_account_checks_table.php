@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('income_categories', function (Blueprint $table) {
+        Schema::create('saving_account_checks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('creator_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
-            $table->string('name')->unique();
+            $table->foreignId('saving_account_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
+            $table->foreignId('checked_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
+            $table->integer('balance');
             $table->mediumText('description')->nullable();
-            $table->boolean('status')->default(true);
-            $table->boolean('is_default')->default(false);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('income_categories');
+        Schema::dropIfExists('saving_account_checks');
     }
 };

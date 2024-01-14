@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('acc_no', 50);
             $table->integer('installment')->default(1);
             $table->integer('deposit');
-            $table->string('description')->nullable();
+            $table->mediumText('description')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('amount');
             $table->integer('previous_balance');
             $table->integer('balance')->storedAs('previous_balance - amount');
-            $table->string('description');
+            $table->mediumText('description');
             $table->timestamp('date')->useCurrent();
             $table->timestamps();
             $table->softDeletes();
