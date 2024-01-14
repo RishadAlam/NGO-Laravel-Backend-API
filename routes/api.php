@@ -283,8 +283,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::apiResource('fields', FieldController::class)->except('show');
     Route::apiResource('centers', CenterController::class)->except('show');
     Route::apiResource('categories', CategoryController::class)->except('show');
-    Route::apiResource('saving/check', SavingAccountCheckController::class)->except('show');
-    Route::apiResource('loan/check', LoanAccountCheckController::class)->except('show');
+    Route::apiResource('saving/check', SavingAccountCheckController::class);
+    Route::apiResource('loan/check', LoanAccountCheckController::class);
     Route::apiResource('saving-collection', SavingCollectionController::class)->except('show');
 
     // Client Routes

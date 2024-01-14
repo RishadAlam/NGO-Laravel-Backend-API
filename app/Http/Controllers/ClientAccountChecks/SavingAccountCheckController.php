@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
+use App\Models\category\CategoryConfig;
 use App\Models\client\SavingAccountCheck;
 use App\Http\Requests\ClientAccountChecks\SavingAccountCheckStoreRequest;
 
@@ -50,7 +51,28 @@ class SavingAccountCheckController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $account = SavingAccount::active()
+            ->approve()
+            ->clientRegistration('id', 'name')
+            ->find($id, ['id', 'client_registration_id', 'category_id', 'total_installment', 'balance']);
+
+        if (empty($account)) {
+            return create_validation_error_response(__('customValidations.client.saving.not_found'));
+        }
+
+        $categoryConf = CategoryConfig::categoryID($account->category_id)
+            ->first('saving_acc_check_time_period');
+
+        return response([
+            'success'   => true,
+            'data'      => [
+                'id'                => $account->id,
+                'name'              => $account->ClientRegistration->name,
+                'balance'           => $account->balance,
+                'total_installment' => $account->total_installment,
+                'next_check_in_at'  => Carbon::now()->addDays($categoryConf->saving_acc_check_time_period > 0 ? $categoryConf->saving_acc_check_time_period : 1),
+            ],
+        ], 200);
     }
 
     /**
