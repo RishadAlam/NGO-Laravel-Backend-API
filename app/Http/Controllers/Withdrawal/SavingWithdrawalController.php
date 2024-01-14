@@ -29,10 +29,15 @@ class SavingWithdrawalController extends Controller
     {
         $data           = (object) $request->validated();
         $is_approved    = AppConfig::get_config('money_withdrawal_approval');
-        $account        = SavingAccount::find($data->id);
+        $account        = SavingAccount::find($data->saving_account_id);
+        $categoryConf   = CategoryConfig::categoryID($account->category_id)
+            ->first(['min_saving_withdrawal', 'max_saving_withdrawal']);
 
         if ($data->amount > $account->balance) {
             return create_validation_error_response(__('customValidations.accounts.insufficient_balance'));
+        }
+        if ($categoryConf->max_saving_withdrawal > 0 && ($data->amount < $categoryConf->min_saving_withdrawal || $data->amount > $categoryConf->max_saving_withdrawal)) {
+            return create_validation_error_response(__('customValidations.common.amount') . ' ' . __('customValidations.common_validation.crossed_the_limitations'));
         }
 
         $field_map = [
