@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
 use App\Models\client\LoanAccount;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\category\CategoryConfig;
 use App\Models\Withdrawal\LoanSavingWithdrawal;
 use App\Http\Requests\Withdrawal\LoanWithdrawalControllerStoreRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
@@ -28,10 +30,15 @@ class LoanSavingWithdrawalController extends Controller
     {
         $data           = (object) $request->validated();
         $is_approved    = AppConfig::get_config('money_withdrawal_approval');
-        $account        = LoanAccount::find($data->id);
+        $account        = LoanAccount::find($data->account_id);
+        $categoryConf   = CategoryConfig::categoryID($account->category_id)
+            ->first(['min_loan_saving_withdrawal', 'max_loan_saving_withdrawal']);
 
         if ($data->amount > $account->balance) {
             return create_validation_error_response(__('customValidations.accounts.insufficient_balance'));
+        }
+        if ($categoryConf->max_loan_saving_withdrawal > 0 && ($data->amount < $categoryConf->min_loan_saving_withdrawal || $data->amount > $categoryConf->max_loan_saving_withdrawal)) {
+            return create_validation_error_response(__('customValidations.common.amount') . ' ' . __('customValidations.common_validation.crossed_the_limitations'));
         }
 
         $field_map = [
@@ -73,7 +80,28 @@ class LoanSavingWithdrawalController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $account = LoanAccount::active()
+            ->approve()
+            ->clientRegistration('id', 'name')
+            ->find($id, ['id', 'client_registration_id', 'category_id', 'balance']);
+
+        if (empty($account)) {
+            return create_validation_error_response(__('customValidations.client.saving.not_found'));
+        }
+
+        $categoryConf = CategoryConfig::categoryID($account->category_id)
+            ->first(['min_loan_saving_withdrawal', 'max_loan_saving_withdrawal']);
+
+        return response([
+            'success'   => true,
+            'data'      => [
+                'id'        => $account->id,
+                'name'      => $account->ClientRegistration->name,
+                'balance'   => $account->balance,
+                'min'       => $categoryConf->min_loan_saving_withdrawal,
+                'max'       => $categoryConf->max_loan_saving_withdrawal
+            ],
+        ], 200);
     }
 
     /**

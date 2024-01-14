@@ -29,7 +29,7 @@ class SavingWithdrawalController extends Controller
     {
         $data           = (object) $request->validated();
         $is_approved    = AppConfig::get_config('money_withdrawal_approval');
-        $account        = SavingAccount::find($data->saving_account_id);
+        $account        = SavingAccount::find($data->account_id);
         $categoryConf   = CategoryConfig::categoryID($account->category_id)
             ->first(['min_saving_withdrawal', 'max_saving_withdrawal']);
 

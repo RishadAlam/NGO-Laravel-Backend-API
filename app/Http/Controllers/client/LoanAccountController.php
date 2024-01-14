@@ -141,6 +141,26 @@ class LoanAccountController extends Controller
     }
 
     /**
+     * Show the specified resource from storage.
+     */
+    public function show(string $id)
+    {
+        $account = LoanAccount::approve()
+            ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
+            ->field('id', 'name',)
+            ->center('id', 'name',)
+            ->category('id', 'name', 'is_default')
+            ->author('id', 'name')
+            ->approver('id', 'name')
+            ->find($id);
+
+        return response([
+            'success'   => true,
+            'data'      => $account,
+        ], 200);
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(LoanAccountUpdateRequest $request, string $id)

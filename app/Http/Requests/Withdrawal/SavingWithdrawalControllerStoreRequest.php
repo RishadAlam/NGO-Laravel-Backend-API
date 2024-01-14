@@ -22,9 +22,9 @@ class SavingWithdrawalControllerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "saving_account_id" => "required|numeric",
-            "amount"            => "required|numeric",
-            "description"       => "required",
+            "account_id"    => "required|numeric",
+            "amount"        => "required|numeric",
+            "description"   => "required",
         ];
     }
 }
