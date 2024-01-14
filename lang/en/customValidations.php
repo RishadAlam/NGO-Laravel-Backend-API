@@ -451,6 +451,7 @@ return [
         'saving' => [
             'successful'        => 'The Saving Account has been successfully registered.',
             'update'            => 'The Saving Account has been successfully updated.',
+            'account_check'     => 'The Saving Account has been successfully Checked.',
             'delete'            => 'The Saving Account has been successfully deleted.',
             'p_delete'          => 'The Saving Account has been permanently deleted.',
             'approved'          => 'The Saving Account has been successfully approved.',
@@ -465,6 +466,7 @@ return [
         'loan' => [
             'successful'        => 'The Loan Account has been successfully registered.',
             'update'            => 'The Loan Account has been successfully updated.',
+            'account_check'     => 'The Loan Account has been successfully Checked.',
             'delete'            => 'The Loan Account has been successfully deleted.',
             'p_delete'          => 'The Loan Account has been permanently deleted.',
             'approved'          => 'The Loan Account has been successfully approved.',
