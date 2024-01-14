@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
+use App\Models\category\CategoryConfig;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
 
@@ -73,7 +74,28 @@ class SavingWithdrawalController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $account = SavingAccount::active()
+            ->approve()
+            ->clientRegistration('id', 'name')
+            ->find($id, ['id', 'client_registration_id', 'category_id', 'balance']);
+
+        if (empty($account)) {
+            return create_validation_error_response(__('customValidations.client.saving.not_found'));
+        }
+
+        $categoryConf = CategoryConfig::categoryID($account->category_id)
+            ->first(['min_saving_withdrawal', 'max_saving_withdrawal']);
+
+        return response([
+            'success'   => true,
+            'data'      => [
+                'id'        => $account->id,
+                'name'      => $account->ClientRegistration->name,
+                'balance'   => $account->balance,
+                'min'       => $categoryConf->min_saving_withdrawal,
+                'max'       => $categoryConf->max_saving_withdrawal
+            ],
+        ], 200);
     }
 
     /**

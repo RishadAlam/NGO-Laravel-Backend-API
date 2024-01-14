@@ -3,13 +3,14 @@
 namespace App\Models\category;
 
 use App\Models\accounts\Account;
+use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CategoryConfig extends Model
 {
-    use HasFactory, BelongsToCategoryTrait;
+    use HasFactory, HelperScopesTrait, BelongsToCategoryTrait;
 
     /**
      * The attributes that are mass assignable.

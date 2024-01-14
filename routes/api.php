@@ -298,8 +298,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
         // Withdrawal
         Route::prefix('withdrawal')->group(function () {
-            Route::apiResource('saving', SavingWithdrawalController::class)->except('show');
-            Route::apiResource('loan-saving', LoanSavingWithdrawalController::class)->except('show');
+            Route::apiResource('saving', SavingWithdrawalController::class);
+            Route::apiResource('loan-saving', LoanSavingWithdrawalController::class);
         });
     });
 
