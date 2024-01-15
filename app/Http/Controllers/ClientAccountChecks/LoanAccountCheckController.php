@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\client\LoanAccount;
 use App\Http\Controllers\Controller;
+use App\Models\category\CategoryConfig;
 use App\Models\client\LoanAccountCheck;
 use App\Http\Requests\ClientAccountChecks\LoanAccountCheckStoreRequest;
 
@@ -27,13 +28,13 @@ class LoanAccountCheckController extends Controller
         $data           = (object) $request->validated();
         $account        = LoanAccount::find($data->account_id);
 
-        if ($data->amount > $account->balance) {
-            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'));
+        if (empty($account)) {
+            return create_validation_error_response(__('customValidations.client.loan.not_found'));
         }
 
         LoanAccountCheck::create(
             [
-                'saving_account_id'     => $account->id,
+                'loan_account_id'       => $account->id,
                 'installment_recovered' => $account->total_rec_installment,
                 'installment_remaining' => $account->payable_installment - $account->total_rec_installment,
                 'balance'               => $account->balance,
@@ -55,7 +56,45 @@ class LoanAccountCheckController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $account = LoanAccount::active()
+            ->approve()
+            ->clientRegistration('id', 'name')
+            ->find(
+                $id,
+                [
+                    'id',
+                    'client_registration_id',
+                    'category_id',
+                    'balance',
+                    'total_rec_installment',
+                    'total_loan_rec',
+                    'total_loan_remaining',
+                    'total_interest_rec',
+                    'total_interest_remaining'
+                ]
+            );
+
+        if (empty($account)) {
+            return create_validation_error_response(__('customValidations.client.loan.not_found'));
+        }
+
+        $categoryConf = CategoryConfig::categoryID($account->category_id)
+            ->first('loan_acc_check_time_period');
+
+        return response([
+            'success'   => true,
+            'data'      => [
+                'id'                        => $account->id,
+                'name'                      => $account->ClientRegistration->name,
+                'balance'                   => $account->balance,
+                'total_installment'         => $account->total_rec_installment,
+                'total_loan_rec'            => $account->total_loan_rec,
+                'total_loan_remaining'      => $account->total_loan_remaining,
+                'total_interest_rec'        => $account->total_interest_rec,
+                'total_interest_remaining'  => $account->total_interest_remaining,
+                'next_check_in_at'          => Carbon::now()->addDays($categoryConf->loan_acc_check_time_period > 0 ? $categoryConf->loan_acc_check_time_period : 1),
+            ],
+        ], 200);
     }
 
     /**

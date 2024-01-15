@@ -86,7 +86,7 @@ class LoanSavingWithdrawalController extends Controller
             ->find($id, ['id', 'client_registration_id', 'category_id', 'balance']);
 
         if (empty($account)) {
-            return create_validation_error_response(__('customValidations.client.saving.not_found'));
+            return create_validation_error_response(__('customValidations.client.loan.not_found'));
         }
 
         $categoryConf = CategoryConfig::categoryID($account->category_id)
