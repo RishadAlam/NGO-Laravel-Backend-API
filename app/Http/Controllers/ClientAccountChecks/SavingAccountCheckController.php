@@ -28,10 +28,11 @@ class SavingAccountCheckController extends Controller
         $data           = (object) $request->validated();
         $account        = SavingAccount::find($data->account_id);
 
-        if ($data->amount > $account->balance) {
-            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'));
+        if (empty($account)) {
+            return create_validation_error_response(__('customValidations.client.saving.not_found'));
         }
 
+        SavingAccountCheck::where('saving_account_id', $account->id)->update(['status' => true]);
         SavingAccountCheck::create(
             [
                 'saving_account_id'     => $account->id,

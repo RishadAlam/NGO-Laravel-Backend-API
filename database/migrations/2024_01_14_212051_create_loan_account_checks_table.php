@@ -23,7 +23,8 @@ return new class extends Migration
             $table->integer('interest_recovered');
             $table->integer('interest_remaining');
             $table->mediumText('description')->nullable();
-            $table->timestamp('next_check_in_at');
+            $table->boolean('status')->default(false);
+            $table->timestamp('next_check_in_at')->nullable();
             $table->timestamps();
         });
     }

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->integer('installment_recovered');
             $table->integer('balance');
             $table->mediumText('description')->nullable();
-            $table->timestamp('next_check_in_at');
+            $table->boolean('status')->default(false);
+            $table->timestamp('next_check_in_at')->nullable();
             $table->timestamps();
         });
     }

@@ -17,6 +17,7 @@ class SavingAccountCheck extends Model
     protected $fillable = [
         'saving_account_id',
         'balance',
+        'installment_recovered',
         'description',
         'checked_by',
         'next_check_in_at',
