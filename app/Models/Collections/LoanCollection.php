@@ -11,6 +11,7 @@ use App\Models\client\ClientRegistration;
 use App\Http\Traits\BelongsToAccountTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\BelongsToLoanAccountTrait;
 use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Collections\LoanCollectionActionHistory;
@@ -25,6 +26,7 @@ class LoanCollection extends Model
         BelongsToCategoryTrait,
         BelongsToAuthorTrait,
         BelongsToAccountTrait,
+        BelongsToLoanAccountTrait,
         BelongsToClientRegistrationTrait;
 
     /**

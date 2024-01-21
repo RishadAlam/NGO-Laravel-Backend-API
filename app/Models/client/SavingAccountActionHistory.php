@@ -5,11 +5,12 @@ namespace App\Models\client;
 use App\Models\User;
 use App\Models\client\SavingAccount;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToSavingAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SavingAccountActionHistory extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToSavingAccountTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -24,16 +25,6 @@ class SavingAccountActionHistory extends Model
         'action_type',
         'action_details'
     ];
-
-    /**
-     * Relationship belongs to SavingAccount model
-     *
-     * @return response()
-     */
-    public function SavingAccount()
-    {
-        return $this->belongsTo(SavingAccount::class)->withTrashed();
-    }
 
     /**
      * Relationship belongs to User model

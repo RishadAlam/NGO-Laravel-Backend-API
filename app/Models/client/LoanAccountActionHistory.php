@@ -5,11 +5,12 @@ namespace App\Models\client;
 use App\Models\User;
 use App\Models\client\LoanAccount;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToLoanAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanAccountActionHistory extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToLoanAccountTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -24,16 +25,6 @@ class LoanAccountActionHistory extends Model
         'action_type',
         'action_details'
     ];
-
-    /**
-     * Relationship belongs to LoanAccount model
-     *
-     * @return response()
-     */
-    public function LoanAccount()
-    {
-        return $this->belongsTo(LoanAccount::class)->withTrashed();
-    }
 
     /**
      * Relationship belongs to User model

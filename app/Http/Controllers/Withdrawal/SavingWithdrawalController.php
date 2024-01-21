@@ -116,6 +116,20 @@ class SavingWithdrawalController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        SavingWithdrawal::find($id)->delete();
+        return create_response(__('customValidations.client.collection.delete'));
+    }
+
+    /**
+     * Display the pending resource. 
+     */
+    public function pending_withdrawal()
+    {
+        $withdrawals = SavingWithdrawal::pendingWithdrawals()->get();
+
+        return response([
+            'success'   => true,
+            'data'      => $withdrawals,
+        ], 200);
     }
 }

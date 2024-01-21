@@ -172,4 +172,23 @@ trait HelperScopesTrait
     {
         $query->where('client_registration_id', $client_registration_id);
     }
+
+    /**
+     * Filter Scope
+     */
+    public function scopeFilter($query)
+    {
+        $query->when(request('user_id'), function ($query) {
+            $query->createdBy(request('user_id'));
+        })
+            ->when(request('field_id'), function ($query) {
+                $query->fieldID(request('field_id'));
+            })
+            ->when(request('center_id'), function ($query) {
+                $query->centerID(request('center_id'));
+            })
+            ->when(request('category_id'), function ($query) {
+                $query->categoryID(request('category_id'));
+            });
+    }
 }

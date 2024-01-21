@@ -119,4 +119,17 @@ class LoanSavingWithdrawalController extends Controller
     {
         //
     }
+
+    /**
+     * Display the pending resource. 
+     */
+    public function pending_withdrawal()
+    {
+        $pending_loans = LoanSavingWithdrawal::get();
+
+        return response([
+            'success'   => true,
+            'data'      => $pending_loans,
+        ], 200);
+    }
 }

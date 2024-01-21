@@ -170,6 +170,30 @@ class RolePermissionSeeder extends Seeder
                     'pending_loan_collection_permanently_delete',
                 ]
             ],
+            // Saving Withdrawal
+            [
+                'groupName'     => 'saving_withdrawal',
+                'permissions'   => [
+                    'permission_to_make_saving_withdrawal',
+                    'pending_saving_withdrawal_list_view',
+                    'pending_saving_withdrawal_list_view_as_admin',
+                    'pending_saving_withdrawal_approval',
+                    'pending_saving_withdrawal_update',
+                    'pending_saving_withdrawal_delete',
+                ]
+            ],
+            // Loan Saving Withdrawal
+            [
+                'groupName'     => 'loan_saving_withdrawal',
+                'permissions'   => [
+                    'permission_to_make_loan_saving_withdrawal',
+                    'pending_loan_saving_withdrawal_list_view',
+                    'pending_loan_saving_withdrawal_list_view_as_admin',
+                    'pending_loan_saving_withdrawal_approval',
+                    'pending_loan_saving_withdrawal_update',
+                    'pending_loan_saving_withdrawal_delete',
+                ]
+            ],
             // Account
             [
                 'groupName'     => 'account_management',

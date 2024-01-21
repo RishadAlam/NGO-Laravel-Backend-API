@@ -116,29 +116,10 @@ class SavingAccount extends Model
             ->nominees('id', 'saving_account_id', 'name', 'father_name', 'husband_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'image', 'image_uri', 'signature', 'signature_uri', 'address')
             ->pending()
             ->filter()
-            ->orderedBy();
-    }
-
-    /**
-     * Filter Scope
-     */
-    public function scopeFilter($query)
-    {
-        $query->when(request('user_id'), function ($query) {
-            $query->createdBy(request('user_id'));
-        })
             ->when(!Auth::user()->can('pending_saving_acc_list_view_as_admin'), function ($query) {
                 $query->createdBy();
             })
-            ->when(request('field_id'), function ($query) {
-                $query->fieldID(request('field_id'));
-            })
-            ->when(request('center_id'), function ($query) {
-                $query->centerID(request('center_id'));
-            })
-            ->when(request('category_id'), function ($query) {
-                $query->categoryID(request('category_id'));
-            });
+            ->orderedBy();
     }
 
     /**

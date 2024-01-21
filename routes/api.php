@@ -202,10 +202,20 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::PUT('loan/approved/{id}', [LoanAccountController::class, 'approved'])->name('loan.approved');
         Route::PUT('loan/loan-approved/{id}', [LoanAccountController::class, 'loan_approved'])->name('loan.loanApproved');
     });
-    // Collection Permanent Destroy Routes
+
+    // Collection Approval Routes
     Route::prefix('collection')->group(function () {
         Route::POST('saving/approved', [SavingCollectionController::class, 'approved'])->name('saving.approved');
         Route::POST('loan/approved', [LoanCollectionController::class, 'approved'])->name('loan.approved');
+    });
+    Route::prefix('withdrawal')->group(function () {
+        // Pending Withdrawal Routes 
+        Route::GET('saving/pending', [SavingWithdrawalController::class, 'pending_withdrawal']);
+        Route::GET('loan-saving/pending', [LoanSavingWithdrawalController::class, 'pending_withdrawal']);
+
+        // Withdrawal Approval Routes
+        Route::GET('saving/approved', [SavingWithdrawalController::class, 'approved']);
+        Route::GET('loan-saving/approved', [LoanSavingWithdrawalController::class, 'approved']);
     });
 
     /*
@@ -294,17 +304,16 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::apiResource('loan', LoanAccountController::class);
     });
 
-    // Collection / Withdrawal Routes
+    // Collection Routes
     Route::prefix('collection')->group(function () {
-        // Collection
         Route::apiResource('saving', SavingCollectionController::class)->except('show');
         Route::apiResource('loan', LoanCollectionController::class)->except('show');
+    });
 
-        // Withdrawal
-        Route::prefix('withdrawal')->group(function () {
-            Route::apiResource('saving', SavingWithdrawalController::class);
-            Route::apiResource('loan-saving', LoanSavingWithdrawalController::class);
-        });
+    // Withdrawal Routes
+    Route::prefix('withdrawal')->group(function () {
+        Route::apiResource('saving', SavingWithdrawalController::class);
+        Route::apiResource('loan-saving', LoanSavingWithdrawalController::class);
     });
 
     // Accounts Routes

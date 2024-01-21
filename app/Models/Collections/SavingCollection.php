@@ -18,6 +18,7 @@ use App\Models\client\ClientRegistration;
 use App\Http\Traits\BelongsToAccountTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\BelongsToSavingAccountTrait;
 use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Collections\SavingCollectionActionHistory;
@@ -32,7 +33,8 @@ class SavingCollection extends Model
         BelongsToCategoryTrait,
         BelongsToAuthorTrait,
         BelongsToAccountTrait,
-        BelongsToClientRegistrationTrait;
+        BelongsToClientRegistrationTrait,
+        BelongsToSavingAccountTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -61,14 +63,6 @@ class SavingCollection extends Model
     public function SavingCollectionActionHistory()
     {
         return $this->hasMany(SavingCollectionActionHistory::class);
-    }
-
-    /**
-     * Relation with Saving Account Table
-     */
-    public function SavingAccount()
-    {
-        return $this->belongsTo(SavingAccount::class)->withTrashed();
     }
 
     /**

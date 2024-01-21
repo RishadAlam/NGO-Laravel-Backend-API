@@ -35,16 +35,6 @@ class Nominee extends Model
     ];
 
     /**
-     * Relationship belongs to SavingAccount model
-     *
-     * @return response()
-     */
-    public function SavingAccount()
-    {
-        return $this->belongsTo(SavingAccount::class)->withTrashed();
-    }
-
-    /**
      * Mutator for address json Data
      */
     public function setAddressAttribute($value)
