@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\Withdrawal;
 
 use Carbon\Carbon;
+use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
+use App\Models\accounts\Account;
+use App\Models\accounts\Expense;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
 use App\Models\category\CategoryConfig;
+use App\Models\accounts\ExpenseCategory;
 use App\Models\Withdrawal\SavingWithdrawal;
+use App\Http\Requests\Withdrawal\SavingWithdrawalApprovalRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
 
 class SavingWithdrawalController extends Controller
@@ -131,5 +136,57 @@ class SavingWithdrawalController extends Controller
             'success'   => true,
             'data'      => $withdrawals,
         ], 200);
+    }
+
+
+    /**
+     * Approved the specified Withdrawal
+     */
+    public function approved(SavingWithdrawalApprovalRequest $request, string $id)
+    {
+        $account        = null;
+        $data           = (object) $request->validated();
+        $withdrawal     = SavingWithdrawal::with(['SavingAccount:id,balance', 'Category:id,name,is_default'])->find($id);
+        $fee            = CategoryConfig::categoryID($withdrawal->category_id)->pluck('saving_withdrawal_fee');
+
+        if (!$withdrawal) {
+            return create_validation_error_response(__('customValidations.client.withdrawal.not_found'));
+        }
+        if ($withdrawal->amount > $withdrawal->SavingAccount->balance) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
+        }
+        if (!empty($fee) && ($withdrawal->amount + $fee) > $withdrawal->SavingAccount->balance) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'fee');
+        }
+        if (isset($data->account) && $account = Account::find($data->account)) {
+            if ($account->balance < $withdrawal->amount) {
+                return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'account');
+            }
+        }
+
+
+        DB::transaction(function () use ($withdrawal, $data, $account) {
+            if (isset($data->account) && !empty($account)) {
+                $expenseCatId   = ExpenseCategory::where('name', 'saving_withdrawal')->value('id');
+                $categoryName   = !$withdrawal->category->is_default ? $withdrawal->category->name :  __("customValidations.category.default.{$withdrawal->category->name}");
+                $acc_no         = Helper::tsNumbers($withdrawal->acc_no);
+                $amount         = Helper::tsNumbers("৳{$withdrawal->amount}/-");
+                $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.category') . ' = ' . $categoryName . ', ' . __('customValidations.common.saving') . ' ' . __('customValidations.common.withdrawal') . ' = ' . $amount;
+
+                Expense::store(
+                    $data->account,
+                    $expenseCatId,
+                    $withdrawal->amount,
+                    $account->balance,
+                    $description
+                );
+                $account->increment('total_withdrawal', $withdrawal->amount);
+            }
+
+            SavingAccount::find($withdrawal->saving_account_id)->increment('total_withdrawn', $withdrawal->amount);
+            $withdrawal->update(['account_id' => $data->account, 'approved_by' => auth()->id()]);
+        });
+
+        return create_response(__('customValidations.client.withdrawal.approved'));
     }
 }

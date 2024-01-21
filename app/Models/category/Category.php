@@ -49,7 +49,7 @@ class Category extends Model
      */
     public function CategoryConfig()
     {
-        return $this->hasMany(CategoryConfig::class)->withTrashed();
+        return $this->hasOne(CategoryConfig::class);
     }
 
     /**
