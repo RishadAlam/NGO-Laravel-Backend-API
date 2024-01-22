@@ -23,6 +23,10 @@ class ExpenseCategorySeeder extends Seeder
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
+                'name'          => 'loan_saving_withdrawal',
+                'is_default'    => true,
+                'creator_id'    => auth()->id()
+            ], [
                 'name'          => 'electricity_bill',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()

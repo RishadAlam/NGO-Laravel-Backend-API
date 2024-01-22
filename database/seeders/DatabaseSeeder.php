@@ -31,7 +31,8 @@ class DatabaseSeeder extends Seeder
                 SavingAccountSeeder::class,
                 LoanAccountSeeder::class,
                 SavingCollectionSeeder::class,
-                LoanCollectionSeeder::class
+                LoanCollectionSeeder::class,
+                AccountFeesCategorySeeder::class
             ]
         );
     }

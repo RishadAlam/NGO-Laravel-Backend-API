@@ -6,13 +6,17 @@ use Carbon\Carbon;
 use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
+use App\Models\accounts\Income;
 use App\Models\accounts\Account;
 use App\Models\accounts\Expense;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
+use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
+use App\Models\client\SavingAccountFee;
 use App\Models\accounts\ExpenseCategory;
+use App\Models\client\AccountFeesCategory;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Http\Requests\Withdrawal\SavingWithdrawalApprovalRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
@@ -138,7 +142,6 @@ class SavingWithdrawalController extends Controller
         ], 200);
     }
 
-
     /**
      * Approved the specified Withdrawal
      */
@@ -147,7 +150,16 @@ class SavingWithdrawalController extends Controller
         $account        = null;
         $data           = (object) $request->validated();
         $withdrawal     = SavingWithdrawal::with(['SavingAccount:id,balance', 'Category:id,name,is_default'])->find($id);
-        $fee            = CategoryConfig::categoryID($withdrawal->category_id)->pluck('saving_withdrawal_fee');
+        $savingAccount  = SavingAccount::find($withdrawal->saving_account_id);
+        $categoryConf   = CategoryConfig::categoryID($withdrawal->category_id)->first(['saving_withdrawal_fee', 's_with_fee_acc_id']);
+        $fee            = $categoryConf->saving_withdrawal_fee;
+        $feeAccId       = $categoryConf->s_with_fee_acc_id;
+
+        $expenseCatId   = ExpenseCategory::where('name', 'saving_withdrawal')->value('id');
+        $categoryName   = !$withdrawal->category->is_default ? $withdrawal->category->name :  __("customValidations.category.default.{$withdrawal->category->name}");
+        $acc_no         = Helper::tsNumbers($withdrawal->acc_no);
+        $amount         = Helper::tsNumbers("৳{$withdrawal->amount}/-");
+        $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.category') . ' = ' . $categoryName . ', ' . __('customValidations.common.saving') . ' ' . __('customValidations.common.withdrawal') . ' = ' . $amount;
 
         if (!$withdrawal) {
             return create_validation_error_response(__('customValidations.client.withdrawal.not_found'));
@@ -164,15 +176,8 @@ class SavingWithdrawalController extends Controller
             }
         }
 
-
-        DB::transaction(function () use ($withdrawal, $data, $account) {
+        DB::transaction(function () use ($withdrawal, $data, $account, $savingAccount, $expenseCatId, $description, $feeAccId) {
             if (isset($data->account) && !empty($account)) {
-                $expenseCatId   = ExpenseCategory::where('name', 'saving_withdrawal')->value('id');
-                $categoryName   = !$withdrawal->category->is_default ? $withdrawal->category->name :  __("customValidations.category.default.{$withdrawal->category->name}");
-                $acc_no         = Helper::tsNumbers($withdrawal->acc_no);
-                $amount         = Helper::tsNumbers("৳{$withdrawal->amount}/-");
-                $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.category') . ' = ' . $categoryName . ', ' . __('customValidations.common.saving') . ' ' . __('customValidations.common.withdrawal') . ' = ' . $amount;
-
                 Expense::store(
                     $data->account,
                     $expenseCatId,
@@ -182,8 +187,30 @@ class SavingWithdrawalController extends Controller
                 );
                 $account->increment('total_withdrawal', $withdrawal->amount);
             }
+            if (!empty($fee) && $fee > 0) {
+                $categoryId     = AccountFeesCategory::where('name', 'withdrawal_fee')->value('id');
+                $feeAccount     = Account::find($feeAccId);
+                $incomeCatId   = IncomeCategory::where('name', 'withdrawal_fee')->value('id');
 
-            SavingAccount::find($withdrawal->saving_account_id)->increment('total_withdrawn', $withdrawal->amount);
+                SavingAccountFee::create([
+                    'saving_account_id'         => $savingAccount->id,
+                    'account_fees_category_id'  => $categoryId,
+                    'creator_id'                => auth()->id(),
+                    'amount'                    => $fee,
+                    'description'               => $description
+                ]);
+                Income::store(
+                    $feeAccId,
+                    $incomeCatId,
+                    $fee,
+                    $feeAccount->balance,
+                    $description
+                );
+                $feeAccount->increment('total_deposit', $fee);
+                $savingAccount->increment('total_withdrawn', $fee);
+            }
+
+            $savingAccount->increment('total_withdrawn', $withdrawal->amount);
             $withdrawal->update(['account_id' => $data->account, 'approved_by' => auth()->id()]);
         });
 
