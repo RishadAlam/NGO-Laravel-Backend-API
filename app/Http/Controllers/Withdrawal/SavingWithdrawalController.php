@@ -176,7 +176,7 @@ class SavingWithdrawalController extends Controller
             }
         }
 
-        DB::transaction(function () use ($withdrawal, $data, $account, $savingAccount, $expenseCatId, $description, $feeAccId) {
+        DB::transaction(function () use ($withdrawal, $data, $account, $savingAccount, $expenseCatId, $description, $fee, $feeAccId) {
             if (isset($data->account) && !empty($account)) {
                 Expense::store(
                     $data->account,
@@ -190,7 +190,7 @@ class SavingWithdrawalController extends Controller
             if (!empty($fee) && $fee > 0) {
                 $categoryId     = AccountFeesCategory::where('name', 'withdrawal_fee')->value('id');
                 $feeAccount     = Account::find($feeAccId);
-                $incomeCatId   = IncomeCategory::where('name', 'withdrawal_fee')->value('id');
+                $incomeCatId    = IncomeCategory::where('name', 'withdrawal_fee')->value('id');
 
                 SavingAccountFee::create([
                     'saving_account_id'         => $savingAccount->id,
@@ -211,7 +211,13 @@ class SavingWithdrawalController extends Controller
             }
 
             $savingAccount->increment('total_withdrawn', $withdrawal->amount);
-            $withdrawal->update(['account_id' => $data->account, 'approved_by' => auth()->id()]);
+            $withdrawal->update(
+                [
+                    'is_approved' => true,
+                    'approved_by' => auth()->id(),
+                    'approved_at' => Carbon::now()
+                ]
+            );
         });
 
         return create_response(__('customValidations.client.withdrawal.approved'));

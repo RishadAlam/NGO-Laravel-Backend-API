@@ -214,8 +214,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('loan-saving/pending', [LoanSavingWithdrawalController::class, 'pending_withdrawal']);
 
         // Withdrawal Approval Routes
-        Route::GET('saving/approved', [SavingWithdrawalController::class, 'approved']);
-        Route::GET('loan-saving/approved', [LoanSavingWithdrawalController::class, 'approved']);
+        Route::PUT('saving/approved/{id}', [SavingWithdrawalController::class, 'approved']);
+        Route::PUT('loan-saving/approved/{id}', [LoanSavingWithdrawalController::class, 'approved']);
     });
 
     /*

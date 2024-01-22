@@ -33,8 +33,9 @@ class SavingWithdrawal extends Model
         'center_id',
         'category_id',
         'saving_account_id',
-        'account_id',
         'approved_by',
+        'is_approved',
+        'approved_at',
         'acc_no',
         'balance',
         'amount',
@@ -52,10 +53,18 @@ class SavingWithdrawal extends Model
             ->center('id', 'name')
             ->category('id', 'name', 'is_default')
             ->author('id', 'name')
-            ->with('SavingAccount', function ($query) {
-                $query->select('id', 'balance', 'client_registration_id');
-                $query->ClientRegistration('id', 'name', 'image_uri');
-            })
+            ->with(
+                [
+                    'SavingAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id');
+                        $query->ClientRegistration('id', 'name', 'image_uri');
+                    },
+                    'Category' => function ($query) {
+                        $query->select('id', 'name', 'is_default');
+                        $query->with('CategoryConfig:id,category_id,saving_withdrawal_fee');
+                    }
+                ]
+            )
             ->filter()
             ->orderedBy();
     }
