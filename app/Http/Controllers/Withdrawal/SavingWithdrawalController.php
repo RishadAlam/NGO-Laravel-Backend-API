@@ -20,6 +20,7 @@ use App\Models\accounts\ExpenseCategory;
 use App\Models\client\AccountFeesCategory;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Http\Requests\Withdrawal\SavingWithdrawalApprovalRequest;
+use App\Http\Requests\Withdrawal\LoanWithdrawalControllerUpdateRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
 
 class SavingWithdrawalController extends Controller
@@ -37,53 +38,40 @@ class SavingWithdrawalController extends Controller
      */
     public function store(SavingWithdrawalControllerStoreRequest $request)
     {
-        $data           = (object) $request->validated();
-        $is_approved    = AppConfig::get_config('money_withdrawal_approval');
-        $account        = SavingAccount::find($data->account_id);
-        $categoryConf   = CategoryConfig::categoryID($account->category_id)
-            ->first(['min_saving_withdrawal', 'max_saving_withdrawal']);
+        try {
+            return DB::transaction(function () use ($request) {
+                $data           = (object) $request->validated();
+                $is_approved    = AppConfig::get_config('money_withdrawal_approval');
+                $account        = SavingAccount::find($data->account_id);
+                $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['min_saving_withdrawal', 'max_saving_withdrawal']);
 
-        if ($data->amount > $account->balance) {
-            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'));
-        }
-        if ($categoryConf->max_saving_withdrawal > 0 && ($data->amount < $categoryConf->min_saving_withdrawal || $data->amount > $categoryConf->max_saving_withdrawal)) {
-            return create_validation_error_response(__('customValidations.common.amount') . ' ' . __('customValidations.common_validation.crossed_the_limitations'));
-        }
+                // Validation
+                $validationErrors = self::validateAmount($data->amount, $account->balance, $categoryConf->min_saving_withdrawal, $categoryConf->max_saving_withdrawal);
+                if (!empty($validationErrors)) {
+                    return $validationErrors;
+                }
 
-        $field_map = [
-            'field_id'           => $account->field_id,
-            'center_id'          => $account->center_id,
-            'category_id'        => $account->category_id,
-            'saving_account_id'  => $account->id,
-            'acc_no'             => $account->acc_no,
-            'balance'            => $account->balance,
-            'amount'             => $data->amount,
-            'description'        => $data->description,
-            'creator_id'         => auth()->id(),
-        ];
+                $field_map = self::fieldMapping($account, $data, true);
+                if ($is_approved) {
+                    $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['saving_withdrawal_fee', 's_with_fee_acc_id']);
+                    $fee            = $categoryConf->saving_withdrawal_fee;
+                    $feeAccId       = $categoryConf->s_with_fee_acc_id;
 
+                    if (!empty($fee) && ($data->amount + $fee) > $account->balance) {
+                        return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'fee');
+                    }
 
-        if ($is_approved) {
-            $field_map += [
-                'is_approved'   => $is_approved,
-                'approved_by'   => auth()->id(),
-                'account_id'    => auth()->id(),
-                'approved_at'   => Carbon::now('Asia/Dhaka')
-            ];
+                    $withdrawal = SavingWithdrawal::create($field_map);
+                    self::processWithdrawal($withdrawal, null, $fee, $feeAccId, (array) $data);
+                } else {
+                    SavingWithdrawal::create($field_map);
+                }
 
-            DB::transaction(function () use ($field_map, $data, $account) {
-                $withdrawal     = SavingWithdrawal::create($field_map);
-                $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['saving_withdrawal_fee', 's_with_fee_acc_id']);
-                $fee            = $categoryConf->saving_withdrawal_fee;
-                $feeAccId       = $categoryConf->s_with_fee_acc_id;
-
-                self::processWithdrawal($withdrawal, null, $fee, $feeAccId, (array) $data);
+                return create_response(__('customValidations.client.withdrawal.successful'));
             });
-        } else {
-            SavingWithdrawal::create($field_map);
+        } catch (\Exception $e) {
+            return create_response($e->getMessage(), null, 400, false);
         }
-
-        return create_response(__('customValidations.client.withdrawal.successful'));
     }
 
     /**
@@ -118,9 +106,22 @@ class SavingWithdrawalController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(LoanWithdrawalControllerUpdateRequest $request, string $id)
     {
-        //
+        $data           = (object) $request->validated();
+        $withdrawal     = SavingWithdrawal::find($id);
+        $account        = SavingAccount::find($withdrawal->saving_account_id);
+        $categoryConf   = CategoryConfig::categoryID($withdrawal->category_id)
+            ->first(['min_saving_withdrawal', 'max_saving_withdrawal']);
+
+        // Validation
+        $validationErrors = self::validateAmount($data->amount, $account->balance, $categoryConf->min_saving_withdrawal, $categoryConf->max_saving_withdrawal);
+        if (!empty($validationErrors)) {
+            return $validationErrors;
+        }
+
+        $withdrawal->update(self::fieldMapping($account, $data));
+        return create_response(__('customValidations.client.withdrawal.update'));
     }
 
     /**
@@ -164,9 +165,9 @@ class SavingWithdrawalController extends Controller
                 }
 
                 // Validation
-                $validationErrors = self::validateWithdrawal($withdrawal, $account, $fee, $requestData);
+                $validationErrors = self::validateWithdrawal($withdrawal, $account, $fee);
                 if (!empty($validationErrors)) {
-                    return create_validation_error_response($validationErrors);
+                    return $validationErrors;
                 }
 
                 // Process Withdrawal
@@ -184,16 +185,12 @@ class SavingWithdrawalController extends Controller
      * @param SavingWithdrawal $withdrawal
      * @param Account $account
      * @param int $fee
-     * @param array $requestData
-     * @return array
+     * @return response
      */
-    private static function validateWithdrawal(SavingWithdrawal $withdrawal, Account $account = null, int $fee, array $requestData): array
+    private static function validateWithdrawal(SavingWithdrawal $withdrawal, Account $account = null, int $fee)
     {
-        $data               = (object) $requestData;
-        $validationErrors   = [];
-
         if (!$withdrawal) {
-            $validationErrors[] = __('customValidations.client.withdrawal.not_found');
+            return create_validation_error_response(__('customValidations.client.withdrawal.not_found'));
         }
         if ($withdrawal->amount > $withdrawal->SavingAccount->balance) {
             return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
@@ -204,8 +201,58 @@ class SavingWithdrawalController extends Controller
         if (!empty($account) && $account->balance < $withdrawal->amount) {
             return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'account');
         }
+        return false;
+    }
 
-        return $validationErrors;
+    /**
+     * Validate withdrawal Amount
+     *
+     * @param int $amount
+     * @param int $balance
+     * @param int $min
+     * @param int $max
+     * @return response
+     */
+    private static function validateAmount(int $amount, int $balance, int $min, int $max)
+    {
+        if ($amount > $balance) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'));
+        }
+        if ($amount < $min || ($max > 0 && $amount > $max)) {
+            return create_validation_error_response(__('customValidations.common.withdrawal') . ' ' . __('customValidations.common_validation.crossed_the_limitations'));
+        }
+
+        return false;
+    }
+
+    /**
+     * Field Mapping Withdrawal Data
+     *
+     * @param SavingAccount $account
+     * @param object $requestData
+     * @param boolean $is_store
+     * @param boolean $is_approved
+     * @return array
+     */
+    private static function fieldMapping(SavingAccount $account, object $requestData, $is_store = false)
+    {
+        $field_map = [
+            'balance'       => $account->balance,
+            'amount'        => $requestData->amount,
+            'description'   => $requestData->description,
+        ];
+        if ($is_store) {
+            $field_map += [
+                'field_id'           => $account->field_id,
+                'center_id'          => $account->center_id,
+                'category_id'        => $account->category_id,
+                'saving_account_id'  => $account->id,
+                'acc_no'             => $account->acc_no,
+                'creator_id'         => auth()->id(),
+            ];
+        }
+
+        return $field_map;
     }
 
     /**

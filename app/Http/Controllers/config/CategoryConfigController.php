@@ -74,4 +74,16 @@ class CategoryConfigController extends Controller
             200
         );
     }
+
+    /**
+     * Get Element configuration
+     */
+    public function get_element_config(Request $request, string $id)
+    {
+        $configs = CategoryConfig::categoryID($id)->first($request->post());
+        return response([
+            'success'   => true,
+            'data'      => $configs,
+        ], 200);
+    }
 }
