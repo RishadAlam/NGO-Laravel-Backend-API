@@ -2,12 +2,26 @@
 
 namespace App\Models\Withdrawal;
 
+use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToFieldTrait;
+use App\Http\Traits\BelongsToAuthorTrait;
+use App\Http\Traits\BelongsToCenterTrait;
+use App\Http\Traits\BelongsToApproverTrait;
+use App\Http\Traits\BelongsToCategoryTrait;
+use App\Http\Traits\BelongsToSavingAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanSavingWithdrawal extends Model
 {
-    use HasFactory;
+    use HasFactory,
+        HelperScopesTrait,
+        BelongsToFieldTrait,
+        BelongsToCenterTrait,
+        BelongsToCategoryTrait,
+        BelongsToAuthorTrait,
+        BelongsToApproverTrait,
+        BelongsToSavingAccountTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -25,4 +39,30 @@ class LoanSavingWithdrawal extends Model
         'description',
         'creator_id',
     ];
+
+    /**
+     * Pending Saving Registration Forms Scope.
+     */
+    public function scopePendingWithdrawals($query)
+    {
+        return $query->pending()
+            ->field('id', 'name')
+            ->center('id', 'name')
+            ->category('id', 'name', 'is_default')
+            ->author('id', 'name')
+            ->with(
+                [
+                    'LoanAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id');
+                        $query->ClientRegistration('id', 'name', 'image_uri');
+                    },
+                    'Category' => function ($query) {
+                        $query->select('id', 'name', 'is_default');
+                        $query->with('CategoryConfig:id,category_id,loan_saving_withdrawal_fee');
+                    }
+                ]
+            )
+            ->filter()
+            ->orderedBy();
+    }
 }

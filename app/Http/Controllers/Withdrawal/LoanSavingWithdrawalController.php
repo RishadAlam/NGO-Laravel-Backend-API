@@ -125,11 +125,11 @@ class LoanSavingWithdrawalController extends Controller
      */
     public function pending_withdrawal()
     {
-        $pending_loans = LoanSavingWithdrawal::get();
+        $withdrawals = LoanSavingWithdrawal::pendingWithdrawals()->get();
 
         return response([
             'success'   => true,
-            'data'      => $pending_loans,
+            'data'      => $withdrawals,
         ], 200);
     }
 }
