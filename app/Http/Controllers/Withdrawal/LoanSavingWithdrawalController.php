@@ -38,51 +38,41 @@ class LoanSavingWithdrawalController extends Controller
      */
     public function store(LoanWithdrawalControllerStoreRequest $request)
     {
-        $data           = (object) $request->validated();
-        $is_approved    = AppConfig::get_config('money_withdrawal_approval');
-        $account        = LoanAccount::find($data->account_id);
-        $categoryConf   = CategoryConfig::categoryID($account->category_id)
-            ->first(['min_loan_saving_withdrawal', 'max_loan_saving_withdrawal']);
+        try {
+            return DB::transaction(function () use ($request) {
+                $data           = (object) $request->validated();
+                $is_approved    = AppConfig::get_config('money_withdrawal_approval');
+                $account        = LoanAccount::find($data->account_id);
+                $categoryConf   = CategoryConfig::categoryID($account->category_id)
+                    ->first(['min_loan_saving_withdrawal', 'max_loan_saving_withdrawal']);
 
-        if ($data->amount > $account->balance) {
-            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'));
-        }
-        if ($categoryConf->max_loan_saving_withdrawal > 0 && ($data->amount < $categoryConf->min_loan_saving_withdrawal || $data->amount > $categoryConf->max_loan_saving_withdrawal)) {
-            return create_validation_error_response(__('customValidations.common.amount') . ' ' . __('customValidations.common_validation.crossed_the_limitations'));
-        }
+                // Validation
+                $validationErrors = self::validateAmount($data->amount, $account->balance, $categoryConf->min_loan_saving_withdrawal, $categoryConf->max_loan_saving_withdrawal);
+                if (!empty($validationErrors)) {
+                    return $validationErrors;
+                }
 
-        $field_map = [
-            'field_id'           => $account->field_id,
-            'center_id'          => $account->center_id,
-            'category_id'        => $account->category_id,
-            'loan_account_id'    => $account->id,
-            'acc_no'             => $account->acc_no,
-            'balance'            => $account->balance,
-            'amount'             => $data->amount,
-            'description'        => $data->description,
-            'creator_id'         => auth()->id(),
-        ];
+                $field_map = self::fieldMapping($account, $data, true);
+                if ($is_approved) {
+                    $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['loan_saving_withdrawal_fee', 'ls_with_fee_acc_id']);
+                    $fee            = $categoryConf->loan_saving_withdrawal_fee;
+                    $feeAccId       = $categoryConf->ls_with_fee_acc_id;
 
+                    if (!empty($fee) && ($data->amount + $fee) > $account->balance) {
+                        return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'fee');
+                    }
 
-        if ($is_approved) {
-            $field_map += [
-                'is_approved'   => $is_approved,
-                'approved_by'   => auth()->id(),
-                'account_id'    => auth()->id(),
-                'approved_at'   => Carbon::now('Asia/Dhaka')
-            ];
+                    $withdrawal = LoanSavingWithdrawal::create($field_map);
+                    self::processWithdrawal($withdrawal, null, $fee, $feeAccId, (array) $data);
+                } else {
+                    LoanSavingWithdrawal::create($field_map);
+                }
 
-            DB::transaction(function () use ($field_map, $data, $account) {
-                LoanSavingWithdrawal::create($field_map);
-                $account->increment('total_withdrawn', $data->amount);
-                // Account::find($data->account_id)
-                //     ->increment('total_deposit', $data->total);
+                return create_response(__('customValidations.client.withdrawal.successful'));
             });
-        } else {
-            LoanSavingWithdrawal::create($field_map);
+        } catch (\Exception $e) {
+            return create_response($e->getMessage(), null, 400, false);
         }
-
-        return create_response(__('customValidations.client.withdrawal.successful'));
     }
 
     /**
@@ -162,7 +152,6 @@ class LoanSavingWithdrawalController extends Controller
      * @param LoanAccount $account
      * @param object $requestData
      * @param boolean $is_store
-     * @param boolean $is_approved
      * @return array
      */
     private static function fieldMapping(LoanAccount $account, object $requestData, $is_store = false)

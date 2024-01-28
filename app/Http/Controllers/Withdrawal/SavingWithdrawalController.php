@@ -231,7 +231,6 @@ class SavingWithdrawalController extends Controller
      * @param SavingAccount $account
      * @param object $requestData
      * @param boolean $is_store
-     * @param boolean $is_approved
      * @return array
      */
     private static function fieldMapping(SavingAccount $account, object $requestData, $is_store = false)
