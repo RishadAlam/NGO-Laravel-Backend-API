@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
+use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
 use Illuminate\Support\Facades\Validator;
 use App\Models\client\SavingAccountActionHistory;
@@ -202,13 +203,14 @@ class SavingAccountController extends Controller
 
         DB::transaction(function () use ($savingAccount, $categoryConfig) {
             if ($categoryConfig->saving_acc_reg_fee > 0) {
+                $incomeCatId    = IncomeCategory::where('name', 'saving_form_fee')->value('id');
                 $categoryName   = !$savingAccount->category->is_default ? $savingAccount->category->name :  __("customValidations.category.default.{$savingAccount->category->name}");
                 $acc_no         = Helper::tsNumbers($savingAccount->acc_no);
                 $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.name') . ' = ' . $savingAccount->clientRegistration->name . ', '  . __('customValidations.common.saving') . ' ' . __('customValidations.common.category') . ' = ' . $categoryName;
 
                 Income::store(
                     $categoryConfig->saving_reg_fee_store_acc->id,
-                    1,
+                    $incomeCatId,
                     $categoryConfig->saving_acc_reg_fee,
                     $categoryConfig->saving_reg_fee_store_acc->balance,
                     $description

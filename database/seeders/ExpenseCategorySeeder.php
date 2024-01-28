@@ -27,6 +27,10 @@ class ExpenseCategorySeeder extends Seeder
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
+                'name'          => 'account_closing_interest',
+                'is_default'    => true,
+                'creator_id'    => auth()->id()
+            ], [
                 'name'          => 'electricity_bill',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
@@ -40,6 +44,18 @@ class ExpenseCategorySeeder extends Seeder
                 'creator_id'    => auth()->id()
             ], [
                 'name'          => 'daily_expense',
+                'is_default'    => true,
+                'creator_id'    => auth()->id()
+            ], [
+                'name'          => 'employee_salary',
+                'is_default'    => true,
+                'creator_id'    => auth()->id()
+            ], [
+                'name'          => 'transportation_allowance',
+                'is_default'    => true,
+                'creator_id'    => auth()->id()
+            ], [
+                'name'          => 'hospitality',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ],

@@ -262,7 +262,7 @@ class LoanAccountController extends Controller
 
         DB::transaction(function () use ($LoanAccount, $categoryConfig) {
             if ($categoryConfig->loan_acc_reg_fee > 0) {
-                $incomeCatId    = IncomeCategory::where('name', 'registration_fee')->value('id');
+                $incomeCatId    = IncomeCategory::where('name', 'loan_form_fee')->value('id');
                 $categoryName   = !$LoanAccount->category->is_default ? $LoanAccount->category->name :  __("customValidations.category.default.{$LoanAccount->category->name}");
                 $acc_no         = Helper::tsNumbers($LoanAccount->acc_no);
                 $loan_given     = Helper::tsNumbers("৳{$LoanAccount->loan_given}/-");
