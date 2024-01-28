@@ -20,6 +20,7 @@ use App\Models\client\AccountFeesCategory;
 use App\Models\Withdrawal\LoanSavingWithdrawal;
 use App\Http\Requests\Withdrawal\LoanSavingWithdrawalApprovalRequest;
 use App\Http\Requests\Withdrawal\LoanWithdrawalControllerStoreRequest;
+use App\Http\Requests\Withdrawal\LoanWithdrawalControllerUpdateRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
 
 class LoanSavingWithdrawalController extends Controller
@@ -116,9 +117,73 @@ class LoanSavingWithdrawalController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(LoanWithdrawalControllerUpdateRequest $request, string $id)
     {
-        //
+        $data           = (object) $request->validated();
+        $withdrawal     = LoanSavingWithdrawal::find($id);
+        $account        = LoanAccount::find($withdrawal->loan_account_id);
+        $categoryConf   = CategoryConfig::categoryID($withdrawal->category_id)
+            ->first(['min_loan_saving_withdrawal', 'max_loan_saving_withdrawal']);
+
+        // Validation
+        $validationErrors = self::validateAmount($data->amount, $account->balance, $categoryConf->min_loan_saving_withdrawal, $categoryConf->max_loan_saving_withdrawal);
+        if (!empty($validationErrors)) {
+            return $validationErrors;
+        }
+
+        $withdrawal->update(self::fieldMapping($account, $data));
+        return create_response(__('customValidations.client.withdrawal.update'));
+    }
+
+    /**
+     * Validate withdrawal Amount
+     *
+     * @param int $amount
+     * @param int $balance
+     * @param int $min
+     * @param int $max
+     * @return response
+     */
+    private static function validateAmount(int $amount, int $balance, int $min, int $max)
+    {
+        if ($amount > $balance) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'));
+        }
+        if ($amount < $min || ($max > 0 && $amount > $max)) {
+            return create_validation_error_response(__('customValidations.common.withdrawal') . ' ' . __('customValidations.common_validation.crossed_the_limitations'));
+        }
+
+        return false;
+    }
+
+    /**
+     * Field Mapping Withdrawal Data
+     *
+     * @param LoanAccount $account
+     * @param object $requestData
+     * @param boolean $is_store
+     * @param boolean $is_approved
+     * @return array
+     */
+    private static function fieldMapping(LoanAccount $account, object $requestData, $is_store = false)
+    {
+        $field_map = [
+            'balance'       => $account->balance,
+            'amount'        => $requestData->amount,
+            'description'   => $requestData->description,
+        ];
+        if ($is_store) {
+            $field_map += [
+                'field_id'           => $account->field_id,
+                'center_id'          => $account->center_id,
+                'category_id'        => $account->category_id,
+                'loan_account_id'    => $account->id,
+                'acc_no'             => $account->acc_no,
+                'creator_id'         => auth()->id(),
+            ];
+        }
+
+        return $field_map;
     }
 
     /**

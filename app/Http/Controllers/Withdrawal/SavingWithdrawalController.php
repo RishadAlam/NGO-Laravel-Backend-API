@@ -20,8 +20,8 @@ use App\Models\accounts\ExpenseCategory;
 use App\Models\client\AccountFeesCategory;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Http\Requests\Withdrawal\SavingWithdrawalApprovalRequest;
-use App\Http\Requests\Withdrawal\LoanWithdrawalControllerUpdateRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
+use App\Http\Requests\Withdrawal\SavingWithdrawalControllerUpdateRequest;
 
 class SavingWithdrawalController extends Controller
 {
@@ -106,7 +106,7 @@ class SavingWithdrawalController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(LoanWithdrawalControllerUpdateRequest $request, string $id)
+    public function update(SavingWithdrawalControllerUpdateRequest $request, string $id)
     {
         $data           = (object) $request->validated();
         $withdrawal     = SavingWithdrawal::find($id);
