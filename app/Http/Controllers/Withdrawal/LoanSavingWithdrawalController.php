@@ -3,13 +3,22 @@
 namespace App\Http\Controllers\Withdrawal;
 
 use Carbon\Carbon;
+use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
+use App\Models\accounts\Income;
+use App\Models\accounts\Account;
+use App\Models\accounts\Expense;
 use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\client\LoanAccountFee;
+use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
+use App\Models\accounts\ExpenseCategory;
+use App\Models\client\AccountFeesCategory;
 use App\Models\Withdrawal\LoanSavingWithdrawal;
+use App\Http\Requests\Withdrawal\LoanSavingWithdrawalApprovalRequest;
 use App\Http\Requests\Withdrawal\LoanWithdrawalControllerStoreRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
 
@@ -117,7 +126,8 @@ class LoanSavingWithdrawalController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        LoanSavingWithdrawal::find($id)->delete();
+        return create_response(__('customValidations.client.withdrawal.delete'));
     }
 
     /**
@@ -131,5 +141,126 @@ class LoanSavingWithdrawalController extends Controller
             'success'   => true,
             'data'      => $withdrawals,
         ], 200);
+    }
+
+    /**
+     * Approved the specified Withdrawal
+     */
+    public function approved(LoanSavingWithdrawalApprovalRequest $request, string $id)
+    {
+        try {
+            return DB::transaction(function () use ($request, $id) {
+                $account        = null;
+                $requestData    = $request->validated();
+                $withdrawal     = LoanSavingWithdrawal::with(['LoanAccount:id,balance', 'Category:id,name,is_default'])->find($id);
+                $categoryConf   = CategoryConfig::categoryID($withdrawal->category_id)->first(['loan_saving_withdrawal_fee', 'ls_with_fee_acc_id']);
+                $fee            = $categoryConf->loan_saving_withdrawal_fee;
+                $feeAccId       = $categoryConf->ls_with_fee_acc_id;
+
+                if (isset($requestData['account'])) {
+                    $account = Account::find($requestData['account']);
+                }
+
+                // Validation
+                $validationErrors = self::validateWithdrawal($withdrawal, $account, $fee);
+                if (!empty($validationErrors)) {
+                    return $validationErrors;
+                }
+
+                // Process Withdrawal
+                self::processWithdrawal($withdrawal, $account, $fee, $feeAccId, $requestData);
+                return create_response(__('customValidations.client.withdrawal.approved'));
+            });
+        } catch (\Exception $e) {
+            return create_response($e->getMessage(), null, 400, false);
+        }
+    }
+
+    /**
+     * Validate withdrawal request
+     *
+     * @param LoanSavingWithdrawal $withdrawal
+     * @param Account $account
+     * @param int $fee
+     * @return response
+     */
+    private static function validateWithdrawal(LoanSavingWithdrawal $withdrawal, Account $account = null, int $fee)
+    {
+        if (!$withdrawal) {
+            return create_validation_error_response(__('customValidations.client.withdrawal.not_found'));
+        }
+        if ($withdrawal->amount > $withdrawal->LoanAccount->balance) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
+        }
+        if (!empty($fee) && ($withdrawal->amount + $fee) > $withdrawal->LoanAccount->balance) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'fee');
+        }
+        if (!empty($account) && $account->balance < $withdrawal->amount) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'account');
+        }
+        return false;
+    }
+
+    /**
+     * Process withdrawal
+     *
+     * @param LoanSavingWithdrawal $withdrawal
+     * @param Account $account
+     * @param int $fee
+     * @param int $feeAccId
+     * @param array $requestData
+     */
+    private static function processWithdrawal(LoanSavingWithdrawal $withdrawal, Account $account = null, int $fee, int $feeAccId, array $requestData): void
+    {
+        $data           = (object) $requestData;
+        $loanAccount    = $withdrawal->LoanAccount;
+
+        $expenseCatId   = ExpenseCategory::where('name', 'loan_saving_withdrawal')->value('id');
+        $categoryName   = !$withdrawal->category->is_default ? $withdrawal->category->name :  __("customValidations.category.default.{$withdrawal->category->name}");
+        $acc_no         = Helper::tsNumbers($withdrawal->acc_no);
+        $amount         = Helper::tsNumbers("৳{$withdrawal->amount}/-");
+        $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.category') . ' = ' . $categoryName . ', ' . __('customValidations.common.loan_saving') . ' ' . __('customValidations.common.withdrawal') . ' = ' . $amount;
+
+        if (isset($data->account) && !empty($account)) {
+            Expense::store(
+                $data->account,
+                $expenseCatId,
+                $withdrawal->amount,
+                $account->balance,
+                $description
+            );
+            $account->increment('total_withdrawal', $withdrawal->amount);
+        }
+        if (!empty($fee) && $fee > 0) {
+            $categoryId     = AccountFeesCategory::where('name', 'withdrawal_fee')->value('id');
+            $feeAccount     = Account::find($feeAccId);
+            $incomeCatId    = IncomeCategory::where('name', 'withdrawal_fee')->value('id');
+
+            LoanAccountFee::create([
+                'loan_account_id'           => $loanAccount->id,
+                'account_fees_category_id'  => $categoryId,
+                'creator_id'                => auth()->id(),
+                'amount'                    => $fee,
+                'description'               => $description
+            ]);
+            Income::store(
+                $feeAccId,
+                $incomeCatId,
+                $fee,
+                $feeAccount->balance,
+                $description
+            );
+            $feeAccount->increment('total_deposit', $fee);
+            $loanAccount->increment('total_withdrawn', $fee);
+        }
+
+        $loanAccount->increment('total_withdrawn', $withdrawal->amount);
+        $withdrawal->update(
+            [
+                'is_approved' => true,
+                'approved_by' => auth()->id(),
+                'approved_at' => Carbon::now()
+            ]
+        );
     }
 }

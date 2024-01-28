@@ -9,6 +9,7 @@ use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
 use App\Http\Traits\BelongsToApproverTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
+use App\Http\Traits\BelongsToLoanAccountTrait;
 use App\Http\Traits\BelongsToSavingAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -21,7 +22,8 @@ class LoanSavingWithdrawal extends Model
         BelongsToCategoryTrait,
         BelongsToAuthorTrait,
         BelongsToApproverTrait,
-        BelongsToSavingAccountTrait;
+        BelongsToSavingAccountTrait,
+        BelongsToLoanAccountTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -33,6 +35,9 @@ class LoanSavingWithdrawal extends Model
         'center_id',
         'category_id',
         'loan_account_id',
+        'approved_by',
+        'is_approved',
+        'approved_at',
         'acc_no',
         'balance',
         'amount',

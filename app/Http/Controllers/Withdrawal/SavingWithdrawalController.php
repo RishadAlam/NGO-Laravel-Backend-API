@@ -130,7 +130,7 @@ class SavingWithdrawalController extends Controller
     public function destroy(string $id)
     {
         SavingWithdrawal::find($id)->delete();
-        return create_response(__('customValidations.client.collection.delete'));
+        return create_response(__('customValidations.client.withdrawal.delete'));
     }
 
     /**

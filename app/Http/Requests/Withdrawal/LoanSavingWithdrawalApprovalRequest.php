@@ -11,7 +11,7 @@ class LoanSavingWithdrawalApprovalRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,19 @@ class LoanSavingWithdrawalApprovalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "account" => "sometimes"
+        ];
+    }
+
+    /**
+     * Validation attributes
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'account' => __("customValidations.common.account"),
         ];
     }
 }
