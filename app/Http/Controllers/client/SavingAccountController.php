@@ -28,7 +28,7 @@ class SavingAccountController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permission:pending_saving_acc_list_view|pending_saving_acc_list_view_as_admin')->only('index');
+        $this->middleware('permission:pending_saving_acc_list_view|pending_saving_acc_list_view_as_admin')->only('pending_forms');
         $this->middleware('can:saving_acc_registration')->only('store');
         $this->middleware('can:pending_saving_acc_update')->only('update');
         $this->middleware('can:pending_saving_acc_permanently_delete')->only('permanently_destroy');
@@ -231,7 +231,6 @@ class SavingAccountController extends Controller
     public function activeAccount(string $client_id)
     {
         $saving = SavingAccount::with('Nominees')->activeSaving($client_id)->get();
-
         return response([
             'success'   => true,
             'data'      => $saving,
@@ -244,7 +243,6 @@ class SavingAccountController extends Controller
     public function pendingAccount(string $client_id)
     {
         $saving = SavingAccount::with('Nominees')->pendingSaving($client_id)->get();
-
         return response([
             'success'   => true,
             'data'      => $saving,
@@ -257,7 +255,6 @@ class SavingAccountController extends Controller
     public function holdAccount(string $client_id)
     {
         $saving = SavingAccount::with('Nominees')->holdSaving($client_id)->get();
-
         return response([
             'success'   => true,
             'data'      => $saving,
@@ -365,37 +362,6 @@ class SavingAccountController extends Controller
 
         return $histData;
     }
-
-    // /**
-    //  * Set Saving Acc update Nominee hist
-    //  * 
-    //  * @param array $histData
-    //  * @param object $nomineeData
-    //  * @param object $nominee
-    //  * 
-    //  * @return array
-    //  */
-    // private static function set_update_nominees_hist(&$histData, $nomineeData, $nominee)
-    // {
-    //     $nomineeData->address   = (object) $nomineeData->address;
-    //     $nominee->address       = (object) $nominee->address;
-    //     $fieldsToCompare        = ['name', 'husband_name', 'father_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'address'];
-    //     $addressFields          = ['street_address', 'city', 'word_no', 'post_office', 'police_station', 'district', 'division'];
-
-    //     foreach ($fieldsToCompare as $field) {
-    //         if ($field === 'address') {
-    //             foreach ($addressFields as $subField) {
-    //                 $clientValue    = $nominee->{$field}->{$subField} ?? '';
-    //                 $dataValue      = $nomineeData->{$field}->{$subField} ?? '';
-    //                 !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
-    //             }
-    //         } else {
-    //             $clientValue    = $nominee->{$field} ?? '';
-    //             $dataValue      = $nomineeData->{$field} ?? '';
-    //             !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
-    //         }
-    //     }
-    // }
 
     /**
      * Update Files

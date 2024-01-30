@@ -277,6 +277,7 @@ class RolePermissionSeeder extends Seeder
                 'permissions'   => [
                     'staff_list_view',
                     'staff_permissions_view',
+                    'staff_permission_update',
                     'staff_registration',
                     'staff_data_update',
                     'staff_soft_delete',

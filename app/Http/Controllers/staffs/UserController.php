@@ -21,7 +21,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('can:staff_list_view')->only('index');
-        $this->middleware('can:staff_permissions_view')->only('show');
+        $this->middleware('can:staff_permissions_view')->only('get_user_permissions');
         $this->middleware('can:staff_registration')->only('store');
         $this->middleware('can:staff_data_update')->only('update');
         $this->middleware('can:staff_soft_delete')->only('destroy');

@@ -10,6 +10,15 @@ use Spatie\Permission\Models\Permission;
 class PermissionController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:staff_permissions_view')->only('index');
+        $this->middleware('can:staff_permission_update')->only('update');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(string $id)

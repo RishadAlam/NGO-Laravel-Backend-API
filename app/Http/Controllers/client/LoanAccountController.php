@@ -43,51 +43,7 @@ class LoanAccountController extends Controller
      */
     public function index()
     {
-        // $month  = !empty(request('date_range')) ? Carbon::parse(request('date_range'))->month : Carbon::now()->month;
-        // $year   = !empty(request('date_range')) ? Carbon::parse(request('date_range'))->year : Carbon::now()->year;
-
-        // $query  = LoanAccount::with([
-        //     'Author:id,name',
-        //     'ClientRegistration:id,acc_no,name,image_uri',
-        //     'Field:id,name',
-        //     'Center:id,name',
-        //     'Category:id,name,is_default',
-        //     'Guarantors:id,loan_account_id,name,father_name,husband_name,mother_name,nid,dob,occupation,relation,gender,primary_phone,secondary_phone,image,image_uri,signature,signature_uri,address',
-        // ])
-        //     ->when(request('fetch_pending_forms'), function ($query) {
-        //         $query->where('is_approved', false)
-        //             ->when(!Auth::user()->can('pending_loan_acc_list_view_as_admin'), function ($query) {
-        //                 $query->where('creator_id', Auth::id());
-        //             });
-        //     })
-        //     ->when(request('fetch_pending_loans'), function ($query) use ($month, $year) {
-        //         $query->where('is_approved', true)
-        //             ->when(!Auth::user()->can('pending_loan_view_as_admin'), function ($query) {
-        //                 $query->where('creator_id', Auth::id());
-        //             })
-        //             ->whereMonth('start_date', $month)
-        //             ->whereYear('start_date', $year);
-        //     })
-        //     ->when(request('field_id'), function ($query) {
-        //         $query->where('field_id', request('field_id'));
-        //     })
-        //     ->when(request('center_id'), function ($query) {
-        //         $query->where('center_id', request('center_id'));
-        //     })
-        //     ->when(request('category_id'), function ($query) {
-        //         $query->where('category_id', request('category_id'));
-        //     })
-        //     ->when(request('user_id'), function ($query) {
-        //         $query->where('creator_id', request('user_id'));
-        //     })
-        //     ->orderBy('id', 'DESC');
-
-        // $loan_registrations = $query->get();
-        // $loan_registrations = LoanAccount::fetchPendingForms()->get();
-        // return response([
-        //     'success' => true,
-        //     'data' => $loan_registrations,
-        // ], 200);
+        //
     }
 
     /**
@@ -337,7 +293,6 @@ class LoanAccountController extends Controller
     public function activeAccount(string $client_id)
     {
         $loan = LoanAccount::with('Guarantors')->activeLoan($client_id)->get();
-
         return response([
             'success'   => true,
             'data'      => $loan,
@@ -350,7 +305,6 @@ class LoanAccountController extends Controller
     public function pendingAccount(string $client_id)
     {
         $loan = LoanAccount::with('Guarantors')->pendingLoan($client_id)->get();
-
         return response([
             'success'   => true,
             'data'      => $loan,
@@ -363,7 +317,6 @@ class LoanAccountController extends Controller
     public function holdAccount(string $client_id)
     {
         $loan = LoanAccount::with('Guarantors')->holdLoan($client_id)->get();
-
         return response([
             'success'   => true,
             'data'      => $loan,
@@ -376,7 +329,6 @@ class LoanAccountController extends Controller
     public function closedAccount(string $client_id)
     {
         $loan = LoanAccount::with('Guarantors')->closedLoan($client_id)->get();
-
         return response([
             'success'   => true,
             'data'      => $loan,

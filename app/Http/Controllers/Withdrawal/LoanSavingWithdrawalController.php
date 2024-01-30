@@ -26,6 +26,18 @@ use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
 class LoanSavingWithdrawalController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('permission:pending_loan_saving_withdrawal_list_view|pending_loan_saving_withdrawal_list_view_as_admin')->only('pending_withdrawal');
+        $this->middleware('can:permission_to_make_loan_saving_withdrawal')->only('store');
+        $this->middleware('can:pending_loan_saving_withdrawal_update')->only('update');
+        $this->middleware('can:pending_loan_saving_withdrawal_delete')->only('destroy');
+        $this->middleware('can:pending_loan_saving_withdrawal_approval')->only('approved');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
