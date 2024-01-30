@@ -50,7 +50,15 @@ class ClientRegistrationController extends Controller
      */
     public function index()
     {
-        //
+        $client = ClientRegistration::approve()
+            ->field('id', 'name')
+            ->center('id', 'name')
+            ->author('id', 'name')
+            ->filter()
+            ->orderedBy()
+            ->get();
+
+        return create_response(null, $client);
     }
 
     /**
