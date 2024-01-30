@@ -151,8 +151,10 @@ class ClientRegistration extends Model
             })
             ->when(request('search'), function ($query) {
                 $query->where('acc_no', 'LIKE', '%' . request('search') . '%')
-                    ->orWhere('name', 'LIKE', '%' . request('search') . '%')
-                    ->take(10);
+                    ->orWhere('name', 'LIKE', '%' . request('search') . '%');
+            })
+            ->when(request('limit'), function ($query) {
+                $query->take(request('limit'));
             });
     }
 
