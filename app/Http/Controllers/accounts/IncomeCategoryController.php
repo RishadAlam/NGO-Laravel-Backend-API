@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\accounts;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\accounts\IncomeCategoryChangeStatusRequest;
+use App\Models\accounts\IncomeCategory;
 use App\Http\Requests\accounts\IncomeCategoryStoreRequest;
 use App\Http\Requests\accounts\IncomeCategoryUpdateRequest;
-use App\Models\accounts\IncomeCategory;
-use Illuminate\Http\Request;
+use App\Http\Requests\accounts\IncomeCategoryChangeStatusRequest;
 
 class IncomeCategoryController extends Controller
 {
@@ -27,16 +27,8 @@ class IncomeCategoryController extends Controller
      */
     public function index()
     {
-        $categories = IncomeCategory::with('Author:id,name')
-            ->get();
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $categories
-            ],
-            200
-        );
+        $categories = IncomeCategory::with('Author:id,name')->get();
+        return create_response(null, $categories);
     }
 
     /**
@@ -53,13 +45,7 @@ class IncomeCategoryController extends Controller
             ]
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.income_category.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.income_category.successful'));
     }
 
     /**
@@ -74,13 +60,7 @@ class IncomeCategoryController extends Controller
                 'description'   => $data->description ?? null,
             ]);
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.income_category.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.income_category.update'));
     }
 
     /**
@@ -89,13 +69,7 @@ class IncomeCategoryController extends Controller
     public function destroy(string $id)
     {
         IncomeCategory::find($id)->delete();
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.income_category.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.income_category.delete'));
     }
 
     /**
@@ -105,14 +79,7 @@ class IncomeCategoryController extends Controller
     {
         $status = $request->validated()['status'];
         IncomeCategory::find($id)->update(['status' => $status]);
-
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.income_category.status')
-            ],
-            200
-        );
+        return create_response(__('customValidations.income_category.status'));
     }
 
     /**
@@ -120,15 +87,7 @@ class IncomeCategoryController extends Controller
      */
     public function get_active_categories()
     {
-        $categories = IncomeCategory::where('status', true)
-            ->get(['id', 'name', 'is_default']);
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $categories
-            ],
-            200
-        );
+        $categories = IncomeCategory::where('status', true)->get(['id', 'name', 'is_default']);
+        return create_response(null, $categories);
     }
 }

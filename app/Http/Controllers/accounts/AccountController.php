@@ -54,13 +54,7 @@ class AccountController extends Controller
             ->with(['AccountActionHistory', 'AccountActionHistory.Author:id,name,image_uri'])
             ->get();
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $accounts
-            ],
-            200
-        );
+        return create_response(null, $accounts);
     }
 
     /**
@@ -79,13 +73,7 @@ class AccountController extends Controller
             ]
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.accounts.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.accounts.successful'));
     }
 
     /**
@@ -112,13 +100,7 @@ class AccountController extends Controller
             AccountActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.accounts.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.accounts.update'));
     }
 
     /**
@@ -131,13 +113,7 @@ class AccountController extends Controller
             AccountActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.accounts.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.accounts.delete'));
     }
 
     /**
@@ -154,13 +130,7 @@ class AccountController extends Controller
             }
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.accounts.status')
-            ],
-            200
-        );
+        return create_response(__('customValidations.accounts.status'));
     }
 
     /**
@@ -171,13 +141,7 @@ class AccountController extends Controller
         $accounts = Account::where('status', true)
             ->get(['id', 'name', 'balance', 'is_default']);
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $accounts
-            ],
-            200
-        );
+        return create_response(null, $accounts);
     }
 
     /**
@@ -293,14 +257,7 @@ class AccountController extends Controller
             ->values()
             ->all();
 
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $transactions
-            ],
-            200
-        );
+        return create_response(null, $transactions);
     }
 
     /**

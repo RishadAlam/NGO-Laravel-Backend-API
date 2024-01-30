@@ -28,16 +28,8 @@ class AppConfigController extends Controller
      */
     public function index()
     {
-        $appSettings = AppConfig::where('meta_key', 'company_details')
-            ->value('meta_value');
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $appSettings,
-            ],
-            200
-        );
+        $appSettings = AppConfig::where('meta_key', 'company_details')->value('meta_value');
+        return create_response(null, $appSettings);
     }
 
     /**
@@ -64,13 +56,7 @@ class AppConfigController extends Controller
             'guarantor_reg_sign_is_required'
         ])->get(['id', 'meta_key', 'meta_value']);
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $appSettings,
-            ],
-            200
-        );
+        return create_response(null, $appSettings);
     }
 
     /**
@@ -111,17 +97,8 @@ class AppConfigController extends Controller
                 ]
             );
 
-        $appSettings = AppConfig::where('meta_key', 'company_details')
-            ->value('meta_value');
-
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.app_config.app_settings_update'),
-                'data'      => $appSettings,
-            ],
-            200
-        );
+        $appSettings = AppConfig::where('meta_key', 'company_details')->value('meta_value');
+        return create_response(null, $appSettings);
     }
 
     /**
@@ -143,13 +120,7 @@ class AppConfigController extends Controller
                 );
         }
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.app_config.approval_configuration_update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.app_config.approval_configuration_update'));
     }
 
     /**
@@ -178,12 +149,6 @@ class AppConfigController extends Controller
                 ]
             );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.app_config.transfer_transaction_update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.app_config.transfer_transaction_update'));
     }
 }

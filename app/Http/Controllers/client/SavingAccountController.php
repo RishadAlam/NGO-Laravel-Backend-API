@@ -40,11 +40,7 @@ class SavingAccountController extends Controller
      */
     public function index()
     {
-        // $saving_accounts = SavingAccount::fetchPendingForms()->get();
-        // return response([
-        //     'success'   => true,
-        //     'data'      => $saving_accounts,
-        // ], 200);
+        //
     }
 
     /**
@@ -61,10 +57,7 @@ class SavingAccountController extends Controller
             ->approver('id', 'name')
             ->find($id);
 
-        return response([
-            'success'   => true,
-            'data'      => $saving,
-        ], 200);
+        return create_response(null, $saving);
     }
 
     /**
@@ -176,10 +169,7 @@ class SavingAccountController extends Controller
     public function pending_forms()
     {
         $pending_forms = SavingAccount::fetchPendingForms()->get();
-        return response([
-            'success'   => true,
-            'data'      => $pending_forms,
-        ], 200);
+        return create_response(null, $pending_forms);
     }
 
     /**
@@ -231,10 +221,7 @@ class SavingAccountController extends Controller
     public function activeAccount(string $client_id)
     {
         $saving = SavingAccount::with('Nominees')->activeSaving($client_id)->get();
-        return response([
-            'success'   => true,
-            'data'      => $saving,
-        ], 200);
+        return create_response(null, $saving);
     }
 
     /**
@@ -243,10 +230,7 @@ class SavingAccountController extends Controller
     public function pendingAccount(string $client_id)
     {
         $saving = SavingAccount::with('Nominees')->pendingSaving($client_id)->get();
-        return response([
-            'success'   => true,
-            'data'      => $saving,
-        ], 200);
+        return create_response(null, $saving);
     }
 
     /**
@@ -255,10 +239,7 @@ class SavingAccountController extends Controller
     public function holdAccount(string $client_id)
     {
         $saving = SavingAccount::with('Nominees')->holdSaving($client_id)->get();
-        return response([
-            'success'   => true,
-            'data'      => $saving,
-        ], 200);
+        return create_response(null, $saving);
     }
 
     /**
@@ -267,11 +248,7 @@ class SavingAccountController extends Controller
     public function closedAccount(string $client_id)
     {
         $saving = SavingAccount::with('Nominees')->closedSaving($client_id)->get();
-
-        return response([
-            'success'   => true,
-            'data'      => $saving,
-        ], 200);
+        return create_response(null, $saving);
     }
 
     /**
@@ -282,6 +259,7 @@ class SavingAccountController extends Controller
         $occupations = Nominee::distinct('occupation')
             ->orderBy('occupation', 'asc')
             ->pluck('occupation');
+
         return create_response(null, $occupations);
     }
 
@@ -293,6 +271,7 @@ class SavingAccountController extends Controller
         $relations = Nominee::distinct('relation')
             ->orderBy('relation', 'asc')
             ->pluck('relation');
+
         return create_response(null, $relations);
     }
 

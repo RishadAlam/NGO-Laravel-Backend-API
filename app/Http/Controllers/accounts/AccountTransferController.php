@@ -79,14 +79,7 @@ class AccountTransferController extends Controller
             ];
         }
 
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $transfers
-            ],
-            200
-        );
+        return create_response(null, $transfers);
     }
 
     /**
@@ -115,12 +108,6 @@ class AccountTransferController extends Controller
                 ->increment('total_deposit', $data->amount);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.account_transfer.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.account_transfer.successful'));
     }
 }

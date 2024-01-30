@@ -59,11 +59,7 @@ class ClientRegistrationController extends Controller
     public function show(string $id)
     {
         $client = ClientRegistration::client()->find($id);
-
-        return response([
-            'success'   => true,
-            'data'      => $client,
-        ], 200);
+        return create_response(null, $client);
     }
 
     /**
@@ -92,7 +88,8 @@ class ClientRegistrationController extends Controller
                 auth()->id()
             )
         );
-        return self::create_response(__('customValidations.client.registration.successful'));
+
+        return create_response(__('customValidations.client.registration.successful'));
     }
 
     /**
@@ -112,7 +109,7 @@ class ClientRegistrationController extends Controller
             ClientRegistrationActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
-        return self::create_response(__('customValidations.client.registration.update'));
+        return create_response(__('customValidations.client.registration.update'));
     }
 
     /**
@@ -125,7 +122,7 @@ class ClientRegistrationController extends Controller
             ClientRegistrationActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
-        return self::create_response(__('customValidations.client.registration.delete'));
+        return create_response(__('customValidations.client.registration.delete'));
     }
 
     /**
@@ -134,7 +131,7 @@ class ClientRegistrationController extends Controller
     public function permanently_destroy(string $id)
     {
         ClientRegistration::find($id)->forceDelete();
-        return self::create_response(__('customValidations.client.registration.p_delete'));
+        return create_response(__('customValidations.client.registration.p_delete'));
     }
 
     /**
@@ -156,10 +153,7 @@ class ClientRegistrationController extends Controller
             "closedLoans"    => LoanAccount::clientRegistrationID($id)->approve()->closed()->count(),
         ];
 
-        return response([
-            'success'   => true,
-            'data'      => $data,
-        ], 200);
+        return create_response(null, $data);
     }
 
     /**
@@ -171,7 +165,7 @@ class ClientRegistrationController extends Controller
             ->orderBy('occupation', 'asc')
             ->pluck('occupation');
 
-        return self::create_response(null, $occupations);
+        return create_response(null, $occupations);
     }
 
     /**
@@ -180,10 +174,7 @@ class ClientRegistrationController extends Controller
     public function pending_forms()
     {
         $pendingForms = ClientRegistration::fetchPendingForms()->get();
-        return response([
-            'success'   => true,
-            'data'      => $pendingForms,
-        ], 200);
+        return create_response(null, $pendingForms);
     }
 
     /**
@@ -194,10 +185,7 @@ class ClientRegistrationController extends Controller
         $clientAccounts = ClientRegistration::fetchAccounts($field_id, $center_id)
             ->get(['id', 'acc_no', 'name', 'image_uri']);
 
-        return response([
-            'success'   => true,
-            'data'      => $clientAccounts,
-        ], 200);
+        return create_response(null, $clientAccounts);
     }
 
     /**
@@ -206,11 +194,7 @@ class ClientRegistrationController extends Controller
     public function clientInfo()
     {
         $clientInfo = ClientRegistration::info()->get();
-
-        return response([
-            'success'   => true,
-            'data'      => $clientInfo,
-        ], 200);
+        return create_response(null, $clientInfo);
     }
 
     /**
@@ -219,24 +203,7 @@ class ClientRegistrationController extends Controller
     public function approved(string $id)
     {
         ClientRegistration::find($id)->update(['is_approved' => true, 'approved_by' => auth()->id()]);
-        return self::create_response(__('customValidations.client.registration.approved'));
-    }
-
-    /**
-     * Create success Response
-     */
-    private static function create_response($message = null, $data = null, $code = '200', $success = true)
-    {
-        $res = ['success' => $success];
-
-        if (!empty($message)) {
-            $res['message'] = $message;
-        }
-        if (!empty($data)) {
-            $res['data'] = $data;
-        }
-
-        return response($res, $code);
+        return create_response(__('customValidations.client.registration.approved'));
     }
 
     /**

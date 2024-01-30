@@ -81,9 +81,9 @@ class LoanAccountCheckController extends Controller
         $categoryConf = CategoryConfig::categoryID($account->category_id)
             ->first('loan_acc_check_time_period');
 
-        return response([
-            'success'   => true,
-            'data'      => [
+        return create_response(
+            null,
+            [
                 'id'                        => $account->id,
                 'name'                      => $account->ClientRegistration->name,
                 'balance'                   => $account->balance,
@@ -93,8 +93,8 @@ class LoanAccountCheckController extends Controller
                 'total_interest_rec'        => $account->total_interest_rec,
                 'total_interest_remaining'  => $account->total_interest_remaining,
                 'next_check_in_at'          => Carbon::now()->addDays($categoryConf->loan_acc_check_time_period > 0 ? $categoryConf->loan_acc_check_time_period : 1),
-            ],
-        ], 200);
+            ]
+        );
     }
 
     /**

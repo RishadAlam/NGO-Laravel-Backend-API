@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\staffs;
 
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\staffs\StoreRoleRequest;
 use App\Http\Requests\staffs\UpdateRoleRequest;
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -27,13 +27,7 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::all(['id', 'name', 'is_default']);
-        return response(
-            [
-                'success'   => true,
-                'data'      => $roles
-            ],
-            200
-        );
+        return create_response(null, $roles);
     }
 
     /**
@@ -61,13 +55,7 @@ class RoleController extends Controller
     {
         $role = (object) $request->validated();
         Role::find($id)->update(['name' => $role->name]);
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.role.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.role.update'));
     }
 
     /**
@@ -76,12 +64,6 @@ class RoleController extends Controller
     public function destroy(string $id)
     {
         Role::find($id)->delete();
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.role.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.role.delete'));
     }
 }

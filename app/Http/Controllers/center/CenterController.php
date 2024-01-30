@@ -36,13 +36,7 @@ class CenterController extends Controller
             })
             ->get(['id', 'field_id', 'name', 'description', 'status', 'creator_id', 'created_at', 'updated_at']);
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $centers
-            ],
-            200
-        );
+        return create_response(null, $centers);
     }
 
     /**
@@ -60,13 +54,7 @@ class CenterController extends Controller
             ]
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.center.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.center.successful'));
     }
 
     /**
@@ -99,13 +87,7 @@ class CenterController extends Controller
             ]);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.center.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.center.update'));
     }
 
     /**
@@ -125,13 +107,7 @@ class CenterController extends Controller
             ]);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.center.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.center.delete'));
     }
 
     /**
@@ -139,8 +115,8 @@ class CenterController extends Controller
      */
     public function change_status(CenterChangeStatusRequest $request, string $id)
     {
-        $status = $request->validated()['status'];
-        $changeStatus = $status ? '<p class="text-danger">Deactive</p><p class="text-success">Active</p>' : '<p class="text-danger">Active</p><p class="text-success">Deactive</p>';
+        $status         = $request->validated()['status'];
+        $changeStatus   = $status ? '<p class="text-danger">Deactive</p><p class="text-success">Active</p>' : '<p class="text-danger">Active</p><p class="text-success">Deactive</p>';
         DB::transaction(
             function () use ($id, $status, $changeStatus) {
                 Center::find($id)->update(['status' => $status]);
@@ -155,13 +131,7 @@ class CenterController extends Controller
             }
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.center.status')
-            ],
-            200
-        );
+        return create_response(__('customValidations.center.status'));
     }
 
     /**
@@ -175,12 +145,6 @@ class CenterController extends Controller
             })
             ->get(['id', 'field_id', 'name']);
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $centers
-            ],
-            200
-        );
+        return create_response(null, $centers);
     }
 }

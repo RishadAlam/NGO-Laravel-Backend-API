@@ -23,7 +23,7 @@ class CategoryConfigController extends Controller
     public function get_all_categories_config()
     {
         $configs = CategoryConfig::with("Category:id,name,is_default")->get();
-        return $configs;
+        return create_response(null, $configs);
     }
 
     /**
@@ -66,13 +66,7 @@ class CategoryConfigController extends Controller
                 );
         }
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.app_config.categories_configuration_update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.app_config.categories_configuration_update'));
     }
 
     /**
@@ -81,9 +75,6 @@ class CategoryConfigController extends Controller
     public function get_element_config(Request $request, string $id)
     {
         $configs = CategoryConfig::categoryID($id)->first($request->post());
-        return response([
-            'success'   => true,
-            'data'      => $configs,
-        ], 200);
+        return create_response(null, $configs);
     }
 }

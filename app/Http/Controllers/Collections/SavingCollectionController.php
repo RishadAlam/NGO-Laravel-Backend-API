@@ -116,13 +116,8 @@ class SavingCollectionController extends Controller
      */
     public function regularCategoryReport()
     {
-        $categoryReport = Category::categorySavingReport()
-            ->get(['id', 'name', 'is_default']);
-
-        return response([
-            'success'   => true,
-            'data'      => $categoryReport
-        ], 200);
+        $categoryReport = Category::categorySavingReport()->get(['id', 'name', 'is_default']);
+        return create_response(null, $categoryReport);
     }
 
     /**
@@ -130,13 +125,8 @@ class SavingCollectionController extends Controller
      */
     public function pendingCategoryReport()
     {
-        $categoryReport = Category::categorySavingReport(false)
-            ->get(['id', 'name', 'is_default']);
-
-        return response([
-            'success'   => true,
-            'data'      => $categoryReport
-        ], 200);
+        $categoryReport = Category::categorySavingReport(false)->get(['id', 'name', 'is_default']);
+        return create_response(null, $categoryReport);
     }
 
     /**
@@ -145,11 +135,7 @@ class SavingCollectionController extends Controller
     public function regularFieldReport($category_id)
     {
         $fieldReport = Field::fieldSavingReport($category_id)->get(['id', 'name']);
-
-        return response([
-            'success'   => true,
-            'data'      => $fieldReport
-        ], 200);
+        return create_response(null, $fieldReport);
     }
 
     /**
@@ -158,11 +144,7 @@ class SavingCollectionController extends Controller
     public function pendingFieldReport($category_id)
     {
         $fieldReport = Field::fieldSavingReport($category_id, false)->get(['id', 'name']);
-
-        return response([
-            'success'   => true,
-            'data'      => $fieldReport
-        ], 200);
+        return create_response(null, $fieldReport);
     }
 
     /**
@@ -171,11 +153,7 @@ class SavingCollectionController extends Controller
     public function regularCollectionSheet($category_id, $field_id)
     {
         $collections = Center::savingCollectionSheet($category_id, $field_id, request('user_id'))->get(['id', 'name']);
-
-        return response([
-            'success'   => true,
-            'data'      => $collections
-        ], 200);
+        return create_response(null, $collections);
     }
 
     /**
@@ -189,13 +167,9 @@ class SavingCollectionController extends Controller
             request('user_id'),
             false,
             request('date') ? Carbon::parse(request('date'))->format('y-m-d') : Carbon::yesterday()->format('y-m-d')
-        )
-            ->get(['id', 'name']);
+        )->get(['id', 'name']);
 
-        return response([
-            'success'   => true,
-            'data'      => $collections
-        ], 200);
+        return create_response(null, $collections);
     }
 
     /**

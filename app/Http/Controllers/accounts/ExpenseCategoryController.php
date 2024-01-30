@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\accounts;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\accounts\ExpenseCategoryChangeStatusRequest;
+use App\Models\accounts\ExpenseCategory;
 use App\Http\Requests\accounts\ExpenseCategoryStoreRequest;
 use App\Http\Requests\accounts\ExpenseCategoryUpdateRequest;
-use App\Models\accounts\ExpenseCategory;
-use Illuminate\Http\Request;
+use App\Http\Requests\accounts\ExpenseCategoryChangeStatusRequest;
 
 class ExpenseCategoryController extends Controller
 {
@@ -30,13 +30,7 @@ class ExpenseCategoryController extends Controller
         $categories = ExpenseCategory::with('Author:id,name')
             ->get();
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $categories
-            ],
-            200
-        );
+        return create_response(null, $categories);
     }
 
     /**
@@ -53,13 +47,7 @@ class ExpenseCategoryController extends Controller
             ]
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.expense_category.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.expense_category.successful'));
     }
 
     /**
@@ -74,13 +62,7 @@ class ExpenseCategoryController extends Controller
                 'description'   => $data->description ?? null,
             ]);
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.expense_category.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.expense_category.update'));
     }
 
     /**
@@ -89,13 +71,7 @@ class ExpenseCategoryController extends Controller
     public function destroy(string $id)
     {
         ExpenseCategory::find($id)->delete();
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.expense_category.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.expense_category.delete'));
     }
 
     /**
@@ -105,14 +81,7 @@ class ExpenseCategoryController extends Controller
     {
         $status = $request->validated()['status'];
         ExpenseCategory::find($id)->update(['status' => $status]);
-
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.expense_category.status')
-            ],
-            200
-        );
+        return create_response(__('customValidations.expense_category.status'));
     }
 
     /**
@@ -123,12 +92,6 @@ class ExpenseCategoryController extends Controller
         $categories = ExpenseCategory::where('status', true)
             ->get(['id', 'name', 'is_default']);
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $categories
-            ],
-            200
-        );
+        return create_response(null, $categories);
     }
 }

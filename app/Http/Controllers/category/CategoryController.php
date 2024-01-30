@@ -34,13 +34,7 @@ class CategoryController extends Controller
             ->with(['CategoryActionHistory', 'CategoryActionHistory.Author:id,name,image_uri'])
             ->get(['id', 'name', 'group', 'description', 'saving', 'loan', 'status', 'is_default', 'creator_id', 'created_at', 'updated_at']);
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $categories
-            ],
-            200
-        );
+        return create_response(null, $categories);
     }
 
     /**
@@ -61,13 +55,7 @@ class CategoryController extends Controller
         );
 
         CategoryConfig::create(['category_id' => $category->id]);
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.category.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.category.successful'));
     }
 
     /**
@@ -110,13 +98,7 @@ class CategoryController extends Controller
             ]);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.category.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.category.update'));
     }
 
     /**
@@ -137,13 +119,7 @@ class CategoryController extends Controller
             ]);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.category.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.category.delete'));
     }
 
     /**
@@ -167,13 +143,7 @@ class CategoryController extends Controller
             }
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.category.status')
-            ],
-            200
-        );
+        return create_response(__('customValidations.category.status'));
     }
 
     /**
@@ -182,14 +152,7 @@ class CategoryController extends Controller
     public function get_category_groups()
     {
         $groups = Category::distinct('group')->orderBy('group', 'asc')->pluck('group');
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $groups
-            ],
-            200
-        );
+        return create_response(null, $groups);
     }
 
     /**
@@ -206,12 +169,6 @@ class CategoryController extends Controller
             })
             ->get(['id', 'name', 'group', 'is_default']);
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $categories
-            ],
-            200
-        );
+        return create_response(null, $categories);
     }
 }

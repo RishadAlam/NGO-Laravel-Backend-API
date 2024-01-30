@@ -62,13 +62,7 @@ class AccountWithdrawalController extends Controller
             ->orderBy('id', 'DESC')
             ->get();
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $withdrawals
-            ],
-            200
-        );
+        return create_response(null, $withdrawals);
     }
 
     /**
@@ -95,13 +89,7 @@ class AccountWithdrawalController extends Controller
                 ->increment('total_withdrawal', $data->amount);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.account_withdrawal.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.account_withdrawal.successful'));
     }
 
     /**
@@ -140,13 +128,7 @@ class AccountWithdrawalController extends Controller
             AccountWithdrawalActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.account_withdrawal.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.account_withdrawal.update'));
     }
 
     /**
@@ -162,12 +144,6 @@ class AccountWithdrawalController extends Controller
             AccountWithdrawalActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.account_withdrawal.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.account_withdrawal.delete'));
     }
 }

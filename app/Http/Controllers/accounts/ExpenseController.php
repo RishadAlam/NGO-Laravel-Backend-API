@@ -63,13 +63,7 @@ class ExpenseController extends Controller
             ->orderBy('id', 'DESC')
             ->get();
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $expenses
-            ],
-            200
-        );
+        return create_response(null, $expenses);
     }
 
     /**
@@ -96,13 +90,7 @@ class ExpenseController extends Controller
                 ->increment('total_withdrawal', $data->amount);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.expense.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.expense.successful'));
     }
 
     /**
@@ -145,13 +133,7 @@ class ExpenseController extends Controller
             ExpenseActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.expense.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.expense.update'));
     }
 
     /**
@@ -167,12 +149,6 @@ class ExpenseController extends Controller
             ExpenseActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.expense.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.expense.delete'));
     }
 }

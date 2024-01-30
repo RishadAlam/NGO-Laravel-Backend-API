@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\field;
 
+use App\Models\field\Field;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\field\FieldChangeStatusRequest;
+use App\Models\field\FieldActionHistory;
 use App\Http\Requests\field\FieldStoreRequest;
 use App\Http\Requests\field\FieldUpdateRequest;
-use App\Models\field\Field;
-use App\Models\field\FieldActionHistory;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\field\FieldChangeStatusRequest;
 
 class FieldController extends Controller
 {
@@ -32,13 +32,7 @@ class FieldController extends Controller
             ->with(['FieldActionHistory', 'FieldActionHistory.Author:id,name,image_uri'])
             ->get(['id', 'name', 'description', 'status', 'creator_id', 'created_at', 'updated_at']);
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $fields
-            ],
-            200
-        );
+        return create_response(null, $fields);
     }
 
     /**
@@ -55,13 +49,7 @@ class FieldController extends Controller
             ]
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.field.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.field.successful'));
     }
 
     /**
@@ -92,13 +80,7 @@ class FieldController extends Controller
             ]);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.field.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.field.update'));
     }
 
     /**
@@ -118,13 +100,7 @@ class FieldController extends Controller
             ]);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.field.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.field.delete'));
     }
 
     /**
@@ -148,13 +124,7 @@ class FieldController extends Controller
             }
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.field.status')
-            ],
-            200
-        );
+        return create_response(__('customValidations.field.status'));
     }
 
     /**
@@ -162,15 +132,7 @@ class FieldController extends Controller
      */
     public function get_active_fields()
     {
-        $fields = Field::where('status', true)
-            ->get(['id', 'name']);
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $fields
-            ],
-            200
-        );
+        $fields = Field::where('status', true)->get(['id', 'name']);
+        return create_response(null, $fields);
     }
 }

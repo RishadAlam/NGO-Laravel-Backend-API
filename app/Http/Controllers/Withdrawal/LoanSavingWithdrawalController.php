@@ -104,16 +104,16 @@ class LoanSavingWithdrawalController extends Controller
         $categoryConf = CategoryConfig::categoryID($account->category_id)
             ->first(['min_loan_saving_withdrawal', 'max_loan_saving_withdrawal']);
 
-        return response([
-            'success'   => true,
-            'data'      => [
+        return create_response(
+            null,
+            [
                 'id'        => $account->id,
                 'name'      => $account->ClientRegistration->name,
                 'balance'   => $account->balance,
                 'min'       => $categoryConf->min_loan_saving_withdrawal,
                 'max'       => $categoryConf->max_loan_saving_withdrawal
-            ],
-        ], 200);
+            ]
+        );
     }
 
     /**
@@ -202,11 +202,7 @@ class LoanSavingWithdrawalController extends Controller
     public function pending_withdrawal()
     {
         $withdrawals = LoanSavingWithdrawal::pendingWithdrawals()->get();
-
-        return response([
-            'success'   => true,
-            'data'      => $withdrawals,
-        ], 200);
+        return create_response(null, $withdrawals);
     }
 
     /**

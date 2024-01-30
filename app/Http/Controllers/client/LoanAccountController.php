@@ -110,10 +110,7 @@ class LoanAccountController extends Controller
             ->approver('id', 'name')
             ->find($id);
 
-        return response([
-            'success'   => true,
-            'data'      => $account,
-        ], 200);
+        return create_response(null, $account);
     }
 
     /**
@@ -176,10 +173,7 @@ class LoanAccountController extends Controller
     public function pending_forms()
     {
         $pending_forms = LoanAccount::fetchPendingForms()->get();
-        return response([
-            'success' => true,
-            'data' => $pending_forms,
-        ], 200);
+        return create_response(null, $pending_forms);
     }
 
     /**
@@ -191,10 +185,7 @@ class LoanAccountController extends Controller
         $year   = !empty(request('date_range')) ? Carbon::parse(request('date_range'))->year : Carbon::now()->year;
 
         $pending_loans = LoanAccount::fetchPendingLoans($month, $year)->get();
-        return response([
-            'success' => true,
-            'data' => $pending_loans,
-        ], 200);
+        return create_response(null, $pending_loans);
     }
 
     /**
@@ -293,10 +284,7 @@ class LoanAccountController extends Controller
     public function activeAccount(string $client_id)
     {
         $loan = LoanAccount::with('Guarantors')->activeLoan($client_id)->get();
-        return response([
-            'success'   => true,
-            'data'      => $loan,
-        ], 200);
+        return create_response(null, $loan);
     }
 
     /**
@@ -305,10 +293,7 @@ class LoanAccountController extends Controller
     public function pendingAccount(string $client_id)
     {
         $loan = LoanAccount::with('Guarantors')->pendingLoan($client_id)->get();
-        return response([
-            'success'   => true,
-            'data'      => $loan,
-        ], 200);
+        return create_response(null, $loan);
     }
 
     /**
@@ -317,10 +302,7 @@ class LoanAccountController extends Controller
     public function holdAccount(string $client_id)
     {
         $loan = LoanAccount::with('Guarantors')->holdLoan($client_id)->get();
-        return response([
-            'success'   => true,
-            'data'      => $loan,
-        ], 200);
+        return create_response(null, $loan);
     }
 
     /**
@@ -329,10 +311,7 @@ class LoanAccountController extends Controller
     public function closedAccount(string $client_id)
     {
         $loan = LoanAccount::with('Guarantors')->closedLoan($client_id)->get();
-        return response([
-            'success'   => true,
-            'data'      => $loan,
-        ], 200);
+        return create_response(null, $loan);
     }
 
     /**
@@ -431,37 +410,6 @@ class LoanAccountController extends Controller
 
         return $histData;
     }
-
-    // /**
-    //  * Set Saving Acc update Nominee hist
-    //  * 
-    //  * @param array $histData
-    //  * @param object $nomineeData
-    //  * @param object $nominee
-    //  * 
-    //  * @return array
-    //  */
-    // private static function set_update_guarantors_hist(&$histData, $nomineeData, $nominee)
-    // {
-    //     $nomineeData->address   = (object) $nomineeData->address;
-    //     $nominee->address       = (object) $nominee->address;
-    //     $fieldsToCompare        = ['name', 'husband_name', 'father_name', 'mother_name', 'nid', 'dob', 'occupation', 'relation', 'gender', 'primary_phone', 'secondary_phone', 'address'];
-    //     $addressFields          = ['street_address', 'city', 'word_no', 'post_office', 'police_station', 'district', 'division'];
-
-    //     foreach ($fieldsToCompare as $field) {
-    //         if ($field === 'address') {
-    //             foreach ($addressFields as $subField) {
-    //                 $clientValue    = $nominee->{$field}->{$subField} ?? '';
-    //                 $dataValue      = $nomineeData->{$field}->{$subField} ?? '';
-    //                 !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
-    //             }
-    //         } else {
-    //             $clientValue    = $nominee->{$field} ?? '';
-    //             $dataValue      = $nomineeData->{$field} ?? '';
-    //             !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
-    //         }
-    //     }
-    // }
 
     /**
      * Update Files

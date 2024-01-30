@@ -56,13 +56,7 @@ class UserController extends Controller
             ];
         }
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $responseData
-            ],
-            200
-        );
+        return create_response(null, $responseData);
     }
 
     /**
@@ -110,13 +104,7 @@ class UserController extends Controller
             }
         );
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.staff.status')
-            ],
-            200
-        );
+        return create_response(__('customValidations.staff.status'));
     }
 
     /**
@@ -133,13 +121,8 @@ class UserController extends Controller
                 'group_name'    => $permission->group_name
             ];
         }
-        return response(
-            [
-                'success'   => true,
-                'data'      => $permissions
-            ],
-            200
-        );
+
+        return create_response(null, $permissions);
     }
 
     /**
@@ -216,13 +199,7 @@ class UserController extends Controller
             ]);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.staff.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.staff.delete'));
     }
 
     /**
@@ -230,18 +207,7 @@ class UserController extends Controller
      */
     public function get_active_users()
     {
-        $users = User::where('status', true)
-            // ->when(!Auth::user()->can('saving_acc_creator_selection'), function ($query) {
-            //     $query->whereId(auth()->user()->id);
-            // })
-            ->get(['id', 'name']);
-
-        return response(
-            [
-                'success'   => true,
-                'data'      => $users
-            ],
-            200
-        );
+        $users = User::where('status', true)->get(['id', 'name']);
+        return create_response(null, $users);
     }
 }

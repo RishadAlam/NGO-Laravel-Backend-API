@@ -32,16 +32,13 @@ class PermissionController extends Controller
         $userPermissions = User::find($id)
             ->getPermissionNames();
 
-        return response(
+        return create_response(
+            null,
             [
-                'success'   => true,
-                'data'      => [
-                    'allGroups'         => $allGroups,
-                    'allPermissions'    => $allPermissions,
-                    'userPermissions'   => $userPermissions
-                ]
-            ],
-            200
+                'allGroups'         => $allGroups,
+                'allPermissions'    => $allPermissions,
+                'userPermissions'   => $userPermissions
+            ]
         );
     }
 
@@ -51,12 +48,6 @@ class PermissionController extends Controller
     public function update(Request $request, string $id)
     {
         User::find($id)->syncPermissions($request->permissions);
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.permission.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.permission.update'));
     }
 }

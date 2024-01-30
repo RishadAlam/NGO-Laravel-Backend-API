@@ -63,13 +63,7 @@ class IncomeController extends Controller
             ->orderBy('id', 'DESC')
             ->get();
 
-        return response(
-            [
-                'success'   => true,
-                'data'      => $incomes
-            ],
-            200
-        );
+        return create_response(null, $incomes);
     }
 
     /**
@@ -95,13 +89,7 @@ class IncomeController extends Controller
                 ->increment('total_deposit', $data->amount);
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.income.successful'),
-            ],
-            200
-        );
+        return create_response(__('customValidations.income.successful'));
     }
 
     /**
@@ -143,13 +131,7 @@ class IncomeController extends Controller
             IncomeActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.income.update')
-            ],
-            200
-        );
+        return create_response(__('customValidations.income.update'));
     }
 
     /**
@@ -165,12 +147,6 @@ class IncomeController extends Controller
             IncomeActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
-        return response(
-            [
-                'success'   => true,
-                'message'   => __('customValidations.income.delete')
-            ],
-            200
-        );
+        return create_response(__('customValidations.income.delete'));
     }
 }

@@ -118,13 +118,8 @@ class LoanCollectionController extends Controller
      */
     public function regularCategoryReport()
     {
-        $categoryReport = Category::categoryLoanReport()
-            ->get(['id', 'name', 'is_default']);
-
-        return response([
-            'success'   => true,
-            'data'      => $categoryReport
-        ], 200);
+        $categoryReport = Category::categoryLoanReport()->get(['id', 'name', 'is_default']);
+        return create_response(null, $categoryReport);
     }
 
     /**
@@ -132,13 +127,8 @@ class LoanCollectionController extends Controller
      */
     public function pendingCategoryReport()
     {
-        $categoryReport = Category::categoryLoanReport(false)
-            ->get(['id', 'name', 'is_default']);
-
-        return response([
-            'success'   => true,
-            'data'      => $categoryReport
-        ], 200);
+        $categoryReport = Category::categoryLoanReport(false)->get(['id', 'name', 'is_default']);
+        return create_response(null, $categoryReport);
     }
 
     /**
@@ -176,11 +166,7 @@ class LoanCollectionController extends Controller
     public function regularFieldReport($category_id)
     {
         $fieldReport = Field::fieldLoanReport($category_id)->get(['id', 'name']);
-
-        return response([
-            'success'   => true,
-            'data'      => $fieldReport
-        ], 200);
+        return create_response(null, $fieldReport);
     }
 
     /**
@@ -189,11 +175,7 @@ class LoanCollectionController extends Controller
     public function pendingFieldReport($category_id)
     {
         $fieldReport = Field::fieldLoanReport($category_id, false)->get(['id', 'name']);
-
-        return response([
-            'success'   => true,
-            'data'      => $fieldReport
-        ], 200);
+        return create_response(null, $fieldReport);
     }
 
     /**
@@ -202,11 +184,7 @@ class LoanCollectionController extends Controller
     public function regularCollectionSheet($category_id, $field_id)
     {
         $collections = Center::loanCollectionSheet($category_id, $field_id, request('user_id'))->get(['id', 'name']);
-
-        return response([
-            'success'   => true,
-            'data'      => $collections
-        ], 200);
+        return create_response(null, $collections);
     }
 
     /**
@@ -220,13 +198,9 @@ class LoanCollectionController extends Controller
             request('user_id'),
             false,
             request('date') ? Carbon::parse(request('date'))->format('y-m-d') : Carbon::yesterday()->format('y-m-d')
-        )
-            ->get(['id', 'name']);
+        )->get(['id', 'name']);
 
-        return response([
-            'success'   => true,
-            'data'      => $collections
-        ], 200);
+        return create_response(null, $collections);
     }
 
     /**
