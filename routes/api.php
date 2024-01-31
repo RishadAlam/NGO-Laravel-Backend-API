@@ -139,6 +139,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('loan/guarantor/occupations', [LoanAccountController::class, 'get_guarantor_occupations'])->name('loan.occupations');
         Route::GET('loan/guarantor/relations', [LoanAccountController::class, 'get_guarantor_relations'])->name('loan.relations');
         Route::GET('saving/short-summery/{id}', [SavingAccountController::class, 'get_short_summery'])->name('saving.short_summery');
+        Route::GET('loan/short-summery/{id}', [LoanAccountController::class, 'get_short_summery'])->name('loan.short_summery');
     });
 
     // Accounts Additional Routes

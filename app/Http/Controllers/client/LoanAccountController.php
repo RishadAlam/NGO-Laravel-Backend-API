@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
+use App\Models\client\LoanAccountCheck;
 use App\Models\accounts\ExpenseCategory;
 use App\Models\client\LoanAccountActionHistory;
 use App\Http\Requests\client\LoanApprovalRequest;
@@ -186,6 +187,44 @@ class LoanAccountController extends Controller
 
         $pending_loans = LoanAccount::fetchPendingLoans($month, $year)->get();
         return create_response(null, $pending_loans);
+    }
+
+    /**
+     * Account short Summery
+     */
+    public function get_short_summery(string $id)
+    {
+        $account = LoanAccount::withTrashed()->find($id, ['loan_given', 'payable_installment', 'total_payable_interest', 'total_rec_installment', 'total_withdrawn', 'balance', 'total_loan_rec', 'total_loan_remaining', 'total_interest_rec', 'total_interest_remaining']);
+        $check = LoanAccountCheck::where('loan_account_id', $id)->orderBy('created_at', 'DESC')->first(['created_at', 'next_check_in_at']);
+
+        $installment        = $account->total_rec_installment;
+        $total_withdraw     = $account->total_withdrawn;
+        $balance            = $account->balance;
+        $loan_recovered     = $account->total_loan_rec;
+        $loan_remaining     = $account->total_loan_remaining;
+        $interest_recovered = $account->total_interest_rec;
+        $interest_remaining = $account->total_interest_remaining;
+        $total_recovered    = $loan_recovered + $interest_recovered;
+        $total_remaining    = $loan_remaining + $interest_remaining;
+        $total              = $account->loan_given + $account->total_payable_interest;
+
+
+        return create_response(null, [
+            "installment"               => "{$installment}/{$account->payable_installment}",
+            "total_withdraw"            => $total_withdraw,
+            "balance"                   => $balance,
+            "loan_given"                => $account->loan_given,
+            "loan_recovered"            => $loan_recovered,
+            "loan_remaining"            => $loan_remaining,
+            "total_payable_interest"    => $account->total_payable_interest,
+            "interest_recovered"        => $interest_recovered,
+            "interest_remaining"        => $interest_remaining,
+            "total_payable"             => $total,
+            "total_recovered"           => $total_recovered,
+            "total_remaining"           => $total_remaining,
+            "last_check"                => $check->created_at ?? null,
+            "next_check"                => $check->next_check_in_at ?? null,
+        ]);
     }
 
     /**
