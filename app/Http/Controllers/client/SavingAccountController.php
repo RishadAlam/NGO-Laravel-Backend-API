@@ -16,6 +16,7 @@ use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
+use App\Models\client\SavingAccountCheck;
 use Illuminate\Support\Facades\Validator;
 use App\Models\client\SavingAccountActionHistory;
 use App\Http\Requests\client\SavingAccountStoreRequest;
@@ -48,7 +49,8 @@ class SavingAccountController extends Controller
      */
     public function show(string $id)
     {
-        $saving = SavingAccount::approve()
+        $saving = SavingAccount::withTrashed()
+            ->approve()
             ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
             ->field('id', 'name',)
             ->center('id', 'name',)
@@ -170,6 +172,23 @@ class SavingAccountController extends Controller
     {
         $pending_forms = SavingAccount::fetchPendingForms()->get();
         return create_response(null, $pending_forms);
+    }
+
+    /**
+     * Account short Summery
+     */
+    public function get_short_summery(string $id)
+    {
+        $account = SavingAccount::withTrashed()->find($id, ['total_installment', 'total_withdrawn', 'balance']);
+        $check = SavingAccountCheck::where('saving_account_id', $id)->orderBy('created_at', 'DESC')->first(['created_at', 'next_check_in_at']);
+
+        return create_response(null, [
+            "installment"       => $account->total_installment ?? 0,
+            "total_withdraw"    => $account->total_withdrawn ?? 0,
+            "balance"           => $account->balance ?? 0,
+            "last_check"        => $check->created_at ?? null,
+            "next_check"        => $check->next_check_in_at ?? null,
+        ]);
     }
 
     /**

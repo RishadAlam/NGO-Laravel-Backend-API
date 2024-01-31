@@ -130,7 +130,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('categories/active', [CategoryController::class, 'get_active_Categories']);
     Route::GET('categories/groups', [CategoryController::class, 'get_category_groups']);
 
-    // Registration form additional routes
+    // Client additional routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
         Route::GET('count-accounts/{id}', [ClientRegistrationController::class, 'countAccounts'])->name('count_accounts');
         Route::GET('occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('occupations');
@@ -138,6 +138,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('saving/nominee/relations', [SavingAccountController::class, 'get_nominee_relations'])->name('saving.relations');
         Route::GET('loan/guarantor/occupations', [LoanAccountController::class, 'get_guarantor_occupations'])->name('loan.occupations');
         Route::GET('loan/guarantor/relations', [LoanAccountController::class, 'get_guarantor_relations'])->name('loan.relations');
+        Route::GET('saving/short-summery/{id}', [SavingAccountController::class, 'get_short_summery'])->name('saving.short_summery');
     });
 
     // Accounts Additional Routes
