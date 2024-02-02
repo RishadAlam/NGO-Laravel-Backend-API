@@ -86,6 +86,8 @@ class Center extends Model
             ->with(
                 [
                     'SavingAccount' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date) {
+                        $query->approve();
+                        $query->active();
                         $query->select(
                             'id',
                             'field_id',
@@ -135,6 +137,8 @@ class Center extends Model
             ->with(
                 [
                     'LoanAccount' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date) {
+                        $query->approve();
+                        $query->active();
                         $query->select(
                             'id',
                             'field_id',
