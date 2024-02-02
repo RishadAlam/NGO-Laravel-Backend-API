@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE'],
 
-    'allowed_origins' => ['http://localhost:5173', 'jonokollan.com', '*.jonokollan.com'],
+    'allowed_origins' => ['http://localhost:5173', 'https://jonokollan.com/', '*.jonokollan.com'],
 
     'allowed_origins_patterns' => [],
 
