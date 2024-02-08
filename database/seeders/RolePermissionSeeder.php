@@ -280,6 +280,7 @@ class RolePermissionSeeder extends Seeder
                     'staff_permission_update',
                     'staff_registration',
                     'staff_data_update',
+                    'staff_status_update',
                     'staff_soft_delete',
                     'staff_action_history',
                     'staff_reset_password',
