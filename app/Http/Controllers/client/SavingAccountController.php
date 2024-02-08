@@ -330,7 +330,7 @@ class SavingAccountController extends Controller
             $map += ['acc_no' => $acc_no, 'client_registration_id' => $client_registration_id];
         }
         if (isset($is_approved)) {
-            $$map += ['is_approved' => $is_approved, 'approved_by' => auth()->id()];
+            $map += ['is_approved' => $is_approved, 'approved_by' => auth()->id()];
         }
         if (isset($creator_id)) {
             $map['creator_id'] = $creator_id ?? auth()->id();

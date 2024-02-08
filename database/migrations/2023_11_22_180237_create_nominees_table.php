@@ -25,8 +25,8 @@ return new class extends Migration
             $table->enum('gender', ['male', 'female', 'others']);
             $table->string('primary_phone', 20)->nullable();
             $table->string('secondary_phone', 20)->nullable();
-            $table->string('image');
-            $table->string('image_uri');
+            $table->string('image')->nullable();
+            $table->string('image_uri')->nullable();
             $table->string('signature')->nullable();
             $table->string('signature_uri')->nullable();
             $table->json('address');

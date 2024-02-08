@@ -60,10 +60,10 @@ class Helper
         if (isset($foreignIdKey, $id)) {
             $map += [$foreignIdKey => $id];
         }
-        if (isset($image, $image_uri)) {
+        if (!empty($image) || !empty($image_uri)) {
             $map += ['image' => $image, 'image_uri' => $image_uri];
         }
-        if (isset($signature, $signature_uri)) {
+        if (!empty($signature) || !empty($signature_uri)) {
             $map += ['signature' => $signature, 'signature_uri' => $signature_uri];
         }
 
@@ -167,6 +167,11 @@ class Helper
     public static function storeSignature($signature, $prefix, $folder)
     {
         $folder_path    = public_path() . "/storage/{$folder}/";
+
+        if (!file_exists($folder_path)) {
+            mkdir($folder_path, 0777, true);
+        }
+
         $image_parts    = explode(";base64,", $signature);
         $image_type_aux = explode("image/", $image_parts[0]);
         $image_type     = $image_type_aux[1];
