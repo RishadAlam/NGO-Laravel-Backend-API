@@ -24,6 +24,7 @@ class UserController extends Controller
         $this->middleware('can:staff_permissions_view')->only('get_user_permissions');
         $this->middleware('can:staff_registration')->only('store');
         $this->middleware('can:staff_data_update')->only('update');
+        $this->middleware('can:staff_status_update')->only('change_status');
         $this->middleware('can:staff_soft_delete')->only('destroy');
     }
 
