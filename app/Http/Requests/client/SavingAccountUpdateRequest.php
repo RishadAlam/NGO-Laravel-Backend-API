@@ -74,7 +74,7 @@ class SavingAccountUpdateRequest extends FormRequest
             'nominees.*.signature'              => 'sometimes',
             'nominees.*.address.street_address' => 'required',
             'nominees.*.address.city'           => 'required',
-            'nominees.*.address.word_no'        => 'sometimes|nullable|numeric',
+            'nominees.*.address.word_no'        => 'sometimes|nullable',
             'nominees.*.address.post_office'    => 'required',
             'nominees.*.address.police_station' => 'required',
             'nominees.*.address.district'       => 'required',

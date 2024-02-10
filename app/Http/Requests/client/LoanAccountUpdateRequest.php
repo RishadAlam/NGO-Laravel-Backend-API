@@ -77,7 +77,7 @@ class LoanAccountUpdateRequest extends FormRequest
             'guarantors.*.signature'                => 'sometimes',
             'guarantors.*.address.street_address'   => 'required',
             'guarantors.*.address.city'             => 'required',
-            'guarantors.*.address.word_no'          => 'sometimes|nullable|numeric',
+            'guarantors.*.address.word_no'          => 'sometimes|nullable',
             'guarantors.*.address.post_office'      => 'required',
             'guarantors.*.address.police_station'   => 'required',
             'guarantors.*.address.district'         => 'required',
