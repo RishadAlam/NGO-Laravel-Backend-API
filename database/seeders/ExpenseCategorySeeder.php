@@ -62,6 +62,6 @@ class ExpenseCategorySeeder extends Seeder
         ];
 
         ExpenseCategory::insert($categories);
-        ExpenseCategory::factory(5)->create();
+        // ExpenseCategory::factory(5)->create();
     }
 }

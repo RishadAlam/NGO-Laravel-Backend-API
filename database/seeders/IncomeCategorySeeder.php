@@ -42,6 +42,6 @@ class IncomeCategorySeeder extends Seeder
         ];
 
         IncomeCategory::insert($categories);
-        IncomeCategory::factory(5)->create();
+        // IncomeCategory::factory(5)->create();
     }
 }

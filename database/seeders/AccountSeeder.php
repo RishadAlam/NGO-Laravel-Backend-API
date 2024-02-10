@@ -19,6 +19,6 @@ class AccountSeeder extends Seeder
             'creator_id'    => auth()->id()
         ]);
 
-        Account::factory(5)->create();
+        // Account::factory(5)->create();
     }
 }

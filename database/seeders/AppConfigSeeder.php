@@ -20,8 +20,8 @@ class AppConfigSeeder extends Seeder
                     "company_name"          => "Jonokollan kormojibi co-oparetive society ltd",
                     "company_short_name"    => "Jonokollan",
                     "company_address"       => "",
-                    "company_logo"          => "logo_1695993860.png",
-                    "company_logo_uri"      => "http:\/\/127.0.0.1:8000\/storage\/config\/logo_1699030624.png",
+                    "company_logo"          => null,
+                    "company_logo_uri"      => null,
                 ])
             ],
             // [
@@ -34,34 +34,34 @@ class AppConfigSeeder extends Seeder
             // ],
             [
                 "meta_key"      => "saving_collection_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "loan_collection_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "money_exchange_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "money_withdrawal_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "client_registration_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "saving_account_registration_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "saving_account_closing_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "loan_account_registration_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "loan_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "loan_account_closing_approval",
-                "meta_value"    => json_encode(true)
+                "meta_value"    => json_encode(false)
             ], [
                 "meta_key"      => "client_reg_sign_is_required",
                 "meta_value"    => json_encode(true)
