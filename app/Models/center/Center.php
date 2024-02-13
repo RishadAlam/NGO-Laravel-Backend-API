@@ -148,7 +148,8 @@ class Center extends Model
                             'acc_no',
                             'payable_deposit',
                             'loan_installment',
-                            'interest_installment'
+                            'interest_installment',
+                            'is_loan_approved'
                         );
                         $query->fieldID($field_id);
                         $query->categoryID($category_id);
