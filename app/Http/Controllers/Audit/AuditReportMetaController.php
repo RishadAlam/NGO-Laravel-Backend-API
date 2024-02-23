@@ -15,6 +15,18 @@ use App\Http\Requests\Audit\AuditReportMetaUpdateRequest;
 class AuditReportMetaController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:audit_report_meta_list_view')->only('index');
+        $this->middleware('can:audit_report_meta_create')->only('store');
+        $this->middleware('can:audit_report_meta_update')->only('update');
+        $this->middleware('can:audit_report_meta_soft_delete')->only('destroy');
+        $this->middleware('can:audit_report_meta_permanently_delete')->only('permanent_delete');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()

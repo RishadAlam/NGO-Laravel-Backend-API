@@ -305,7 +305,19 @@ class RolePermissionSeeder extends Seeder
                     'approvals_config',
                     'categories_config'
                 ]
-            ]
+            ],
+            // Audit Report Meta
+            [
+                'groupName'     => 'audit_report_meta',
+                'permissions'   => [
+                    'audit_report_meta_list_view',
+                    'audit_report_meta_create',
+                    'audit_report_meta_update',
+                    'audit_report_meta_soft_delete',
+                    'audit_report_meta_action_history',
+                    'audit_report_meta_permanently_delete',
+                ]
+            ],
         ];
 
         /**
