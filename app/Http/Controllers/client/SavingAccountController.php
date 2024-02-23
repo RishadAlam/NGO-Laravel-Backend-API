@@ -228,7 +228,13 @@ class SavingAccountController extends Controller
                     ->increment('total_deposit', $categoryConfig->saving_acc_reg_fee);
             }
 
-            $savingAccount->update(['is_approved' => true, 'approved_by' => auth()->id()]);
+            $savingAccount->update(
+                [
+                    'is_approved' => true,
+                    'approved_by' => auth()->id(),
+                    'approved_at' => Carbon::now('Asia/Dhaka')
+                ]
+            );
         });
 
         return create_response(__('customValidations.client.saving.approved'));

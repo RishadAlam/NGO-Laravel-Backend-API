@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('client_registration_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
+            $table->foreignId('loan_approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
             $table->string('acc_no', 50);
             $table->date('start_date');
             $table->date('duration_date');

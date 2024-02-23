@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\client;
 
+use Carbon\Carbon;
 use App\Helpers\Helper;
 use App\Models\AppConfig;
 use App\Models\client\LoanAccount;
@@ -210,7 +211,13 @@ class ClientRegistrationController extends Controller
      */
     public function approved(string $id)
     {
-        ClientRegistration::find($id)->update(['is_approved' => true, 'approved_by' => auth()->id()]);
+        ClientRegistration::find($id)->update(
+            [
+                'is_approved' => true,
+                'approved_by' => auth()->id(),
+                'approved_at' => Carbon::now('Asia/Dhaka')
+            ]
+        );
         return create_response(__('customValidations.client.registration.approved'));
     }
 

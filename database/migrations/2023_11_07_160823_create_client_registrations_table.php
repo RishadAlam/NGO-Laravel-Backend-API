@@ -40,6 +40,7 @@ return new class extends Migration
             $table->json('present_address');
             $table->json('permanent_address');
             $table->boolean('is_approved')->default(false);
+            $table->timestamp('approved_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

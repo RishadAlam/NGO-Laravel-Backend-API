@@ -265,7 +265,13 @@ class LoanAccountController extends Controller
                     ->increment('total_deposit', $categoryConfig->loan_acc_reg_fee);
             }
 
-            $LoanAccount->update(['is_approved' => true]);
+            $LoanAccount->update(
+                [
+                    'is_approved' => true,
+                    'approved_by' => auth()->id(),
+                    'approved_at' => Carbon::now('Asia/Dhaka')
+                ]
+            );
         });
 
         return create_response(__('customValidations.client.loan.approved'));
@@ -311,7 +317,13 @@ class LoanAccountController extends Controller
                 $account->increment('total_withdrawal', $LoanAccount->loan_given);
             }
 
-            $LoanAccount->update(['is_loan_approved' => true, 'approved_by' => auth()->id()]);
+            $LoanAccount->update(
+                [
+                    'is_loan_approved'      => true,
+                    'loan_approved_by'      => auth()->id(),
+                    'is_loan_approved_at'   => Carbon::now('Asia/Dhaka')
+                ]
+            );
         });
 
         return create_response(__('customValidations.client.loan.approved'));
