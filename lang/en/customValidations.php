@@ -501,4 +501,23 @@ return [
             'not_found'         => 'withdrawal not found!'
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Audit Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'audit' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Report meta key Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'meta' => [
+            'successful'        => 'The meta key has been successfully created.',
+            'update'            => 'The meta key has been successfully updated.',
+            'delete'            => 'The meta key has been successfully deleted.',
+            'p_delete'          => 'The meta key has been permanently deleted.',
+        ],
+    ],
 ];

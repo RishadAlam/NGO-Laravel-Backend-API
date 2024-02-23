@@ -17,6 +17,7 @@ use App\Http\Controllers\category\CategoryController;
 use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\client\LoanAccountController;
 use App\Http\Controllers\client\SavingAccountController;
+use App\Http\Controllers\Audit\AuditReportMetaController;
 use App\Http\Controllers\config\CategoryConfigController;
 use App\Http\Controllers\accounts\IncomeCategoryController;
 use App\Http\Controllers\accounts\AccountTransferController;
@@ -335,6 +336,11 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
             Route::apiResource('/', ExpenseController::class)->except('show')->parameter('', 'expense');
             Route::apiResource('categories', ExpenseCategoryController::class)->except('show');
         });
+    });
+
+    // Audit Routes
+    Route::prefix('audit')->name('audit.')->group(function () {
+        Route::apiResource('meta', AuditReportMetaController::class)->except('show');
     });
 
     /*

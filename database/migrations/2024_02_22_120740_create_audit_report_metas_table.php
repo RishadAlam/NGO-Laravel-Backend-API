@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('column_no');
             $table->boolean('is_default')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
