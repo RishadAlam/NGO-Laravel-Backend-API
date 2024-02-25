@@ -32,7 +32,10 @@ class AuditReportMetaController extends Controller
      */
     public function index()
     {
-        $meta_keys = AuditReportMeta::with('Author:id,name')->get();
+        $meta_keys = AuditReportMeta::with('Author:id,name')
+            ->with(['AuditReportMetaActionHistory', 'AuditReportMetaActionHistory.Author:id,name,image_uri'])
+            ->get();
+
         return create_response(null, $meta_keys);
     }
 
