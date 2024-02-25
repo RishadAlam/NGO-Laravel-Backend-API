@@ -22,9 +22,10 @@ class AuditReportMetaUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'meta_key'  => 'required',
-            'page_no'   => 'required|integer',
-            'column_no' => 'required|integer',
+            'meta_key'      => 'required',
+            'meta_value'    => 'sometimes|nullable',
+            'page_no'       => 'required|integer',
+            'column_no'     => 'required|integer',
         ];
     }
 }

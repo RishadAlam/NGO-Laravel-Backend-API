@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->string('meta_key');
+            $table->string('meta_value')->nullable();
             $table->integer('page_no');
             $table->integer('column_no');
             $table->boolean('is_default')->default(false);

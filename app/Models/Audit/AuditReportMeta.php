@@ -17,6 +17,7 @@ class AuditReportMeta extends Model
      */
     protected $fillable = [
         'meta_key',
+        'meta_value',
         'page_no',
         'column_no',
         'creator_id'

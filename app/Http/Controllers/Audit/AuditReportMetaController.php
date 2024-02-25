@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Audit;
 
 use App\Helpers\Helper;
 use Illuminate\Http\Request;
+use Ramsey\Uuid\Type\Integer;
 use PhpParser\Node\Stmt\Static_;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -41,7 +42,7 @@ class AuditReportMetaController extends Controller
     public function store(AuditReportMetaStoreRequest $request)
     {
         $data = (object) $request->validated();
-        AuditReportMeta::create(Self::setFieldMap($data));
+        AuditReportMeta::create(Self::setFieldMap($data, true));
 
         return create_response(__('customValidations.audit.meta.successful'));
     }
@@ -55,9 +56,10 @@ class AuditReportMetaController extends Controller
         $meta       = AuditReportMeta::find($id);
         $histData   = [];
 
-        $meta->meta_key     !== $data->meta_key ? $histData['meta_key'] = "<p class='text-danger'>{$meta->meta_key}</p><p class='text-success'>{$data->meta_key}</p>" : '';
-        $meta->page_no      !== $data->page_no ? $histData['page_no'] = "<p class='text-danger'>{$meta->page_no}</p><p class='text-success'>{$data->page_no}</p>" : '';
-        $meta->column_no    !== $data->column_no ? $histData['column_no'] = "<p class='text-danger'>{$meta->column_no}</p><p class='text-success'>{$data->column_no}</p>" : '';
+        $meta->meta_key         !== $data->meta_key ? $histData['meta_key'] = "<p class='text-danger'>{$meta->meta_key}</p><p class='text-success'>{$data->meta_key}</p>" : '';
+        $meta->meta_value       !== $data->meta_value ? $histData['meta_value'] = "<p class='text-danger'>{$meta->meta_value}</p><p class='text-success'>{$data->meta_value}</p>" : '';
+        $meta->page_no          !== $data->page_no ? $histData['page_no'] = "<p class='text-danger'>{$meta->page_no}</p><p class='text-success'>{$data->page_no}</p>" : '';
+        $meta->column_no        !== $data->column_no ? $histData['column_no'] = "<p class='text-danger'>{$meta->column_no}</p><p class='text-success'>{$data->column_no}</p>" : '';
 
         DB::transaction(function () use ($id, $data, $meta, $histData) {
             $meta->update(Self::setFieldMap($data));
@@ -83,12 +85,19 @@ class AuditReportMetaController extends Controller
     /**
      * Field Map
      */
-    private static function setFieldMap(object $data)
+    private static function setFieldMap(object $data, bool $isNew = false)
     {
-        return [
-            'meta_key'  => $data->meta_key,
-            'page_no'   => $data->page_no,
-            'column_no' => $data->column_no,
+        $map = [
+            'meta_key'      => $data->meta_key,
+            'meta_value'    => $data->meta_value,
+            'page_no'       => $data->page_no,
+            'column_no'     => $data->column_no,
         ];
+
+        if ($isNew) {
+            $map['creator_id'] = auth()->id();
+        }
+
+        return $map;
     }
 }
