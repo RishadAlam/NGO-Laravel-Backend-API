@@ -158,7 +158,7 @@ class LoanAccount extends Model
             ->Center('id', 'name')
             ->Category('id', 'name', 'is_default')
             ->Author('id', 'name')
-            ->ClientRegistration('id', 'name')
+            ->ClientRegistration('id', 'name', 'image_uri')
             ->where('is_approved', true)
             ->when(!Auth::user()->can('pending_loan_view_as_admin'), function ($query) {
                 $query->createdBy();
