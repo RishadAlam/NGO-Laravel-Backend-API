@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('audit_report_metas', function (Blueprint $table) {
+        Schema::create('audit_report_page_action_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('audit_report_page_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
-            $table->string('meta_key');
-            $table->string('meta_value')->nullable();
-            $table->integer('column_no');
-            $table->boolean('is_default')->default(false);
+            $table->foreignId('author_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
+            $table->string('name');
+            $table->string('image_uri')->nullable();
+            $table->enum('action_type', ['update', 'delete', 'restore']);
+            $table->json('action_details');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('audit_report_metas');
+        Schema::dropIfExists('audit_report_page_action_histories');
     }
 };
