@@ -78,6 +78,198 @@ class AuditReportMetaSeeder extends Seeder
                 'is_default'    => true,
                 'created_at'    => now(),
                 'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'savings_return',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'loan_given',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'printing_stationery',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'office_rent',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'electricity_bill',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'employee_salary',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'travel_cost',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'consumption',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'others_expense',
+                'page_no'       => 1,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'printing_stationery',
+                'page_no'       => 2,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'office_rent',
+                'page_no'       => 2,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'electricity_bill',
+                'page_no'       => 2,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'employee_salary',
+                'page_no'       => 2,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'travel_cost',
+                'page_no'       => 2,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'consumption',
+                'page_no'       => 2,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'others_expense',
+                'page_no'       => 2,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'collection_of_loan_interests',
+                'page_no'       => 2,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'registration_fee',
+                'page_no'       => 2,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'loan_form',
+                'page_no'       => 2,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'closing_fee',
+                'page_no'       => 2,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'reserve_fund',
+                'page_no'       => 3,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'cooperative_dev_fund',
+                'page_no'       => 3,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'undistributed_profits',
+                'page_no'       => 3,
+                'column_no'     => 1,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ], [
+                'creator_id'    => 1,
+                'meta_key'      => 'current_year_net_profits',
+                'page_no'       => 3,
+                'column_no'     => 2,
+                'is_default'    => true,
+                'created_at'    => now(),
+                'updated_at'    => now()
             ],
         ];
 
