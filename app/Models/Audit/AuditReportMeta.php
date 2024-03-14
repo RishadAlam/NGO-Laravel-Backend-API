@@ -16,9 +16,9 @@ class AuditReportMeta extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'audit_report_page_id',
         'meta_key',
         'meta_value',
-        'page_no',
         'column_no',
         'creator_id'
     ];
@@ -29,5 +29,15 @@ class AuditReportMeta extends Model
     public function AuditReportMetaActionHistory()
     {
         return $this->hasMany(AuditReportMetaActionHistory::class);
+    }
+
+    /**
+     * Relationship belongs to Audit Report Page
+     *
+     * @return response()
+     */
+    public function AuditReportPage()
+    {
+        return $this->belongsTo(AuditReportPage::class)->withTrashed();
     }
 }

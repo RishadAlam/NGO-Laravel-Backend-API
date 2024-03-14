@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Static_;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Audit\AuditReportMeta;
+use App\Models\Audit\AuditReportPage;
 use App\Models\Audit\AuditReportMetaActionHistory;
 use App\Http\Requests\Audit\AuditReportMetaStoreRequest;
 use App\Http\Requests\Audit\AuditReportMetaUpdateRequest;
@@ -32,9 +33,8 @@ class AuditReportMetaController extends Controller
      */
     public function index()
     {
-        $meta_keys = AuditReportMeta::with('Author:id,name')
-            ->with(['AuditReportMetaActionHistory', 'AuditReportMetaActionHistory.Author:id,name,image_uri'])
-            ->get();
+        $meta_keys = AuditReportPage::with(['AuditReportMeta', 'AuditReportMeta.author:id,name', 'AuditReportMeta.AuditReportMetaActionHistory'])
+            ->get(['id', 'name', 'is_default']);
 
         return create_response(null, $meta_keys);
     }
@@ -56,13 +56,13 @@ class AuditReportMetaController extends Controller
     public function update(AuditReportMetaUpdateRequest $request, string $id)
     {
         $data       = (object) $request->validated();
-        $meta       = AuditReportMeta::find($id);
+        $meta       = AuditReportMeta::with('AuditReportPage:id,name,is_default')->find($id);
         $histData   = [];
 
-        $meta->meta_key         !== $data->meta_key ? $histData['meta_key'] = "<p class='text-danger'>{$meta->meta_key}</p><p class='text-success'>{$data->meta_key}</p>" : '';
-        $meta->meta_value       !== $data->meta_value ? $histData['meta_value'] = "<p class='text-danger'>{$meta->meta_value}</p><p class='text-success'>{$data->meta_value}</p>" : '';
-        $meta->page_no          !== $data->page_no ? $histData['page_no'] = "<p class='text-danger'>{$meta->page_no}</p><p class='text-success'>{$data->page_no}</p>" : '';
-        $meta->column_no        !== $data->column_no ? $histData['column_no'] = "<p class='text-danger'>{$meta->column_no}</p><p class='text-success'>{$data->column_no}</p>" : '';
+        $meta->meta_key             !== $data->meta_key ? $histData['meta_key'] = "<p class='text-danger'>{$meta->meta_key}</p><p class='text-success'>{$data->meta_key}</p>" : '';
+        $meta->meta_value           !== $data->meta_value ? $histData['meta_value'] = "<p class='text-danger'>{$meta->meta_value}</p><p class='text-success'>{$data->meta_value}</p>" : '';
+        $meta->audit_report_page_id !== $data->audit_report_page_id ? $histData['page'] = "<p class='text-danger'>{$meta->AuditReportPage->name}</p><p class='text-success'>{$request->page['name']}</p>" : '';
+        $meta->column_no            !== $data->column_no ? $histData['column'] = "<p class='text-danger'>{$meta->column_no}</p><p class='text-success'>{$data->column_no}</p>" : '';
 
         DB::transaction(function () use ($id, $data, $meta, $histData) {
             $meta->update(Self::setFieldMap($data));
@@ -91,10 +91,10 @@ class AuditReportMetaController extends Controller
     private static function setFieldMap(object $data, bool $isNew = false)
     {
         $map = [
-            'meta_key'      => $data->meta_key,
-            'meta_value'    => $data->meta_value,
-            'page_no'       => $data->page_no,
-            'column_no'     => $data->column_no,
+            'meta_key'              => $data->meta_key,
+            'meta_value'            => $data->meta_value,
+            'column_no'             => $data->column_no,
+            'audit_report_page_id'  => $data->audit_report_page_id,
         ];
 
         if ($isNew) {

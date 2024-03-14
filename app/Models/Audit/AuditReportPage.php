@@ -27,4 +27,12 @@ class AuditReportPage extends Model
     {
         return $this->hasMany(AuditReportPageActionHistory::class);
     }
+
+    /**
+     * Relation with CenterActionHistory Table
+     */
+    public function AuditReportMeta()
+    {
+        return $this->hasMany(AuditReportMeta::class);
+    }
 }

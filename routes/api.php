@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Models\Audit\AuditReportPage;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\client\LoanAccountController;
 use App\Http\Controllers\client\SavingAccountController;
 use App\Http\Controllers\Audit\AuditReportMetaController;
+use App\Http\Controllers\Audit\AuditReportPageController;
 use App\Http\Controllers\config\CategoryConfigController;
 use App\Http\Controllers\accounts\IncomeCategoryController;
 use App\Http\Controllers\accounts\AccountTransferController;
@@ -130,6 +132,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('centers/active', [CenterController::class, 'get_active_Centers']);
     Route::GET('categories/active', [CategoryController::class, 'get_active_Categories']);
     Route::GET('categories/groups', [CategoryController::class, 'get_category_groups']);
+    Route::GET('audit/page/get-all-pages', [AuditReportPageController::class, 'get_all_pages']);
 
     // Client additional routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
@@ -212,7 +215,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::POST('loan/approved', [LoanCollectionController::class, 'approved'])->name('loan.approved');
     });
     Route::prefix('withdrawal')->group(function () {
-        // Pending Withdrawal Routes 
+        // Pending Withdrawal Routes
         Route::GET('saving/pending', [SavingWithdrawalController::class, 'pending_withdrawal']);
         Route::GET('loan-saving/pending', [LoanSavingWithdrawalController::class, 'pending_withdrawal']);
 
@@ -341,6 +344,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     // Audit Routes
     Route::prefix('audit')->name('audit.')->group(function () {
         Route::apiResource('meta', AuditReportMetaController::class)->except('show');
+        Route::apiResource('page', AuditReportPageController::class)->except('show');
     });
 
     /*
