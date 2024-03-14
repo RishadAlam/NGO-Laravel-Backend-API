@@ -57,12 +57,7 @@ class AuditReportMetaController extends Controller
     {
         $data       = (object) $request->validated();
         $meta       = AuditReportMeta::with('AuditReportPage:id,name,is_default')->find($id);
-        $histData   = [];
-
-        $meta->meta_key             !== $data->meta_key ? $histData['meta_key'] = "<p class='text-danger'>{$meta->meta_key}</p><p class='text-success'>{$data->meta_key}</p>" : '';
-        $meta->meta_value           !== $data->meta_value ? $histData['meta_value'] = "<p class='text-danger'>{$meta->meta_value}</p><p class='text-success'>{$data->meta_value}</p>" : '';
-        $meta->audit_report_page_id !== $data->audit_report_page_id ? $histData['page'] = "<p class='text-danger'>{$meta->AuditReportPage->name}</p><p class='text-success'>{$request->page['name']}</p>" : '';
-        $meta->column_no            !== $data->column_no ? $histData['column'] = "<p class='text-danger'>{$meta->column_no}</p><p class='text-success'>{$data->column_no}</p>" : '';
+        $histData   = self::setActionHistory($meta, $data, $request);
 
         DB::transaction(function () use ($id, $data, $meta, $histData) {
             $meta->update(Self::setFieldMap($data));
@@ -102,5 +97,25 @@ class AuditReportMetaController extends Controller
         }
 
         return $map;
+    }
+
+    /**
+     * Set Action History
+     */
+    private static function setActionHistory(object $meta, object $data, Request $request)
+    {
+        $histData = [];
+
+        $meta->meta_key     != $data->meta_key ? $histData['meta_key'] = "<p class='text-danger'>{$meta->meta_key}</p><p class='text-success'>{$data->meta_key}</p>" : '';
+        $meta->meta_value   != $data->meta_value ? $histData['meta_value'] = "<p class='text-danger'>{$meta->meta_value}</p><p class='text-success'>{$data->meta_value}</p>" : '';
+        $meta->column_no    != $data->column_no ? $histData['column'] = "<p class='text-danger'>{$meta->column_no}</p><p class='text-success'>{$data->column_no}</p>" : '';
+
+        if ($meta->audit_report_page_id != $data->audit_report_page_id) {
+            $oldName            = Helper::setDefaultName($meta->AuditReportPage->is_default, $meta->AuditReportPage->name, 'customValidations.audit.page.default.');
+            $newName            = Helper::setDefaultName($request->page['is_default'], $request->page['name'], 'customValidations.audit.page.default.');
+            $histData['page']   = "<p class='text-danger'>{$oldName}</p><p class='text-success'>{$newName}</p>";
+        }
+
+        return $histData;
     }
 }

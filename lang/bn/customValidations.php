@@ -502,4 +502,37 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Audit Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'audit' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Report Page Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'page' => [
+            'default' => [
+                "deposit_expenditure"   => "জমা-খরচ হিসাব",
+                "profit_loss"           => "লাভ-ক্ষতি হিসাব",
+                "net_profit"            => "নিট লাভ-ক্ষতি হিসাব",
+                "surplus_value"         => "উদ্বৃত্তপত্র"
+            ]
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Report meta key Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'meta' => [
+            'successful'        => 'The meta key has been successfully created.',
+            'update'            => 'The meta key has been successfully updated.',
+            'delete'            => 'The meta key has been successfully deleted.',
+            'p_delete'          => 'The meta key has been permanently deleted.',
+        ],
+    ],
+
 ];

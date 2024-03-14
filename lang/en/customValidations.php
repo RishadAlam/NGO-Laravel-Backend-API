@@ -510,6 +510,20 @@ return [
     'audit' => [
         /*
         |--------------------------------------------------------------------------
+        | Report Page Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'page' => [
+            'default' => [
+                "deposit_expenditure"   => "Deposit Expenditure",
+                "profit_loss"           => "Profit Loss",
+                "net_profit"            => "Net Profit Loss",
+                "surplus_value"         => "Surplus Value"
+            ]
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Report meta key Custom Message
         |--------------------------------------------------------------------------
         */

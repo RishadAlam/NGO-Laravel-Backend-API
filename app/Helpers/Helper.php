@@ -8,7 +8,7 @@ class Helper
 {
     /**
      * Create Action History
-     * 
+     *
      * @param string $foreignIdKey
      * @param integer $foreignId
      * @param string $action
@@ -29,7 +29,7 @@ class Helper
 
     /**
      * Set Nominee/Guarantor Field Map
-     * 
+     *
      * @param object $data
      * @param string $foreignIdKey
      * @param integer $id
@@ -72,11 +72,11 @@ class Helper
 
     /**
      * Set Saving & loan Acc update Nominee/Guarantor hist
-     * 
+     *
      * @param array $histData
      * @param object $nomineeData
      * @param object $nominee
-     * 
+     *
      * @return array
      */
     public static function set_update_nomiguarantor_hist(&$histData, $nomineeData, $nominee)
@@ -137,11 +137,11 @@ class Helper
 
     /**
      * Store Image
-     * 
+     *
      * @param object $image
      * @param string $prefix
      * @param string $folder
-     * @return object 
+     * @return object
      */
     public static function storeImage($image, $prefix, $folder)
     {
@@ -158,11 +158,11 @@ class Helper
 
     /**
      * Store Signature
-     * 
+     *
      * @param string $signature
      * @param string $prefix
      * @param string $folder
-     * @return object 
+     * @return object
      */
     public static function storeSignature($signature, $prefix, $folder)
     {
@@ -188,9 +188,9 @@ class Helper
 
     /**
      * Store Signature
-     * 
+     *
      * @param string $$path
-     * @return void 
+     * @return void
      */
     public static function unlinkImage($path = null)
     {
@@ -201,7 +201,7 @@ class Helper
 
     /**
      * Store Signature
-     * 
+     *
      * @param mixed $value1
      * @param mixed $value2
      * @param boolean $strict
@@ -218,10 +218,10 @@ class Helper
 
     /**
      * Translate Numbers
-     * 
+     *
      * @param string $numbers
      * @param bool $en
-     * 
+     *
      * @return string
      */
     public static function tsNumbers($numbers, $en = false)
@@ -260,5 +260,19 @@ class Helper
             : preg_replace_callback('/[1234567890$]/u', function ($matches) use ($en_to_bn) {
                 return $en_to_bn[$matches[0]] ?? $matches[0];
             }, $numbers);
+    }
+
+    /**
+     * Set default Name
+     *
+     * @param bool $isDefault
+     * @param string $name
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function setDefaultName(bool $isDefault, string $name, string $path)
+    {
+        return $isDefault ? __("{$path}{$name}") : $name;
     }
 }
