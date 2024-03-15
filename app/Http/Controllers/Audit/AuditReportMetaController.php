@@ -45,7 +45,7 @@ class AuditReportMetaController extends Controller
     public function store(AuditReportMetaStoreRequest $request)
     {
         $data = (object) $request->validated();
-        AuditReportMeta::create(Self::setFieldMap($data, true));
+        AuditReportMeta::create(Self::setFieldMap($data));
 
         return create_response(__('customValidations.audit.meta.successful'));
     }
@@ -60,7 +60,7 @@ class AuditReportMetaController extends Controller
         $histData   = self::setActionHistory($meta, $data, $request);
 
         DB::transaction(function () use ($id, $data, $meta, $histData) {
-            $meta->update(Self::setFieldMap($data));
+            $meta->update(Self::setFieldMap($data, $meta->is_default, false));
             AuditReportMetaActionHistory::create(Helper::setActionHistory('audit_report_meta_id', $id, 'update', $histData));
         });
 
@@ -83,15 +83,19 @@ class AuditReportMetaController extends Controller
     /**
      * Field Map
      */
-    private static function setFieldMap(object $data, bool $isNew = false)
+    private static function setFieldMap(object $data, bool $isDefault = false, bool $isNew = true)
     {
         $map = [
-            'meta_key'              => $data->meta_key,
             'meta_value'            => $data->meta_value,
-            'column_no'             => $data->column_no,
-            'audit_report_page_id'  => $data->audit_report_page_id,
         ];
 
+        if (!$isDefault) {
+            $map += [
+                'meta_key'              => $data->meta_key,
+                'column_no'             => $data->column_no,
+                'audit_report_page_id'  => $data->audit_report_page_id,
+            ];
+        }
         if ($isNew) {
             $map['creator_id'] = auth()->id();
         }
