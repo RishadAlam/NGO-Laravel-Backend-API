@@ -72,6 +72,9 @@ class AppConfigSeeder extends Seeder
                 "meta_key"      => "guarantor_reg_sign_is_required",
                 "meta_value"    => json_encode(true)
             ], [
+                "meta_key"      => "client_reg_fee",
+                "meta_value"    => 0
+            ], [
                 "meta_key"      => "money_transfer_transaction",
                 "meta_value"    => json_encode([
                     "saving_to_saving"              => [

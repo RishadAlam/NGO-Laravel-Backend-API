@@ -21,7 +21,7 @@ class AppConfig extends Model
      */
     public function setMetaValueAttribute($value)
     {
-        $this->attributes['meta_value'] = json_encode($value);
+        $this->attributes['meta_value'] = json_encode($value ?? 0);
     }
 
     /**

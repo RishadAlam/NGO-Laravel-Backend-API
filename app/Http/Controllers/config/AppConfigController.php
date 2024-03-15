@@ -53,7 +53,8 @@ class AppConfigController extends Controller
             'money_transfer_transaction',
             'client_reg_sign_is_required',
             'nominee_reg_sign_is_required',
-            'guarantor_reg_sign_is_required'
+            'guarantor_reg_sign_is_required',
+            'client_reg_fee'
         ])->get(['id', 'meta_key', 'meta_value']);
 
         return create_response(null, $appSettings);
