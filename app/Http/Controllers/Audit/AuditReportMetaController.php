@@ -110,9 +110,9 @@ class AuditReportMetaController extends Controller
     {
         $histData = [];
 
-        $meta->meta_key     != $data->meta_key ? $histData['meta_key'] = "<p class='text-danger'>{$meta->meta_key}</p><p class='text-success'>{$data->meta_key}</p>" : '';
-        $meta->meta_value   != $data->meta_value ? $histData['meta_value'] = "<p class='text-danger'>{$meta->meta_value}</p><p class='text-success'>{$data->meta_value}</p>" : '';
-        $meta->column_no    != $data->column_no ? $histData['column'] = "<p class='text-danger'>{$meta->column_no}</p><p class='text-success'>{$data->column_no}</p>" : '';
+        !Helper::areValuesEqual($meta->meta_key, $data->meta_key) ? $histData['meta_key'] = "<p class='text-danger'>{$meta->meta_key}</p><p class='text-success'>{$data->meta_key}</p>" : '';
+        !Helper::areValuesEqual($meta->meta_value, $data->meta_value) ? $histData['meta_value'] = "<p class='text-danger'>{$meta->meta_value}</p><p class='text-success'>{$data->meta_value}</p>" : '';
+        !Helper::areValuesEqual($meta->column_no, $data->column_no) ? $histData['column'] = "<p class='text-danger'>{$meta->column_no}</p><p class='text-success'>{$data->column_no}</p>" : '';
 
         if ($meta->audit_report_page_id != $data->audit_report_page_id) {
             $oldName            = Helper::setDefaultName($meta->AuditReportPage->is_default, $meta->AuditReportPage->name, 'customValidations.audit.page.default.');

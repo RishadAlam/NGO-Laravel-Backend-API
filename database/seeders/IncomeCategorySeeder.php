@@ -23,7 +23,7 @@ class IncomeCategorySeeder extends Seeder
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
-                'name'          => 'loan_form_fee',
+                'name'          => 'loan_form',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [

@@ -91,12 +91,18 @@ class Helper
                 foreach ($addressFields as $subField) {
                     $clientValue    = $nominee->{$field}->{$subField} ?? '';
                     $dataValue      = $nomineeData->{$field}->{$subField} ?? '';
-                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+
+                    if (!Helper::areValuesEqual($clientValue, $dataValue)) {
+                        $histData[$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
+                    }
                 }
             } else {
                 $clientValue    = $nominee->{$field} ?? '';
                 $dataValue      = $nomineeData->{$field} ?? '';
-                !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+
+                if (!Helper::areValuesEqual($clientValue, $dataValue)) {
+                    $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
+                }
             }
         }
     }

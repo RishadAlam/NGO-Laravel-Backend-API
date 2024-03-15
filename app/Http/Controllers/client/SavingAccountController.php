@@ -302,11 +302,11 @@ class SavingAccountController extends Controller
 
     /**
      * Set Saving Acc Field Map
-     * 
+     *
      * @param object $data
      * @param boolean $is_approved
      * @param integer $creator_id
-     * 
+     *
      * @return array
      */
     private static function set_saving_field_map($data, $field_id = null, $center_id = null, $category_id = null, $acc_no = null, $client_registration_id = null, $is_approved = null, $creator_id = null)
@@ -347,10 +347,10 @@ class SavingAccountController extends Controller
 
     /**
      * Set Saving Acc update hist
-     * 
+     *
      * @param object $data
      * @param object $account
-     * 
+     *
      * @return array
      */
     private static function set_update_hist($data, $account)
@@ -361,7 +361,10 @@ class SavingAccountController extends Controller
         foreach ($fieldsToCompare as $field) {
             $clientValue    = $account->{$field} ?? '';
             $dataValue      = $data->{$field} ?? '';
-            !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+
+            if (!Helper::areValuesEqual($clientValue, $dataValue)) {
+                $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
+            }
         }
 
         return $histData;
@@ -369,14 +372,14 @@ class SavingAccountController extends Controller
 
     /**
      * Update Files
-     * 
+     *
      * @param object $model
      * @param object $newImg
      * @param string $histKey
      * @param string $fieldName
      * @param string $uriFieldName
      * @param string $directory
-     * 
+     *
      * @return void
      */
     private static function update_file($model, $newImg, $histKey, $fieldName, $uriFieldName, $directory, &$histData)

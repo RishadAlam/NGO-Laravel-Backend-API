@@ -223,7 +223,7 @@ class ClientRegistrationController extends Controller
 
     /**
      * Set Saving Acc Field Map
-     * 
+     *
      * @param object $data
      * @param boolean $is_approved
      * @param integer $creator_id
@@ -278,7 +278,7 @@ class ClientRegistrationController extends Controller
 
     /**
      * Set Saving Acc update hist
-     * 
+     *
      * @param object $data
      * @param object $client
      * @return array
@@ -299,12 +299,18 @@ class ClientRegistrationController extends Controller
                 foreach ($addressFields as $subField) {
                     $clientValue = $client->{$field}->{$subField} ?? '';
                     $dataValue = $data->{$field}->{$subField} ?? '';
-                    !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field][$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+
+                    if (!Helper::areValuesEqual($clientValue, $dataValue)) {
+                        $histData[$field][$subField] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
+                    }
                 }
             } else {
                 $clientValue = $client->{$field} ?? '';
                 $dataValue = $data->{$field} ?? '';
-                !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+
+                if (!Helper::areValuesEqual($clientValue, $dataValue)) {
+                    $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
+                }
             }
         }
 
@@ -313,14 +319,14 @@ class ClientRegistrationController extends Controller
 
     /**
      * Update Files
-     * 
+     *
      * @param object $model
      * @param object $newImg
      * @param string $histKey
      * @param string $fieldName
      * @param string $uriFieldName
      * @param string $directory
-     * 
+     *
      * @return void
      */
     private static function update_file($model, $newImg, $histKey, $fieldName, $uriFieldName, $directory, &$histData)

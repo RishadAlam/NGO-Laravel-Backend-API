@@ -201,10 +201,10 @@ class SavingCollectionController extends Controller
 
     /**
      * Set Saving Collection update hist
-     * 
+     *
      * @param object $data
      * @param object $collection
-     * 
+     *
      * @return array
      */
     private static function set_update_hist($data, $collection)
@@ -215,7 +215,10 @@ class SavingCollectionController extends Controller
         foreach ($fieldsToCompare as $field) {
             $clientValue    = $collection->{$field} ?? '';
             $dataValue      = $data->{$field} ?? '';
-            !Helper::areValuesEqual($clientValue, $dataValue) ? $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>" : '';
+
+            if (!Helper::areValuesEqual($clientValue, $dataValue)) {
+                $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
+            }
         }
 
         return $histData;
@@ -223,11 +226,11 @@ class SavingCollectionController extends Controller
 
     /**
      * Set Saving Collection Field Map
-     * 
+     *
      * @param object $data
      * @param boolean $is_approved
      * @param integer $creator_id
-     * 
+     *
      * @return array
      */
     private static function set_field_map($data, $new_collection = false)

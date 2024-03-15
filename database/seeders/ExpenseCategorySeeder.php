@@ -39,7 +39,7 @@ class ExpenseCategorySeeder extends Seeder
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
-                'name'          => 'stationary',
+                'name'          => 'printing_stationery',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
@@ -51,11 +51,15 @@ class ExpenseCategorySeeder extends Seeder
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
-                'name'          => 'transportation_allowance',
+                'name'          => 'travel_cost',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ], [
-                'name'          => 'hospitality',
+                'name'          => 'consumption',
+                'is_default'    => true,
+                'creator_id'    => auth()->id()
+            ], [
+                'name'          => 'others_expense',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
             ],
