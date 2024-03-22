@@ -3,7 +3,10 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Audit\AuditReport;
 use Illuminate\Support\Facades\Log;
+use App\Models\client\ClientRegistration;
+use App\Models\Collections\LoanCollection;
 
 class CreateAuditReport extends Command
 {
@@ -26,6 +29,7 @@ class CreateAuditReport extends Command
      */
     public function handle()
     {
+        AuditReport::createReport();
         Log::info("Command run success fully");
     }
 }

@@ -26,4 +26,14 @@ class IncomeCategory extends Model
         'is_default',
         'creator_id'
     ];
+
+    /**
+     * Relationship belongs to Income model
+     *
+     * @return response()
+     */
+    public function Income()
+    {
+        return $this->hasMany(Income::class)->withTrashed();
+    }
 }

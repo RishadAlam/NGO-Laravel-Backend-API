@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('audit_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('last_updated_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
-            $table->string('periods');
+            $table->string('financial_year');
             $table->json('data');
             $table->timestamps();
         });
