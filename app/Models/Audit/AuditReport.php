@@ -2,6 +2,7 @@
 
 namespace App\Models\Audit;
 
+use Carbon\Carbon;
 use App\Models\accounts\Income;
 use App\Models\accounts\Expense;
 use App\Models\client\LoanAccount;
@@ -48,10 +49,10 @@ class AuditReport extends Model
     /**
      * Create Audit Report
      */
-    public static function createReport()
+    public static function createReport($startYear, $endYear)
     {
-        $startDate  = '2023-07-01';
-        $endDate    = '2024-06-30';
+        $startDate  = Carbon::createFromDate($startYear, 7, 1)->startOfDay();
+        $endDate    = Carbon::createFromDate($endYear, 6, 30)->endOfDay();
 
         $collectionMeta     = static::getCollectionMeta($startDate, $endDate);
         $distributionMeta   = static::getDistributionMeta($startDate, $endDate);
@@ -64,7 +65,7 @@ class AuditReport extends Model
         Log::info(print_r($report, true));
     }
 
-    private static function getCollectionMeta($startDate, $endDate)
+    private static function getCollectionMeta(string $startDate, string $endDate)
     {
         return collect([
             ['key' => 'collection_of_shares', 'value' => ClientRegistration::whereBetween('created_at', [$startDate, $endDate])->sum('share'), 'is_default' => true],
@@ -127,8 +128,8 @@ class AuditReport extends Model
         $totalIncomes           = $incomeReport->sum('value');
         $totalExpenses          = $expenseReport->sum('value');
         $net                    = $totalIncomes - $totalExpenses;
-        $netProfits             = max($net, 0);;
-        $netLoss                = min($net, 0);;
+        $netProfits             = max($net, 0);
+        $netLoss                = abs(min($net, 0));
         $totalEstIncomes        = $totalIncomes + $netLoss;
         $totalEstExpenses       = $totalExpenses + $netProfits;
 

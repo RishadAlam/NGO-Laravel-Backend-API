@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use App\Models\Audit\AuditReport;
 use Illuminate\Support\Facades\Log;
@@ -29,7 +30,8 @@ class CreateAuditReport extends Command
      */
     public function handle()
     {
-        AuditReport::createReport();
+
+        AuditReport::createReport(Carbon::now()->year - 1, Carbon::now()->year);
         Log::info("Command run success fully");
     }
 }
