@@ -15,6 +15,7 @@ use App\Models\Collections\LoanCollection;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Collection as SupportCollection;
 
 class AuditReport extends Model
 {
@@ -48,8 +49,12 @@ class AuditReport extends Model
 
     /**
      * Create Audit Report
+     *
+     * @param string $startYear
+     * @param string $endYear
+     * @return void
      */
-    public static function createReport($startYear, $endYear)
+    public static function createReport(string $startYear, string $endYear)
     {
         $startDate  = Carbon::createFromDate($startYear, 7, 1)->startOfDay();
         $endDate    = Carbon::createFromDate($endYear, 6, 30)->endOfDay();
@@ -65,6 +70,9 @@ class AuditReport extends Model
         Log::info(print_r($report, true));
     }
 
+    /**
+     * Get Collection Meta
+     */
     private static function getCollectionMeta(string $startDate, string $endDate)
     {
         return collect([
@@ -76,7 +84,10 @@ class AuditReport extends Model
         ]);
     }
 
-    private static function getDistributionMeta($startDate, $endDate)
+    /**
+     * Get Distribution Meta
+     */
+    private static function getDistributionMeta(string $startDate, string $endDate)
     {
         return collect([
             ['key' => 'savings_return', 'value' => SavingWithdrawal::whereBetween('approved_at', [$startDate, $endDate])->approve()->sum('amount'), 'is_default' => true],
@@ -84,7 +95,10 @@ class AuditReport extends Model
         ]);
     }
 
-    private static function getIncomeReport($startDate, $endDate)
+    /**
+     * Get Income Report
+     */
+    private static function getIncomeReport(string $startDate, string $endDate)
     {
         return Income::with('IncomeCategory:id,name,is_default')
             ->whereBetween('date', [$startDate, $endDate])
@@ -103,10 +117,13 @@ class AuditReport extends Model
             });
     }
 
-    private static function getExpenseReport($startDate, $endDate)
+    /**
+     * Get Expense Report
+     */
+    private static function getExpenseReport(string $startDate, string $endDate)
     {
         return Expense::with('ExpenseCategory:id,name,is_default')
-            ->whereBetween('date', ['2023-07-01', '2024-06-30'])
+            ->whereBetween('date', [$startDate, $endDate])
             ->whereNotIn('expense_category_id', ExpenseCategory::whereIn('name', ['loan_given', 'saving_withdrawal', 'loan_saving_withdrawal', 'account_closing_interest'])->pluck('id'))
             ->groupBy('expense_category_id')
             ->selectRaw('sum(amount) as amount, expense_category_id')
@@ -123,7 +140,10 @@ class AuditReport extends Model
             });
     }
 
-    private static function calculateTotals($incomeReport, $expenseReport, $collectionMeta, $distributionMeta)
+    /**
+     * Get Calculation Totals
+     */
+    private static function calculateTotals(SupportCollection $incomeReport, SupportCollection $expenseReport, SupportCollection $collectionMeta, SupportCollection $distributionMeta)
     {
         $totalIncomes           = $incomeReport->sum('value');
         $totalExpenses          = $expenseReport->sum('value');
@@ -155,7 +175,10 @@ class AuditReport extends Model
         ];
     }
 
-    private static function constructReport($collectionMeta, $distributionMeta, $incomeReport, $expenseReport, $totals)
+    /**
+     * Construct Audit Report
+     */
+    private static function constructReport(SupportCollection $collectionMeta, SupportCollection $distributionMeta, SupportCollection $incomeReport, SupportCollection $expenseReport, array $totals)
     {
         return [
             'deposit_expenditure'   => [
