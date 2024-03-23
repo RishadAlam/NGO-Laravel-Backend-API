@@ -90,6 +90,7 @@ class AuditReport extends Model
     private static function getDistributionMeta(string $startDate, string $endDate)
     {
         return collect([
+            ['key' => 'shares_return', 'value' => ClientRegistration::onlyTrashed()->whereBetween('deleted_at', [$startDate, $endDate])->sum('share'), 'is_default' => true],
             ['key' => 'savings_return', 'value' => SavingWithdrawal::whereBetween('approved_at', [$startDate, $endDate])->approve()->sum('amount'), 'is_default' => true],
             ['key' => 'loan_given', 'value' => LoanAccount::whereBetween('is_loan_approved_at', [$startDate, $endDate])->where('is_loan_approved', true)->sum('loan_given'), 'is_default' => true]
         ]);
