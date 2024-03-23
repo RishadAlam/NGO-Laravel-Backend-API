@@ -64,7 +64,7 @@ class AuditReport extends Model
         $incomeReport       = static::getIncomeReport($startDate, $endDate);
         $expenseReport      = static::getExpenseReport($startDate, $endDate);
 
-        $totals = static::calculateTotals($incomeReport, $expenseReport, $collectionMeta, $distributionMeta);
+        $totals = static::calculateTotals($incomeReport, $expenseReport, $collectionMeta, $distributionMeta, ($startYear - 1) . '-' . $startYear);
         $report = static::constructReport($collectionMeta, $distributionMeta, $incomeReport, $expenseReport, $totals);
 
         Log::info(print_r($report, true));
@@ -144,8 +144,11 @@ class AuditReport extends Model
     /**
      * Get Calculation Totals
      */
-    private static function calculateTotals(SupportCollection $incomeReport, SupportCollection $expenseReport, SupportCollection $collectionMeta, SupportCollection $distributionMeta)
+    private static function calculateTotals(SupportCollection $incomeReport, SupportCollection $expenseReport, SupportCollection $collectionMeta, SupportCollection $distributionMeta, string $financialYear)
     {
+        $previousFund           = AuditReport::where('financial_year', $financialYear)->selectRaw("JSON_EXTRACT(data, '$.deposit_expenditure.total_distributions.current_fund.value') AS current_fund")->latest()->first();
+        $previousFund           = empty($previousFund) ? 0 : $previousFund->current_fund;
+
         $totalIncomes           = $incomeReport->sum('value');
         $totalExpenses          = $expenseReport->sum('value');
         $net                    = $totalIncomes - $totalExpenses;
@@ -157,7 +160,7 @@ class AuditReport extends Model
         $totalCollections       = $collectionMeta->sum('value') + $totalIncomes;
         $totalDistributions     = $distributionMeta->sum('value') + $totalExpenses;
 
-        $totalEstCollections    = $totalCollections + 0;
+        $totalEstCollections    = $totalCollections + $previousFund;
         $currentFund            = $totalEstCollections - $totalDistributions;
         $totalEstDistributions  = $totalDistributions + $currentFund;
 
@@ -171,6 +174,7 @@ class AuditReport extends Model
             'totalCollections'      => $totalCollections,
             'totalDistributions'    => $totalDistributions,
             'totalEstCollections'   => $totalEstCollections,
+            'previous_fund'         => $previousFund,
             'currentFund'           => $currentFund,
             'totalEstDistributions' => $totalEstDistributions,
         ];
@@ -187,7 +191,7 @@ class AuditReport extends Model
                 'expenditure_meta'  => $distributionMeta->toArray(),
                 'total_collections'     => [
                     'total_collections' => (object)['key' => 'total_collections', 'value' => $totals['totalCollections'], 'is_default' => true],
-                    'previous_fund'     => (object)['key' => 'previous_fund', 'value' => 0, 'is_default' => true],
+                    'previous_fund'     => (object)['key' => 'previous_fund', 'value' => $totals['previous_fund'], 'is_default' => true],
                     'total'             => (object)['key' => 'total', 'value' => $totals['totalEstCollections'], 'is_default' => true],
                 ],
                 'total_distributions'       => [
