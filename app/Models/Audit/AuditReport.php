@@ -164,6 +164,20 @@ class AuditReport extends Model
         $currentFund            = $totalEstCollections - $totalDistributions;
         $totalEstDistributions  = $totalDistributions + $currentFund;
 
+        $reserveFund            = 0;
+        $cooperativeFund        = 0;
+        $undistributedProfits   = 0;
+        $currentYearNetProfits  = 0;
+        $totalEstNet            = 0;
+
+        if (!empty($netProfits)) {
+            $reserveFund            = ceil($netProfits * 0.15);
+            $cooperativeFund        = ceil($netProfits * 0.03);
+            $undistributedProfits   = ceil($netProfits - ($reserveFund + $cooperativeFund));
+            $currentYearNetProfits  = $netProfits;
+            $totalEstNet            = $reserveFund + $cooperativeFund + $undistributedProfits;
+        }
+
         return [
             'totalIncomes'          => $totalIncomes,
             'totalExpenses'         => $totalExpenses,
@@ -177,6 +191,11 @@ class AuditReport extends Model
             'previous_fund'         => $previousFund,
             'currentFund'           => $currentFund,
             'totalEstDistributions' => $totalEstDistributions,
+            'reserveFund'           => $reserveFund,
+            'cooperativeFund'       => $cooperativeFund,
+            'undistributedProfits'  => $undistributedProfits,
+            'currentYearNetProfits' => $currentYearNetProfits,
+            'totalEstNet'           => $totalEstNet,
         ];
     }
 
@@ -203,7 +222,7 @@ class AuditReport extends Model
             'profit_loss'   => [
                 'incomes'   => $incomeReport->toArray(),
                 'expenses'  => $expenseReport->toArray(),
-                'total_incomes'     => [
+                'total'     => [
                     'total_incomes' => (object)['key' => 'total_incomes', 'value' => $totals['totalIncomes'], 'is_default' => true],
                     'net_loss'      => (object)['key' => 'net_loss', 'value' => $totals['netLoss'], 'is_default' => true],
                     'total'         => (object)['key' => 'total', 'value' => $totals['totalEstIncomes'], 'is_default' => true],
@@ -212,6 +231,22 @@ class AuditReport extends Model
                     'total_expenses' => (object)['key' => 'total_expenses', 'value' => $totals['totalExpenses'], 'is_default' => true],
                     'net_profits'    => (object)['key' => 'net_profits', 'value' => $totals['netProfits'], 'is_default' => true],
                     'total'          => (object)['key' => 'total', 'value' => $totals['totalEstExpenses'], 'is_default' => true],
+                ],
+            ],
+            'net_profit' => [
+                'expense_meta' => [
+                    ['key' => 'reserve_fund', 'value' => $totals['reserveFund'], 'is_default' => true],
+                    ['key' => 'cooperative_dev_fund', 'value' => $totals['cooperativeFund'], 'is_default' => true],
+                    ['key' => 'undistributed_profits', 'value' => $totals['undistributedProfits'], 'is_default' => true]
+                ],
+                'income_meta' => [
+                    ['key' => 'current_year_net_profits', 'value' => $totals['currentYearNetProfits'], 'is_default' => true]
+                ],
+                'total_incomes'     => [
+                    'total' => (object)['key' => 'total', 'value' => $totals['currentYearNetProfits'], 'is_default' => true],
+                ],
+                'total_expenses'     => [
+                    'total' => (object)['key' => 'total', 'value' => $totals['totalEstNet'], 'is_default' => true],
                 ],
             ]
         ];
