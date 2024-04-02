@@ -30,8 +30,6 @@ class CreateAuditReport extends Command
      */
     public function handle()
     {
-
         AuditReport::createReport(Carbon::now()->year - 1, Carbon::now()->year);
-        Log::info("Command run success fully");
     }
 }

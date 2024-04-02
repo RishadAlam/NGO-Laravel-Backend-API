@@ -56,6 +56,11 @@ class AuditReport extends Model
      */
     public static function createReport(string $startYear, string $endYear)
     {
+        if (!empty(AuditReport::where('financial_year', "{$startYear}-{$endYear}")->count())) {
+            Log::error("Audit Report already Exists!");
+            return create_response('Audit Report already Exists!', null, 401, false);
+        }
+
         $startDate  = Carbon::createFromDate($startYear, 7, 1)->startOfDay();
         $endDate    = Carbon::createFromDate($endYear, 6, 30)->endOfDay();
 
@@ -71,7 +76,8 @@ class AuditReport extends Model
 
         $report = static::constructReport($collectionMeta, $distributionMeta, $incomeReport, $expenseReport, $capitalMeta, $resourceMeta, $totals);
 
-        Log::info(print_r($report, true));
+        AuditReport::create(['financial_year' => "{$startYear}-{$endYear}", 'data' => $report]);
+        return create_response('Audit Report Created successfully.');
     }
 
     /**
@@ -150,8 +156,9 @@ class AuditReport extends Model
      */
     private static function calculateTotals(SupportCollection $incomeReport, SupportCollection $expenseReport, string $financialYear, string $startDate, string $endDate)
     {
-        $defaultMeta            = AuditReportMeta::whereIn('meta_key', ['authorized_shares', 'accumulation_of_savings', 'furniture'])->pluck('meta_value', 'meta_key')->toArray();
+        $defaultMeta            = AuditReportMeta::whereIn('meta_key', ['authorized_shares', 'share_per_each', 'accumulation_of_savings', 'furniture'])->pluck('meta_value', 'meta_key')->toArray();
         $authorizedShares       = $defaultMeta['authorized_shares'] ?? 0;
+        $sharePerEach           = $defaultMeta['share_per_each'] ?? 0;
         $accumulationSavings    = $defaultMeta['accumulation_of_savings'] ?? 0;
         $furniture              = $defaultMeta['furniture'] ?? 0;
 
@@ -171,8 +178,8 @@ class AuditReport extends Model
         $previousCapital        = AuditReport::where('financial_year', $financialYear)->selectRaw("JSON_EXTRACT(data, '$.surplus_value.capital_meta') AS capital_meta")->latest()->first();
         $previousCapitalMeta    = empty($previousCapital->capital_meta) ? [] : array_column($previousCapital->capital_meta, 'value', 'key');
 
-        $previousResource        = AuditReport::where('financial_year', $financialYear)->selectRaw("JSON_EXTRACT(data, '$.surplus_value.resource_meta') AS resource_meta")->latest()->first();
-        $previousResourceMeta    = empty($previousResource->resource_meta) ? [] : array_column($previousCapital->resource_meta, 'value', 'key');
+        $previousResource       = AuditReport::where('financial_year', $financialYear)->selectRaw("JSON_EXTRACT(data, '$.surplus_value.resource_meta') AS resource_meta")->latest()->first();
+        $previousResourceMeta   = empty($previousResource->resource_meta) ? [] : array_column($previousCapital->resource_meta, 'value', 'key');
 
         $previousPaidUpShare    = $previousCapitalMeta['paid_up_shares'] ?? 0;
         $previousSavingsDeposit = $previousCapitalMeta['savings_deposit'] ?? 0;
@@ -183,11 +190,11 @@ class AuditReport extends Model
         $previousLoanOwed       = $previousCapitalMeta['loan_owed'] ?? 0;
         $previousLoss           = $previousCapitalMeta['net_loss'] ?? 0;
 
-        $paidUpShares           = array_sum([$previousPaidUpShare, $shareCollections, -$sharesReturn]);
-        $savingsDeposit         = array_sum([$previousSavingsDeposit, $savingCollections, -$savingReturn]);
+        $paidUpShares           = ($previousPaidUpShare + $shareCollections) - $sharesReturn;
+        $savingsDeposit         = ($previousSavingsDeposit + $savingCollections) - $savingReturn;
 
         $previousFixedDeposit   = 0;
-        $fixedDeposit           = array_sum([$previousFixedDeposit, $FDRCollection]);
+        $fixedDeposit           = $previousFixedDeposit + $FDRCollection;
 
         $totalIncomes           = $incomeReport->sum('value');
         $totalExpenses          = $expenseReport->sum('value');
@@ -197,8 +204,8 @@ class AuditReport extends Model
         $totalEstIncomes        = $totalIncomes + $netLoss;
         $totalEstExpenses       = $totalExpenses + $netProfits;
 
-        $totalCollections       = array_sum([$shareCollections, $savingCollections, $loanCollections, $loanIntCollections, $FDRCollection, $totalIncomes]);
-        $totalDistributions     = array_sum([$sharesReturn, $savingReturn, $loanDistribute, $totalExpenses]);
+        $totalCollections       = $shareCollections + $savingCollections + $loanCollections + $loanIntCollections + $FDRCollection + $totalIncomes;
+        $totalDistributions     = $sharesReturn + $savingReturn + $loanDistribute + $totalExpenses;
 
         $totalEstCollections    = $totalCollections + $previousFund;
         $currentFund            = $totalEstCollections - $totalDistributions;
@@ -213,22 +220,22 @@ class AuditReport extends Model
         if (!empty($netProfits)) {
             $reserveFund            = ceil($netProfits * 0.15);
             $cooperativeFund        = ceil($netProfits * 0.03);
-            $undistributedProfits   = ceil(array_sum([$netProfits, -$reserveFund, -$cooperativeFund]));
+            $undistributedProfits   = ceil($netProfits - ($reserveFund + $cooperativeFund));
             $currentYearNetProfits  = $netProfits;
-            $totalEstNet            = array_sum([$reserveFund, $cooperativeFund, $undistributedProfits]);
+            $totalEstNet            = $reserveFund + $cooperativeFund + $undistributedProfits;
         }
 
-        $reservedFund           = array_sum([$previousReservedFund, $reserveFund]);
-        $cooperativeDevFund     = array_sum([$previousCoOpDevFund, $cooperativeFund]);
-        $undistributedProfit    = array_sum([$previousUndoProfit, $undistributedProfits]);
+        $reservedFund           = $previousReservedFund + $reserveFund;
+        $cooperativeDevFund     = $previousCoOpDevFund + $cooperativeFund;
+        $undistributedProfit    = $previousUndoProfit + $undistributedProfits;
 
-        $loanOwed               = max(array_sum([$previousLoanOwed, $loanDistribute, -$loanCollections]), 0);
-        $currentNetLoss         = max(array_sum([$previousLoss, -$netProfits]), 0);
+        $loanOwed               = max(($previousLoanOwed + $loanDistribute) - $loanCollections, 0);
+        $currentNetLoss         = max($previousLoss - $netProfits, 0);
 
-        $totalCapitals          = array_sum([$paidUpShares, $savingsDeposit, $fixedDeposit, $accumulationSavings, $reservedFund, $cooperativeDevFund, $undistributedProfit]);
-        $totalResources         = array_sum([$currentFund, $loanOwed, $furniture, $currentNetLoss]);
+        $totalCapitals          = $paidUpShares + $savingsDeposit + $fixedDeposit + $accumulationSavings + $reservedFund + $cooperativeDevFund + $undistributedProfit;
+        $totalResources         = $currentFund + $loanOwed + $furniture + $currentNetLoss;
 
-        return compact('shareCollections', 'savingCollections', 'loanCollections', 'loanIntCollections', 'FDRCollection', 'sharesReturn', 'savingReturn', 'loanDistribute', 'totalIncomes', 'totalExpenses', 'netProfits', 'netLoss', 'totalEstIncomes', 'totalEstExpenses', 'totalCollections', 'totalDistributions', 'totalEstCollections', 'previousFund', 'currentFund', 'totalEstDistributions', 'reserveFund', 'cooperativeFund', 'undistributedProfits', 'currentYearNetProfits', 'totalEstNet', 'paidUpShares', 'previousPaidUpShare', 'savingsDeposit', 'previousSavingsDeposit', 'fixedDeposit', 'previousFixedDeposit', 'FDRCollection', 'reservedFund', 'previousReservedFund', 'cooperativeDevFund', 'previousCoOpDevFund', 'undistributedProfit', 'previousUndoProfit', 'loanOwed', 'previousLoanOwed', 'currentNetLoss', 'previousLoss', 'authorizedShares', 'accumulationSavings', 'furniture', 'totalCapitals', 'totalResources');
+        return compact('shareCollections', 'savingCollections', 'loanCollections', 'loanIntCollections', 'FDRCollection', 'sharesReturn', 'savingReturn', 'loanDistribute', 'totalIncomes', 'totalExpenses', 'netProfits', 'netLoss', 'totalEstIncomes', 'totalEstExpenses', 'totalCollections', 'totalDistributions', 'totalEstCollections', 'previousFund', 'currentFund', 'totalEstDistributions', 'reserveFund', 'cooperativeFund', 'undistributedProfits', 'currentYearNetProfits', 'totalEstNet', 'paidUpShares', 'previousPaidUpShare', 'savingsDeposit', 'previousSavingsDeposit', 'fixedDeposit', 'previousFixedDeposit', 'FDRCollection', 'reservedFund', 'previousReservedFund', 'cooperativeDevFund', 'previousCoOpDevFund', 'undistributedProfit', 'previousUndoProfit', 'loanOwed', 'previousLoanOwed', 'currentNetLoss', 'previousLoss', 'authorizedShares', 'sharePerEach', 'accumulationSavings', 'furniture', 'totalCapitals', 'totalResources');
     }
 
     /**
@@ -237,7 +244,7 @@ class AuditReport extends Model
     private static function getCapitalMeta(array $totals)
     {
         return collect([
-            (object) ['key' => 'authorized_shares', 'value' => $totals['authorizedShares'], 'is_default' => true, 'child_meta' => ['desc' => '( প্রতিটি ১০০/= হারে )']],
+            (object) ['key' => 'authorized_shares', 'value' => $totals['authorizedShares'], 'is_default' => true, 'child_meta' => ['share_per_each' => $totals['sharePerEach']]],
             (object) ['key' => 'paid_up_shares', 'value' => $totals['paidUpShares'], 'is_default' => true, 'child_meta' => ['previous_paid_up_shares' => $totals['previousPaidUpShare'], 'current_share_collections' => $totals['shareCollections'], 'current_share_return' => $totals['sharesReturn']]],
             (object) ['key' => 'savings_deposit', 'value' => $totals['savingsDeposit'], 'is_default' => true, 'child_meta' => ['previous_savings_deposit' => $totals['previousSavingsDeposit'], 'current_saving_collections' => $totals['savingCollections'], 'current_saving_return' => $totals['savingReturn']]],
             (object) ['key' => 'fixed_deposit', 'value' => $totals['fixedDeposit'], 'is_default' => true, 'child_meta' => ['previous_fixed_deposit' => $totals['previousFixedDeposit'], 'current_fixed_deposit_collections' => $totals['FDRCollection']]],
@@ -304,20 +311,20 @@ class AuditReport extends Model
                 'income_meta' => [
                     ['key' => 'current_year_net_profits', 'value' => $totals['currentYearNetProfits'], 'is_default' => true]
                 ],
-                'total_incomes'     => [
+                'total_incomes' => [
                     'total' => (object)['key' => 'total', 'value' => $totals['currentYearNetProfits'], 'is_default' => true],
                 ],
-                'total_expenses'     => [
+                'total_expenses' => [
                     'total' => (object)['key' => 'total', 'value' => $totals['totalEstNet'], 'is_default' => true],
                 ],
             ],
             'surplus_value' => [
-                'capital_meta' => $capitalMeta->toArray(),
+                'capital_meta'  => $capitalMeta->toArray(),
                 'resource_meta' => $resourceMeta->toArray(),
-                'total_capitals'     => [
+                'total_capitals' => [
                     'total' => (object)['key' => 'total', 'value' => $totals['totalCapitals'], 'is_default' => true],
                 ],
-                'total_resource'     => [
+                'total_resource' => [
                     'total' => (object)['key' => 'total', 'value' => $totals['totalResources'], 'is_default' => true],
                 ],
             ]
