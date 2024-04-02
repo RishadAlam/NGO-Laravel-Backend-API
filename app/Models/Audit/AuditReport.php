@@ -278,28 +278,28 @@ class AuditReport extends Model
                 'deposit_meta'      => $collectionMeta->toArray(),
                 'expenditure_meta'  => $distributionMeta->toArray(),
                 'total_collections'     => [
-                    'total_collections' => (object)['key' => 'total_collections', 'value' => $totals['totalCollections'], 'is_default' => true],
-                    'previous_fund'     => (object)['key' => 'previous_fund', 'value' => $totals['previousFund'], 'is_default' => true],
-                    'total'             => (object)['key' => 'total', 'value' => $totals['totalEstCollections'], 'is_default' => true],
+                    'net_collections'   => $totals['totalCollections'],
+                    'previous_fund'     => $totals['previousFund'],
+                    'total'             => $totals['totalEstCollections'],
                 ],
-                'total_distributions'       => [
-                    'total_distributions'   => (object)['key' => 'total_distributions', 'value' => $totals['totalDistributions'], 'is_default' => true],
-                    'current_fund'          => (object)['key' => 'current_fund', 'value' => $totals['currentFund'], 'is_default' => true],
-                    'total'                 => (object)['key' => 'total', 'value' => $totals['totalEstDistributions'], 'is_default' => true],
+                'total_distributions'   => [
+                    'net_distributions' => $totals['totalDistributions'],
+                    'current_fund'      => $totals['currentFund'],
+                    'total'             => $totals['totalEstDistributions'],
                 ],
             ],
             'profit_loss'   => [
                 'incomes'   => $incomeReport->toArray(),
                 'expenses'  => $expenseReport->toArray(),
-                'total'     => [
-                    'total_incomes' => (object)['key' => 'total_incomes', 'value' => $totals['totalIncomes'], 'is_default' => true],
-                    'net_loss'      => (object)['key' => 'net_loss', 'value' => $totals['netLoss'], 'is_default' => true],
-                    'total'         => (object)['key' => 'total', 'value' => $totals['totalEstIncomes'], 'is_default' => true],
+                'total_incomes'     => [
+                    'net_incomes'   => $totals['totalIncomes'],
+                    'net_loss'      => $totals['netLoss'],
+                    'total'         => $totals['totalEstIncomes'],
                 ],
-                'total_expenses'     => [
-                    'total_expenses' => (object)['key' => 'total_expenses', 'value' => $totals['totalExpenses'], 'is_default' => true],
-                    'net_profits'    => (object)['key' => 'net_profits', 'value' => $totals['netProfits'], 'is_default' => true],
-                    'total'          => (object)['key' => 'total', 'value' => $totals['totalEstExpenses'], 'is_default' => true],
+                'total_expenses'    => [
+                    'net_expenses'  => $totals['totalExpenses'],
+                    'net_profits'   => $totals['netProfits'],
+                    'total'         => $totals['totalEstExpenses'],
                 ],
             ],
             'net_profit' => [
@@ -311,22 +311,14 @@ class AuditReport extends Model
                 'income_meta' => [
                     ['key' => 'current_year_net_profits', 'value' => $totals['currentYearNetProfits'], 'is_default' => true]
                 ],
-                'total_incomes' => [
-                    'total' => (object)['key' => 'total', 'value' => $totals['currentYearNetProfits'], 'is_default' => true],
-                ],
-                'total_expenses' => [
-                    'total' => (object)['key' => 'total', 'value' => $totals['totalEstNet'], 'is_default' => true],
-                ],
+                'total_incomes'     => ['total' => $totals['currentYearNetProfits']],
+                'total_expenses'    => ['total' => $totals['totalEstNet']],
             ],
             'surplus_value' => [
-                'capital_meta'  => $capitalMeta->toArray(),
-                'resource_meta' => $resourceMeta->toArray(),
-                'total_capitals' => [
-                    'total' => (object)['key' => 'total', 'value' => $totals['totalCapitals'], 'is_default' => true],
-                ],
-                'total_resource' => [
-                    'total' => (object)['key' => 'total', 'value' => $totals['totalResources'], 'is_default' => true],
-                ],
+                'capital_meta'      => $capitalMeta->toArray(),
+                'resource_meta'     => $resourceMeta->toArray(),
+                'total_capitals'    => ['total' => $totals['totalCapitals']],
+                'total_resource'    => ['total' => $totals['totalResources']],
             ]
         ];
     }
