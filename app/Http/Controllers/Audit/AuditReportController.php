@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Audit;
 
 use Illuminate\Http\Request;
+use App\Models\Audit\AuditReport;
 use App\Http\Controllers\Controller;
 
 class AuditReportController extends Controller
@@ -21,7 +22,8 @@ class AuditReportController extends Controller
      */
     public function index()
     {
-        //
+        $reports = AuditReport::with('LastUpdatedBy:id,name,image_uri')->latest()->get();
+        return create_response(null, $reports);
     }
 
     /**

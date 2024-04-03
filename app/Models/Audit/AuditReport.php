@@ -3,6 +3,7 @@
 namespace App\Models\Audit;
 
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\accounts\Income;
 use App\Models\accounts\Expense;
 use App\Models\client\LoanAccount;
@@ -30,6 +31,16 @@ class AuditReport extends Model
         'meta_value',
         'data',
     ];
+
+    /**
+     * Relationship belongs to Users
+     *
+     * @return response()
+     */
+    public function LastUpdatedBy()
+    {
+        return $this->belongsTo(User::class, 'last_updated_by')->withTrashed();
+    }
 
     /**
      * Mutator for action Details json Data
