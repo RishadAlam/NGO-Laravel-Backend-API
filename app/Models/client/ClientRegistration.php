@@ -67,6 +67,22 @@ class ClientRegistration extends Model
     }
 
     /**
+     * Relation with ClientRegistrationActionHistory Table
+     */
+    public function ActiveSavingAccount()
+    {
+        return $this->hasMany(SavingAccount::class);
+    }
+
+    /**
+     * Relation with ClientRegistrationActionHistory Table
+     */
+    public function ActiveLoanAccount()
+    {
+        return $this->hasMany(LoanAccount::class);
+    }
+
+    /**
      * Mutator for address json Data
      */
     public function setPresentAddressAttribute($value)

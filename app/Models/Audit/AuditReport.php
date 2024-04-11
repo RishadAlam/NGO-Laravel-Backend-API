@@ -330,7 +330,30 @@ class AuditReport extends Model
                 'resource_meta'     => $resourceMeta->toArray(),
                 'total_capitals'    => ['total' => $totals['totalCapitals']],
                 'total_resource'    => ['total' => $totals['totalResources']],
-            ]
+            ],
+            'client_list'   => static::getClientList()->toArray()
         ];
+    }
+
+    /**
+     * Get Client List
+     */
+    private static function getClientList()
+    {
+        return ClientRegistration::with([
+            'ActiveSavingAccount:client_registration_id,balance',
+            'ActiveLoanAccount:client_registration_id,balance,total_loan_remaining'
+        ])
+            ->get(['id', 'name', 'acc_no', 'share'])
+            ->map(function ($client) {
+                return (object)[
+                    'id'                    => $client->id,
+                    'name'                  => $client->name,
+                    'account_no'            => $client->acc_no,
+                    'share'                 => $client->share,
+                    'total_savings'         => $client->ActiveSavingAccount->sum('balance') + $client->ActiveLoanAccount->sum('balance'),
+                    'total_loan_remaining'  => $client->ActiveLoanAccount->sum('total_loan_remaining')
+                ];
+            });
     }
 }
