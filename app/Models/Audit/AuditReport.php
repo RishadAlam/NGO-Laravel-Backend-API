@@ -84,8 +84,9 @@ class AuditReport extends Model
         $distributionMeta   = static::getDistributionMeta($totals);
         $capitalMeta        = static::getCapitalMeta($totals);
         $resourceMeta       = static::getResourceMeta($totals);
+        $clientList         = static::getClientList();
 
-        $report = static::constructReport($collectionMeta, $distributionMeta, $incomeReport, $expenseReport, $capitalMeta, $resourceMeta, $totals);
+        $report = static::constructReport($collectionMeta, $distributionMeta, $incomeReport, $expenseReport, $capitalMeta, $resourceMeta,  $clientList, $totals);
 
         AuditReport::create(['financial_year' => "{$startYear}-{$endYear}", 'data' => $report]);
         return create_response('Audit Report Created successfully.');
@@ -280,9 +281,31 @@ class AuditReport extends Model
     }
 
     /**
+     * Get Client List
+     */
+    private static function getClientList()
+    {
+        return ClientRegistration::with([
+            'ActiveSavingAccount:client_registration_id,balance',
+            'ActiveLoanAccount:client_registration_id,balance,total_loan_remaining'
+        ])
+            ->get(['id', 'name', 'acc_no', 'share'])
+            ->map(function ($client) {
+                return (object)[
+                    'id'                    => $client->id,
+                    'name'                  => $client->name,
+                    'account_no'            => $client->acc_no,
+                    'share'                 => $client->share,
+                    'savings'         => $client->ActiveSavingAccount->sum('balance') + $client->ActiveLoanAccount->sum('balance'),
+                    'loan_remaining'  => $client->ActiveLoanAccount->sum('total_loan_remaining')
+                ];
+            });
+    }
+
+    /**
      * Construct Audit Report
      */
-    private static function constructReport(SupportCollection $collectionMeta, SupportCollection $distributionMeta, SupportCollection $incomeReport, SupportCollection $expenseReport, SupportCollection $capitalMeta, SupportCollection $resourceMeta, array $totals)
+    private static function constructReport(SupportCollection $collectionMeta, SupportCollection $distributionMeta, SupportCollection $incomeReport, SupportCollection $expenseReport, SupportCollection $capitalMeta, SupportCollection $resourceMeta, SupportCollection $clientList, array $totals)
     {
         return [
             'deposit_expenditure'   => [
@@ -331,29 +354,12 @@ class AuditReport extends Model
                 'total_capitals'    => ['total' => $totals['totalCapitals']],
                 'total_resource'    => ['total' => $totals['totalResources']],
             ],
-            'client_list'   => static::getClientList()->toArray()
+            'client_list'   => [
+                'client_list'           => $clientList->toArray(),
+                'total_shares'          => $clientList->sum('share'),
+                'total_savings'         => $clientList->sum('savings'),
+                'total_loan_remaining'  => $clientList->sum('loan_remaining'),
+            ]
         ];
-    }
-
-    /**
-     * Get Client List
-     */
-    private static function getClientList()
-    {
-        return ClientRegistration::with([
-            'ActiveSavingAccount:client_registration_id,balance',
-            'ActiveLoanAccount:client_registration_id,balance,total_loan_remaining'
-        ])
-            ->get(['id', 'name', 'acc_no', 'share'])
-            ->map(function ($client) {
-                return (object)[
-                    'id'                    => $client->id,
-                    'name'                  => $client->name,
-                    'account_no'            => $client->acc_no,
-                    'share'                 => $client->share,
-                    'total_savings'         => $client->ActiveSavingAccount->sum('balance') + $client->ActiveLoanAccount->sum('balance'),
-                    'total_loan_remaining'  => $client->ActiveLoanAccount->sum('total_loan_remaining')
-                ];
-            });
     }
 }
