@@ -175,9 +175,11 @@ class AuditReport extends Model
         $furniture              = $defaultMeta['furniture'] ?? 0;
 
         $shareCollections       = ClientRegistration::whereBetween('created_at', [$startDate, $endDate])->sum('share');
-        $savingCollections      = SavingCollection::whereBetween('created_at', [$startDate, $endDate])->approve()->sum('deposit');
+        $collectionOfSavings    = SavingCollection::whereBetween('created_at', [$startDate, $endDate])->approve()->sum('deposit');
+        $collectionOfLSavings   = LoanCollection::whereBetween('created_at', [$startDate, $endDate])->approve()->sum('deposit');
         $loanCollections        = LoanCollection::whereBetween('created_at', [$startDate, $endDate])->approve()->sum('loan');
         $loanIntCollections     = LoanCollection::whereBetween('created_at', [$startDate, $endDate])->approve()->sum('interest');
+        $savingCollections      = $collectionOfSavings + $collectionOfLSavings;
         $FDRCollection          = 0;
 
         $sharesReturn           = ClientRegistration::onlyTrashed()->whereBetween('deleted_at', [$startDate, $endDate])->sum('share');
