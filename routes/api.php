@@ -202,6 +202,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('saving/pending-forms', [SavingAccountController::class, 'pending_forms'])->name('saving.pendingForms');
         Route::GET('loan/pending-forms', [LoanAccountController::class, 'pending_forms'])->name('loan.pendingForms');
         Route::GET('loan/pending-loans', [LoanAccountController::class, 'pending_loans'])->name('loan.pendingLoans');
+        Route::GET('loan/current-month-summary', [LoanAccountController::class, 'loan_distribution_summery'])->name('loan.distribution');
 
         // Registration Approval Routes
         Route::PUT('approved/{id}', [ClientRegistrationController::class, 'approved'])->name('approved');

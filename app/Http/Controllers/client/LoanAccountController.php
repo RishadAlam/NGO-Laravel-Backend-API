@@ -12,6 +12,7 @@ use App\Models\accounts\Expense;
 use App\Models\client\Guarantor;
 use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\accounts\IncomeCategory;
@@ -187,6 +188,25 @@ class LoanAccountController extends Controller
 
         $pending_loans = LoanAccount::fetchPendingLoans($month, $year)->get();
         return create_response(null, $pending_loans);
+    }
+
+    /**
+     * Current Month Loan Distribution summary
+     */
+    public function loan_distribution_summery()
+    {
+        $currentDate    = Carbon::now();
+        $lastMonthData  = Carbon::now()->subMonths();
+
+        $LMTLoanDistribute  = LoanAccount::where('is_loan_approved', true)->whereBetween('start_date', [$lastMonthData->startOfMonth()->startOfDay()->format('Y-m-d'), $lastMonthData->endOfMonth()->format('Y-m-d')])->sum('loan_given');
+        $CMTLoanDistSummary = LoanAccount::where('is_loan_approved', true)->whereBetween('start_date', [$currentDate->startOfMonth()->format('Y-m-d'), $currentDate->endOfMonth()->format('Y-m-d')])->groupBy('start_date')->selectRaw('SUM(loan_given) as amount, start_date as date')->get();
+        $CMTLoanDistribute  = !empty($CMTLoanDistSummary) ? $CMTLoanDistSummary->sum('amount') : 0;
+
+        return create_response(null, [
+            'amount'        => $CMTLoanDistribute,
+            'data'          => $CMTLoanDistSummary,
+            'cmp_amount'    => (($CMTLoanDistribute - $LMTLoanDistribute) / ($LMTLoanDistribute != 0 ? $LMTLoanDistribute : $CMTLoanDistribute)) * 100
+        ]);
     }
 
     /**
