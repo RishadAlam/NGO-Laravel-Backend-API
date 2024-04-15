@@ -200,6 +200,46 @@ class SavingCollectionController extends Controller
     }
 
     /**
+     * Current Month Saving Collection summary
+     */
+    public function saving_collection_summery()
+    {
+        $currentDate    = [Carbon::now()->startOfMonth()->startOfDay(), Carbon::now()->endOfMonth()->endOfDay()];
+        $lastMonthDate  = [Carbon::now()->subMonths()->startOfMonth()->startOfDay(), Carbon::now()->subMonths()->endOfMonth()->endOfDay()];
+
+        $LMTSavingCollection  = SavingCollection::approve()->where('category_id', '!=', Category::whereName('dps')->value('id'))->whereBetween('created_at', $lastMonthDate)->sum('deposit');
+        $CMTSavingCollSummary = SavingCollection::approve()->where('category_id', '!=', Category::whereName('dps')->value('id'))->whereBetween('created_at', $currentDate)->groupBy('created_at')->selectRaw('SUM(deposit) as amount, created_at as date')->get();
+        $CMTSavingCollection  = !empty($CMTSavingCollSummary) ? $CMTSavingCollSummary->sum('amount') : 0;
+
+        return create_response(null, [
+            'last_amount'       => $LMTSavingCollection,
+            'current_amount'    => $CMTSavingCollection,
+            'data'              => $CMTSavingCollSummary,
+            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 0))) * 100)
+        ]);
+    }
+
+    /**
+     * Current Month DPS Collection summary
+     */
+    public function dps_collection_summery()
+    {
+        $currentDate    = [Carbon::now()->startOfMonth()->startOfDay(), Carbon::now()->endOfMonth()->endOfDay()];
+        $lastMonthDate  = [Carbon::now()->subMonths()->startOfMonth()->startOfDay(), Carbon::now()->subMonths()->endOfMonth()->endOfDay()];
+
+        $LMTSavingCollection  = SavingCollection::approve()->where('category_id', Category::whereName('dps')->value('id'))->whereBetween('created_at', $lastMonthDate)->sum('deposit');
+        $CMTSavingCollSummary = SavingCollection::approve()->where('category_id', Category::whereName('dps')->value('id'))->whereBetween('created_at', $currentDate)->groupBy('created_at')->selectRaw('SUM(deposit) as amount, created_at as date')->get();
+        $CMTSavingCollection  = !empty($CMTSavingCollSummary) ? $CMTSavingCollSummary->sum('amount') : 0;
+
+        return create_response(null, [
+            'last_amount'       => $LMTSavingCollection,
+            'current_amount'    => $CMTSavingCollection,
+            'data'              => $CMTSavingCollSummary,
+            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 0))) * 100)
+        ]);
+    }
+
+    /**
      * Set Saving Collection update hist
      *
      * @param object $data

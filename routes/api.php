@@ -213,8 +213,17 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     // Collection Approval Routes
     Route::prefix('collection')->group(function () {
+        // Approval Routes
         Route::POST('saving/approved', [SavingCollectionController::class, 'approved'])->name('saving.approved');
         Route::POST('loan/approved', [LoanCollectionController::class, 'approved'])->name('loan.approved');
+
+        // collection Summary routes
+        Route::GET('saving/current-month-collection-summary', [SavingCollectionController::class, 'saving_collection_summery'])->name('saving.saving_collection_summery');
+        Route::GET('saving/current-month-dps-collection-summary', [SavingCollectionController::class, 'dps_collection_summery'])->name('saving.dps_collection_summary');
+
+        Route::GET('loan/current-month-collection-summary', [LoanCollectionController::class, 'loan_collection_summery'])->name('loan.loan_collection_summery');
+        Route::GET('loan/current-month-monthly_loan-collection-summary', [LoanCollectionController::class, 'monthly_loan_collection_summery'])->name('loan.monthly_loan_collection_summary');
+        Route::GET('loan/current-month-loan-saving-collection-summary', [LoanCollectionController::class, 'loan_saving_collection_summery'])->name('loan.loan_saving_collection_summery');
     });
     Route::prefix('withdrawal')->group(function () {
         // Pending Withdrawal Routes

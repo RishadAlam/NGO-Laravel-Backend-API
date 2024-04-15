@@ -195,17 +195,18 @@ class LoanAccountController extends Controller
      */
     public function loan_distribution_summery()
     {
-        $currentDate    = Carbon::now();
-        $lastMonthData  = Carbon::now()->subMonths();
+        $currentDate    = [Carbon::now()->startOfMonth()->format('Y-m-d'), Carbon::now()->endOfMonth()->format('Y-m-d')];
+        $lastMonthData  = [Carbon::now()->subMonths()->startOfMonth()->format('Y-m-d'), Carbon::now()->subMonths()->endOfMonth()->format('Y-m-d')];
 
-        $LMTLoanDistribute  = LoanAccount::where('is_loan_approved', true)->whereBetween('start_date', [$lastMonthData->startOfMonth()->startOfDay()->format('Y-m-d'), $lastMonthData->endOfMonth()->format('Y-m-d')])->sum('loan_given');
-        $CMTLoanDistSummary = LoanAccount::where('is_loan_approved', true)->whereBetween('start_date', [$currentDate->startOfMonth()->format('Y-m-d'), $currentDate->endOfMonth()->format('Y-m-d')])->groupBy('start_date')->selectRaw('SUM(loan_given) as amount, start_date as date')->get();
+        $LMTLoanDistribute  = LoanAccount::approve('is_loan_approved')->whereBetween('start_date', $lastMonthData)->sum('loan_given');
+        $CMTLoanDistSummary = LoanAccount::approve('is_loan_approved')->whereBetween('start_date', $currentDate)->groupBy('start_date')->selectRaw('SUM(loan_given) as amount, start_date as date')->get();
         $CMTLoanDistribute  = !empty($CMTLoanDistSummary) ? $CMTLoanDistSummary->sum('amount') : 0;
 
         return create_response(null, [
-            'amount'        => $CMTLoanDistribute,
-            'data'          => $CMTLoanDistSummary,
-            'cmp_amount'    => (($CMTLoanDistribute - $LMTLoanDistribute) / ($LMTLoanDistribute != 0 ? $LMTLoanDistribute : $CMTLoanDistribute)) * 100
+            'last_amount'       => $LMTLoanDistribute,
+            'current_amount'    => $CMTLoanDistribute,
+            'data'              => $CMTLoanDistSummary,
+            'cmp_amount'        => ceil((($CMTLoanDistribute - $LMTLoanDistribute) / ($LMTLoanDistribute != 0 ? $LMTLoanDistribute : ($CMTLoanDistribute != 0 ? $CMTLoanDistribute : 0))) * 100)
         ]);
     }
 

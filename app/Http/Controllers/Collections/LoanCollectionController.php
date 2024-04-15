@@ -12,6 +12,7 @@ use App\Models\accounts\Account;
 use App\Models\category\Category;
 use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Collections\LoanCollection;
 use App\Models\Collections\LoanCollectionActionHistory;
@@ -158,6 +159,66 @@ class LoanCollectionController extends Controller
         });
 
         return create_response(__('customValidations.client.collection.approved'));
+    }
+
+    /**
+     * Current Month Loan Collection summary
+     */
+    public function loan_collection_summery()
+    {
+        $currentDate    = [Carbon::now()->startOfMonth()->startOfDay(), Carbon::now()->endOfMonth()->endOfDay()];
+        $lastMonthDate  = [Carbon::now()->subMonths()->startOfMonth()->startOfDay(), Carbon::now()->subMonths()->endOfMonth()->endOfDay()];
+
+        $LMTLoanCollection  = LoanCollection::approve()->where('category_id', '!=', Category::whereName('monthly_loan')->value('id'))->whereBetween('created_at', $lastMonthDate)->sum('loan');
+        $CMTLoanCollSummary = LoanCollection::approve()->where('category_id', '!=', Category::whereName('monthly_loan')->value('id'))->whereBetween('created_at', $currentDate)->groupBy('created_at')->selectRaw('SUM(loan) as amount, created_at as date')->get();
+        $CMTLoanCollection  = !empty($CMTLoanCollSummary) ? $CMTLoanCollSummary->sum('amount') : 0;
+
+        return create_response(null, [
+            'last_amount'       => $LMTLoanCollection,
+            'current_amount'    => $CMTLoanCollection,
+            'data'              => $CMTLoanCollSummary,
+            'cmp_amount'        => ceil((($CMTLoanCollection - $LMTLoanCollection) / ($LMTLoanCollection != 0 ? $LMTLoanCollection : ($CMTLoanCollection != 0 ? $CMTLoanCollection : 0))) * 100)
+        ]);
+    }
+
+    /**
+     * Current Month Monthly Loan Collection summary
+     */
+    public function monthly_loan_collection_summery()
+    {
+        $currentDate    = [Carbon::now()->startOfMonth()->startOfDay(), Carbon::now()->endOfMonth()->endOfDay()];
+        $lastMonthDate  = [Carbon::now()->subMonths()->startOfMonth()->startOfDay(), Carbon::now()->subMonths()->endOfMonth()->endOfDay()];
+
+        $LMTLoanCollection  = LoanCollection::approve()->where('category_id', Category::whereName('monthly_loan')->value('id'))->whereBetween('created_at', $lastMonthDate)->sum('loan');
+        $CMTLoanCollSummary = LoanCollection::approve()->where('category_id', Category::whereName('monthly_loan')->value('id'))->whereBetween('created_at', $currentDate)->groupBy('created_at')->selectRaw('SUM(loan) as amount, created_at as date')->get();
+        $CMTLoanCollection  = !empty($CMTLoanCollSummary) ? $CMTLoanCollSummary->sum('amount') : 0;
+
+        return create_response(null, [
+            'last_amount'       => $LMTLoanCollection,
+            'current_amount'    => $CMTLoanCollection,
+            'data'              => $CMTLoanCollSummary,
+            'cmp_amount'        => ceil((($CMTLoanCollection - $LMTLoanCollection) / ($LMTLoanCollection != 0 ? $LMTLoanCollection : ($CMTLoanCollection != 0 ? $CMTLoanCollection : 0))) * 100)
+        ]);
+    }
+
+    /**
+     * Current Month Loan Saving Collection summary
+     */
+    public function loan_saving_collection_summery()
+    {
+        $currentDate    = [Carbon::now()->startOfMonth()->startOfDay(), Carbon::now()->endOfMonth()->endOfDay()];
+        $lastMonthDate  = [Carbon::now()->subMonths()->startOfMonth()->startOfDay(), Carbon::now()->subMonths()->endOfMonth()->endOfDay()];
+
+        $LMTSavingCollection  = LoanCollection::approve()->whereBetween('created_at', $lastMonthDate)->sum('deposit');
+        $CMTSavingCollSummary = LoanCollection::approve()->whereBetween('created_at', $currentDate)->groupBy('created_at')->selectRaw('SUM(deposit) as amount, created_at as date')->get();
+        $CMTSavingCollection  = !empty($CMTSavingCollSummary) ? $CMTSavingCollSummary->sum('amount') : 0;
+
+        return create_response(null, [
+            'last_amount'       => $LMTSavingCollection,
+            'current_amount'    => $CMTSavingCollection,
+            'data'              => $CMTSavingCollSummary,
+            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 0))) * 100)
+        ]);
     }
 
     /**
