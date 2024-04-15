@@ -11,6 +11,7 @@ use App\Models\center\Center;
 use App\Models\accounts\Account;
 use App\Models\category\Category;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
 use App\Models\Collections\SavingCollection;
@@ -237,6 +238,25 @@ class SavingCollectionController extends Controller
             'data'              => $CMTSavingCollSummary,
             'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 0))) * 100)
         ]);
+    }
+
+    /**
+     * Today Collection sources
+     */
+    public function current_day_saving_collection_sources()
+    {
+        $sources = SavingCollection::with('Category:id,name,is_default')
+            ->today()
+            ->groupBy('category_id')
+            ->selectRaw('SUM(deposit) as amount, category_id')->get();
+
+        return create_response(null, $sources->map(function ($source) {
+            return (object)[
+                'name'          => $source->Category->name,
+                'is_default'    => $source->Category->is_default,
+                'amount'        => $source->amount
+            ];
+        }));
     }
 
     /**
