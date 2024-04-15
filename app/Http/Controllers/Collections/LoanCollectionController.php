@@ -14,6 +14,7 @@ use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Collections\LoanCollection;
 use App\Models\Collections\LoanCollectionActionHistory;
 use App\Http\Requests\collection\LoanCollectionStoreRequest;
@@ -238,6 +239,27 @@ class LoanCollectionController extends Controller
                 'amount'        => $source->amount
             ];
         }));
+    }
+
+    /**
+     * Today Collection
+     */
+    public function current_day_loan_collection()
+    {
+        $collections = LoanCollection::today()
+            ->clientRegistration('id', 'name', 'image_uri')
+            ->category('id', 'name', 'is_default')
+            ->field('id', 'name')
+            ->center('id', 'name')
+            ->account('id', 'name', 'is_default')
+            ->author('id', 'name', 'image_uri')
+            ->when(!Auth::user()->can('view_dashboard_as_admin'), function ($query) {
+                $query->CreatedBy(Auth::user()->id);
+            })
+            ->latest()
+            ->get(['id', 'field_id', 'center_id', 'category_id', 'client_registration_id', 'account_id', 'creator_id', 'acc_no', 'installment', 'deposit', 'loan', 'interest', 'total', 'description', 'created_at']);
+
+        return create_response(null, $collections);
     }
 
     /**

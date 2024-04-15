@@ -220,10 +220,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         // Current Collection Summary routes
         Route::GET('current-day-top-collectionist', [UserController::class, 'current_day_top_collectionist'])->name('users.current_day_top_collectionist');
 
+        Route::GET('saving/current-day-collection', [SavingCollectionController::class, 'current_day_saving_collection'])->name('saving.current_day_saving_collection');
         Route::GET('saving/current-day-collection-sources', [SavingCollectionController::class, 'current_day_saving_collection_sources'])->name('saving.current_day_saving_collection_sources');
         Route::GET('saving/current-month-collection-summary', [SavingCollectionController::class, 'saving_collection_summery'])->name('saving.saving_collection_summery');
         Route::GET('saving/current-month-dps-collection-summary', [SavingCollectionController::class, 'dps_collection_summery'])->name('saving.dps_collection_summary');
 
+        Route::GET('loan/current-day-collection', [LoanCollectionController::class, 'current_day_loan_collection'])->name('loan.current_day_loan_collection');
         Route::GET('loan/current-day-collection-sources', [LoanCollectionController::class, 'current_day_loan_collection_sources'])->name('loan.current_day_loan_collection_sources');
         Route::GET('loan/current-month-collection-summary', [LoanCollectionController::class, 'loan_collection_summery'])->name('loan.loan_collection_summery');
         Route::GET('loan/current-month-monthly_loan-collection-summary', [LoanCollectionController::class, 'monthly_loan_collection_summery'])->name('loan.monthly_loan_collection_summary');
