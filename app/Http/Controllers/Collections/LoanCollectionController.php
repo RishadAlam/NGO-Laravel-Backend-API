@@ -222,6 +222,25 @@ class LoanCollectionController extends Controller
     }
 
     /**
+     * Today Collection sources
+     */
+    public function current_day_loan_collection_sources()
+    {
+        $sources = LoanCollection::with('Category:id,name,is_default')
+            ->today()
+            ->groupBy('category_id')
+            ->selectRaw('SUM(total) as amount, category_id')->get();
+
+        return create_response(null, $sources->map(function ($source) {
+            return (object)[
+                'name'          => $source->Category->name,
+                'is_default'    => $source->Category->is_default,
+                'amount'        => $source->amount
+            ];
+        }));
+    }
+
+    /**
      * Regular Field Report
      */
     public function regularFieldReport($category_id)
