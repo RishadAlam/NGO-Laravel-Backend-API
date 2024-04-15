@@ -218,6 +218,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::POST('loan/approved', [LoanCollectionController::class, 'approved'])->name('loan.approved');
 
         // Current Collection Summary routes
+        Route::GET('current-day-top-collectionist', [UserController::class, 'current_day_top_collectionist'])->name('users.current_day_top_collectionist');
+
         Route::GET('saving/current-day-collection-sources', [SavingCollectionController::class, 'current_day_saving_collection_sources'])->name('saving.current_day_saving_collection_sources');
         Route::GET('saving/current-month-collection-summary', [SavingCollectionController::class, 'saving_collection_summery'])->name('saving.saving_collection_summery');
         Route::GET('saving/current-month-dps-collection-summary', [SavingCollectionController::class, 'dps_collection_summery'])->name('saving.dps_collection_summary');

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserActionHistory;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -209,6 +210,50 @@ class UserController extends Controller
     public function get_active_users()
     {
         $users = User::where('status', true)->get(['id', 'name']);
+        return create_response(null, $users);
+    }
+
+    /**
+     * Today Top Collectionist
+     */
+    public function current_day_top_collectionist()
+    {
+        $users = User::active()
+            ->with(
+                [
+                    'SavingCollection' => function ($query) {
+                        $query->today()
+                            ->selectRaw('SUM(deposit) as deposit, creator_id')
+                            ->groupBy('creator_id');
+                    },
+                    'LoanCollection' => function ($query) {
+                        $query->today()
+                            ->selectRaw('SUM(total) as total, creator_id')
+                            ->groupBy('creator_id');
+                    },
+                ]
+            )
+            ->when(!Auth::user()->can('view_dashboard_as_admin'), function ($query) {
+                $query->whereId(Auth::user()->id);
+            })
+            ->get(['id', 'name', 'email', 'image_uri'])->filter(function ($user) {
+                return !empty($user->SavingCollection[0]) || !empty($user->LoanCollection[0]);
+            })
+            ->map(function ($user) {
+                $amount = ($user->SavingCollection->isEmpty() ? 0 : $user->SavingCollection[0]->deposit)
+                    + ($user->LoanCollection->isEmpty() ? 0 : $user->LoanCollection[0]->total);
+
+                return (object) [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'image_uri' => $user->image_uri,
+                    'email' => $user->email,
+                    'amount' => $amount,
+                ];
+            })
+            ->sortByDesc('amount')
+            ->values();
+
         return create_response(null, $users);
     }
 }

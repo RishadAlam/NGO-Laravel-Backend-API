@@ -3,9 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Laravel\Sanctum\HasApiTokens;
+use App\Http\Traits\HelperScopesTrait;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Collections\LoanCollection;
+use App\Models\Collections\SavingCollection;
 use Spatie\Permission\Traits\HasPermissions;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -14,7 +18,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use SoftDeletes, HasRoles, HasPermissions, HasApiTokens, HasFactory, Notifiable;
+    use SoftDeletes, HasRoles, HasPermissions, HasApiTokens, HasFactory, Notifiable, HelperScopesTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -57,5 +61,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function UserActionHistory()
     {
         return $this->hasMany(UserActionHistory::class);
+    }
+
+    /**
+     * Relation with Saving Collection Table
+     */
+    public function SavingCollection()
+    {
+        return $this->hasMany(SavingCollection::class, 'creator_id');
+    }
+
+    /**
+     * Relation with Loan Collection Table
+     */
+    public function LoanCollection()
+    {
+        return $this->hasMany(LoanCollection::class, 'creator_id');
     }
 }
