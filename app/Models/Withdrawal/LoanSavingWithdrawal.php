@@ -11,6 +11,7 @@ use App\Http\Traits\BelongsToApproverTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
 use App\Http\Traits\BelongsToLoanAccountTrait;
 use App\Http\Traits\BelongsToSavingAccountTrait;
+use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanSavingWithdrawal extends Model
@@ -23,6 +24,7 @@ class LoanSavingWithdrawal extends Model
         BelongsToAuthorTrait,
         BelongsToApproverTrait,
         BelongsToSavingAccountTrait,
+        BelongsToClientRegistrationTrait,
         BelongsToLoanAccountTrait;
 
     /**
@@ -34,6 +36,7 @@ class LoanSavingWithdrawal extends Model
         'field_id',
         'center_id',
         'category_id',
+        'client_registration_id',
         'loan_account_id',
         'approved_by',
         'is_approved',

@@ -175,12 +175,13 @@ class LoanSavingWithdrawalController extends Controller
         ];
         if ($is_store) {
             $field_map += [
-                'field_id'           => $account->field_id,
-                'center_id'          => $account->center_id,
-                'category_id'        => $account->category_id,
-                'loan_account_id'    => $account->id,
-                'acc_no'             => $account->acc_no,
-                'creator_id'         => auth()->id(),
+                'field_id'                  => $account->field_id,
+                'center_id'                 => $account->center_id,
+                'category_id'               => $account->category_id,
+                'client_registration_id'    => $account->client_registration_id,
+                'loan_account_id'           => $account->id,
+                'acc_no'                    => $account->acc_no,
+                'creator_id'                => auth()->id(),
             ];
         }
 

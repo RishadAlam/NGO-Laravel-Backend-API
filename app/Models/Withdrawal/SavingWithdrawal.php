@@ -10,6 +10,7 @@ use App\Http\Traits\BelongsToCenterTrait;
 use App\Http\Traits\BelongsToApproverTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
 use App\Http\Traits\BelongsToSavingAccountTrait;
+use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SavingWithdrawal extends Model
@@ -21,6 +22,7 @@ class SavingWithdrawal extends Model
         BelongsToCategoryTrait,
         BelongsToAuthorTrait,
         BelongsToApproverTrait,
+        BelongsToClientRegistrationTrait,
         BelongsToSavingAccountTrait;
 
     /**
@@ -32,6 +34,7 @@ class SavingWithdrawal extends Model
         'field_id',
         'center_id',
         'category_id',
+        'client_registration_id',
         'saving_account_id',
         'approved_by',
         'is_approved',

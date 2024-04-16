@@ -20,6 +20,7 @@ use App\Models\Collections\LoanCollectionActionHistory;
 use App\Http\Requests\collection\LoanCollectionStoreRequest;
 use App\Http\Requests\collection\LoanCollectionUpdateRequest;
 use App\Http\Requests\collection\LoanCollectionApprovedRequest;
+use App\Models\Withdrawal\LoanSavingWithdrawal;
 
 class LoanCollectionController extends Controller
 {
@@ -260,6 +261,27 @@ class LoanCollectionController extends Controller
             ->get(['id', 'field_id', 'center_id', 'category_id', 'client_registration_id', 'account_id', 'creator_id', 'acc_no', 'installment', 'deposit', 'loan', 'interest', 'total', 'description', 'created_at']);
 
         return create_response(null, $collections);
+    }
+
+    /**
+     * Today Collection
+     */
+    public function current_day_saving_withdrawal()
+    {
+        $withdrawals = LoanSavingWithdrawal::today()
+            ->clientRegistration('id', 'name', 'image_uri')
+            ->category('id', 'name', 'is_default')
+            ->field('id', 'name')
+            ->center('id', 'name')
+            ->account('id', 'name', 'is_default')
+            ->author('id', 'name', 'image_uri')
+            ->when(!Auth::user()->can('view_dashboard_as_admin'), function ($query) {
+                $query->CreatedBy(Auth::user()->id);
+            })
+            ->latest()
+            ->get(['id', 'field_id', 'center_id', 'category_id', 'client_registration_id', 'account_id', 'creator_id', 'acc_no', 'balance', 'amount', 'balance_remaining', 'description', 'created_at']);
+
+        return create_response(null, $withdrawals);
     }
 
     /**
