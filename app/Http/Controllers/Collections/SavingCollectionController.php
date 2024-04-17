@@ -218,7 +218,7 @@ class SavingCollectionController extends Controller
             'last_amount'       => $LMTSavingCollection,
             'current_amount'    => $CMTSavingCollection,
             'data'              => $CMTSavingCollSummary,
-            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 0))) * 100)
+            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 1))) * 100)
         ]);
     }
 
@@ -238,7 +238,7 @@ class SavingCollectionController extends Controller
             'last_amount'       => $LMTSavingCollection,
             'current_amount'    => $CMTSavingCollection,
             'data'              => $CMTSavingCollSummary,
-            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 0))) * 100)
+            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 1))) * 100)
         ]);
     }
 

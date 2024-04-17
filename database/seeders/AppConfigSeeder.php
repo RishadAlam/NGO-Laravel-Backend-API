@@ -24,14 +24,6 @@ class AppConfigSeeder extends Seeder
                     "company_logo_uri"      => null,
                 ])
             ],
-            // [
-            //     "meta_key"      => "collection_time",
-            //     "meta_value"    => json_encode([
-            //         "has_collection_time_is_enabled"    => false,
-            //         "collection_start_time"             => "",
-            //         "collection_end_time"               => "",
-            //     ])
-            // ],
             [
                 "meta_key"      => "saving_collection_approval",
                 "meta_value"    => json_encode(false)

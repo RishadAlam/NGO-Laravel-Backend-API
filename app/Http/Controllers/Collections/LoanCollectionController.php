@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Collections\LoanCollection;
+use App\Models\Withdrawal\LoanSavingWithdrawal;
 use App\Models\Collections\LoanCollectionActionHistory;
 use App\Http\Requests\collection\LoanCollectionStoreRequest;
 use App\Http\Requests\collection\LoanCollectionUpdateRequest;
 use App\Http\Requests\collection\LoanCollectionApprovedRequest;
-use App\Models\Withdrawal\LoanSavingWithdrawal;
 
 class LoanCollectionController extends Controller
 {
@@ -179,7 +179,7 @@ class LoanCollectionController extends Controller
             'last_amount'       => $LMTLoanCollection,
             'current_amount'    => $CMTLoanCollection,
             'data'              => $CMTLoanCollSummary,
-            'cmp_amount'        => ceil((($CMTLoanCollection - $LMTLoanCollection) / ($LMTLoanCollection != 0 ? $LMTLoanCollection : ($CMTLoanCollection != 0 ? $CMTLoanCollection : 0))) * 100)
+            'cmp_amount'        => ceil((($CMTLoanCollection - $LMTLoanCollection) / ($LMTLoanCollection != 0 ? $LMTLoanCollection : ($CMTLoanCollection != 0 ? $CMTLoanCollection : 1))) * 100)
         ]);
     }
 
@@ -199,7 +199,7 @@ class LoanCollectionController extends Controller
             'last_amount'       => $LMTLoanCollection,
             'current_amount'    => $CMTLoanCollection,
             'data'              => $CMTLoanCollSummary,
-            'cmp_amount'        => ceil((($CMTLoanCollection - $LMTLoanCollection) / ($LMTLoanCollection != 0 ? $LMTLoanCollection : ($CMTLoanCollection != 0 ? $CMTLoanCollection : 0))) * 100)
+            'cmp_amount'        => ceil((($CMTLoanCollection - $LMTLoanCollection) / ($LMTLoanCollection != 0 ? $LMTLoanCollection : ($CMTLoanCollection != 0 ? $CMTLoanCollection : 1))) * 100)
         ]);
     }
 
@@ -219,7 +219,7 @@ class LoanCollectionController extends Controller
             'last_amount'       => $LMTSavingCollection,
             'current_amount'    => $CMTSavingCollection,
             'data'              => $CMTSavingCollSummary,
-            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 0))) * 100)
+            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 1))) * 100)
         ]);
     }
 

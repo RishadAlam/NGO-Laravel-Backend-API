@@ -206,7 +206,7 @@ class LoanAccountController extends Controller
             'last_amount'       => $LMTLoanDistribute,
             'current_amount'    => $CMTLoanDistribute,
             'data'              => $CMTLoanDistSummary,
-            'cmp_amount'        => ceil((($CMTLoanDistribute - $LMTLoanDistribute) / ($LMTLoanDistribute != 0 ? $LMTLoanDistribute : ($CMTLoanDistribute != 0 ? $CMTLoanDistribute : 0))) * 100)
+            'cmp_amount'        => ceil((($CMTLoanDistribute - $LMTLoanDistribute) / ($LMTLoanDistribute != 0 ? $LMTLoanDistribute : ($CMTLoanDistribute != 0 ? $CMTLoanDistribute : 1))) * 100)
         ]);
     }
 

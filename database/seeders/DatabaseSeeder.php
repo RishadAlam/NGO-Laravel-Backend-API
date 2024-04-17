@@ -15,24 +15,25 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(
             [
-                // UserSeeder::class,
-                // RolePermissionSeeder::class,
-                // AppConfigSeeder::class,
-                // AccountSeeder::class,
-                // IncomeCategorySeeder::class,
-                // ExpenseCategorySeeder::class,
                 // IncomeSeeder::class,
                 // ExpenseSeeder::class,
                 // AccountWithdrawalSeeder::class,
                 // FieldSeeder::class,
                 // CenterSeeder::class,
-                // CategorySeeder::class,
                 // ClientRegistrationSeeder::class,
                 // SavingAccountSeeder::class,
                 // LoanAccountSeeder::class,
                 // SavingCollectionSeeder::class,
                 // LoanCollectionSeeder::class,
-                // AccountFeesCategorySeeder::class,
+
+                UserSeeder::class,
+                RolePermissionSeeder::class,
+                AppConfigSeeder::class,
+                AccountSeeder::class,
+                IncomeCategorySeeder::class,
+                ExpenseCategorySeeder::class,
+                CategorySeeder::class,
+                AccountFeesCategorySeeder::class,
                 AuditReportPageSeeder::class,
                 AuditReportMetaSeeder::class
             ]
