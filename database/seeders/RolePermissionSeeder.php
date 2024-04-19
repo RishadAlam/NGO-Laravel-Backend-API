@@ -322,7 +322,6 @@ class RolePermissionSeeder extends Seeder
             [
                 'groupName'     => 'cooperative_audit_report',
                 'permissions'   => [
-                    'cooperative_audit_report_list_view',
                     'cooperative_audit_report_view',
                     'cooperative_audit_report_update',
                     'cooperative_audit_report_print',
