@@ -276,8 +276,6 @@ class RolePermissionSeeder extends Seeder
                 'groupName'     => 'staff',
                 'permissions'   => [
                     'staff_list_view',
-                    'staff_permission_view',
-                    'staff_permission_update',
                     'staff_registration',
                     'staff_data_update',
                     'staff_status_update',
@@ -295,6 +293,14 @@ class RolePermissionSeeder extends Seeder
                     'role_registration',
                     'role_update',
                     'role_delete',
+                ]
+            ],
+            // Staffs Permission
+            [
+                'groupName'     => 'staff_permission',
+                'permissions'   => [
+                    'staff_permission_view',
+                    'staff_permission_update',
                 ]
             ],
             // App Config
