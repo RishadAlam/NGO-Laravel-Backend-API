@@ -13,6 +13,7 @@ use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Models\client\ClientRegistration;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\client\AccNoUpdateRequest;
 use App\Http\Requests\client\FieldUpdateRequest;
 use App\Http\Requests\client\CenterUpdateRequest;
 use App\Models\client\ClientRegistrationActionHistory;
@@ -224,6 +225,37 @@ class ClientRegistrationController extends Controller
             $client->LoanCollection()->update(['center_id' => $data->id]);
             $client->SavingWithdrawal()->update(['center_id' => $data->id]);
             $client->LoanSavingWithdrawal()->update(['center_id' => $data->id]);
+
+            ClientRegistrationActionHistory::create(self::setActionHistory($id, 'update', $histData));
+        });
+
+        return create_response(__('customValidations.client.registration.update'));
+    }
+
+    /**
+     * Update the accNo.
+     */
+    public function accNoUpdate(AccNoUpdateRequest $request, string $id)
+    {
+        $data       = (object) $request->validated();
+        $client     = ClientRegistration::find($id);
+
+        if (Helper::areValuesEqual($data->acc_no, $client->acc_no)) {
+            return create_validation_error_response(__('customValidations.acc_no.choose_new_acc_no'));
+        } else {
+            $histData = [
+                'acc_no' => "<p class='text-danger'>- {$client->acc_no}</p><p class='text-success'>+ {$data->acc_no}</p>"
+            ];
+        }
+
+        DB::transaction(function () use ($id, $client, $data, $histData) {
+            $client->update(['acc_no' => $data->acc_no]);
+            $client->SavingAccount()->update(['acc_no' => $data->acc_no]);
+            $client->LoanAccount()->update(['acc_no' => $data->acc_no]);
+            $client->SavingCollection()->update(['acc_no' => $data->acc_no]);
+            $client->LoanCollection()->update(['acc_no' => $data->acc_no]);
+            $client->SavingWithdrawal()->update(['acc_no' => $data->acc_no]);
+            $client->LoanSavingWithdrawal()->update(['acc_no' => $data->acc_no]);
 
             ClientRegistrationActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
