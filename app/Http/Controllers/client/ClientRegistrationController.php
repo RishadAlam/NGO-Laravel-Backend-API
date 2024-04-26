@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\client\ClientRegistration;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\client\FieldUpdateRequest;
+use App\Http\Requests\client\CenterUpdateRequest;
 use App\Models\client\ClientRegistrationActionHistory;
 use App\Http\Requests\client\ClientRegistrationStoreRequest;
 use App\Http\Requests\client\ClientRegistrationUpdateRequest;
@@ -31,6 +32,7 @@ class ClientRegistrationController extends Controller
         $this->middleware('can:pending_client_registration_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_client_registration_approval')->only('approved');
         $this->middleware('can:field_update')->only('fieldUpdate');
+        $this->middleware('can:center_update')->only('centerUpdate');
     }
 
     /**
@@ -191,6 +193,37 @@ class ClientRegistrationController extends Controller
             $client->LoanCollection()->update(['field_id' => $data->id]);
             $client->SavingWithdrawal()->update(['field_id' => $data->id]);
             $client->LoanSavingWithdrawal()->update(['field_id' => $data->id]);
+
+            ClientRegistrationActionHistory::create(self::setActionHistory($id, 'update', $histData));
+        });
+
+        return create_response(__('customValidations.client.registration.update'));
+    }
+
+    /**
+     * Update the center.
+     */
+    public function centerUpdate(CenterUpdateRequest $request, string $id)
+    {
+        $data       = (object) $request->validated();
+        $client     = ClientRegistration::with('Center:id,name')->find($id);
+
+        if (Helper::areValuesEqual($data->id, $client->center_id)) {
+            return create_validation_error_response(__('customValidations.center.choose_new_center'));
+        } else {
+            $histData = [
+                'center' => "<p class='text-danger'>- {$client->center->name}</p><p class='text-success'>+ {$data->name}</p>"
+            ];
+        }
+
+        DB::transaction(function () use ($id, $client, $data, $histData) {
+            $client->update(['center_id' => $data->id]);
+            $client->SavingAccount()->update(['center_id' => $data->id]);
+            $client->LoanAccount()->update(['center_id' => $data->id]);
+            $client->SavingCollection()->update(['center_id' => $data->id]);
+            $client->LoanCollection()->update(['center_id' => $data->id]);
+            $client->SavingWithdrawal()->update(['center_id' => $data->id]);
+            $client->LoanSavingWithdrawal()->update(['center_id' => $data->id]);
 
             ClientRegistrationActionHistory::create(self::setActionHistory($id, 'update', $histData));
         });
