@@ -34,6 +34,7 @@ class ClientRegistrationController extends Controller
         $this->middleware('can:pending_client_registration_approval')->only('approved');
         $this->middleware('can:field_update')->only('fieldUpdate');
         $this->middleware('can:center_update')->only('centerUpdate');
+        $this->middleware('can:acc_no_update')->only('accNoUpdate');
     }
 
     /**
