@@ -16,6 +16,7 @@ use App\Http\Traits\BelongsToApproverTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
 use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SavingAccount extends Model
@@ -27,6 +28,7 @@ class SavingAccount extends Model
         BelongsToCenterTrait,
         BelongsToCategoryTrait,
         BelongsToAuthorTrait,
+        BelongsToClientRegistrationTrait,
         BelongsToApproverTrait;
 
     /**

@@ -123,6 +123,18 @@ class RolePermissionSeeder extends Seeder
                     'pending_loan_permanently_delete',
                 ]
             ],
+            // Client Register Account
+            [
+                'groupName'     => 'client_register_account',
+                'permissions'   => [
+                    'account_update',
+                    'account_delete',
+                    'account_permanently_delete',
+                    'field_update',
+                    'center_update',
+                    'acc_no_update',
+                ]
+            ],
             // Regular Saving Collection
             [
                 'groupName'     => 'regular_saving_collection',

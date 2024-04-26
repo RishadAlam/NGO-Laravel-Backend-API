@@ -30,7 +30,7 @@ return [
         "acc_details"                       => "Account Details",
         "initial_balance"                   => "Initial Balance",
         "field"                             => "Field",
-        "center"                            => "Center",
+        "category"                            => "Center",
         "field_id"                          => "Field",
         "center_id"                         => "Center",
         "creator_id"                        => "Creator",
@@ -253,6 +253,7 @@ return [
         'delete'            => 'The field has been successfully deleted.',
         'update'            => 'The field has been successfully updated.',
         'status'            => 'The field status has been successfully updated.',
+        'choose_new_field'  => 'Choose New Field!',
     ],
 
     /*
@@ -265,6 +266,7 @@ return [
         'delete'            => 'The center has been successfully deleted.',
         'update'            => 'The center has been successfully updated.',
         'status'            => 'The center status has been successfully updated.',
+        'choose_new_center' => 'Choose New Center!',
     ],
 
     /*
@@ -273,10 +275,11 @@ return [
     |--------------------------------------------------------------------------
     */
     'category' => [
-        'successful'        => 'The category has been successfully registered.',
-        'delete'            => 'The category has been successfully deleted.',
-        'update'            => 'The category has been successfully updated.',
-        'status'            => 'The category status has been successfully updated.',
+        'successful'            => 'The category has been successfully registered.',
+        'delete'                => 'The category has been successfully deleted.',
+        'update'                => 'The category has been successfully updated.',
+        'status'                => 'The category status has been successfully updated.',
+        'choose_new_category'   => 'Choose New Category!',
 
         "default"           => [
             "monthly_loan"  => "Monthly Loan",

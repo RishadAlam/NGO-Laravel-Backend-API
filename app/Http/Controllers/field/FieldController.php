@@ -61,7 +61,7 @@ class FieldController extends Controller
         $field      = Field::find($id);
         $histData   = [];
 
-        $field->name        !== $data->name ? $histData['name'] = "<p class='text-danger'>{$field->name}</p><p class='text-success'>{$data->name}</p>" : '';
+        $field->name        !== $data->name ? $histData['name'] = "<p class='text-danger'>- {$field->name}</p><p class='text-success'>+ {$data->name}</p>" : '';
         $field->description !== $data->description ? $histData['description'] = "<p class='text-danger'>{$field->description}</p><p class='text-success'>{$data->description}</p>" : '';
 
         DB::transaction(function () use ($id, $data, $field, $histData) {

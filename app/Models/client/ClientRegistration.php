@@ -2,14 +2,20 @@
 
 namespace App\Models\client;
 
+use App\Models\client\LoanAccount;
+use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToFieldTrait;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
+use App\Models\Collections\LoanCollection;
 use App\Http\Traits\BelongsToApproverTrait;
+use App\Models\Withdrawal\SavingWithdrawal;
+use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Withdrawal\LoanSavingWithdrawal;
 use App\Models\client\ClientRegistrationActionHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -67,7 +73,7 @@ class ClientRegistration extends Model
     }
 
     /**
-     * Relation with ClientRegistrationActionHistory Table
+     * Relation with SavingAccount Table
      */
     public function ActiveSavingAccount()
     {
@@ -75,11 +81,59 @@ class ClientRegistration extends Model
     }
 
     /**
-     * Relation with ClientRegistrationActionHistory Table
+     * Relation with LoanAccount Table
      */
     public function ActiveLoanAccount()
     {
         return $this->hasMany(LoanAccount::class);
+    }
+
+    /**
+     * Relation with SavingAccount Table
+     */
+    public function SavingAccount()
+    {
+        return $this->hasMany(SavingAccount::class)->withTrashed();
+    }
+
+    /**
+     * Relation with LoanAccount Table
+     */
+    public function LoanAccount()
+    {
+        return $this->hasMany(LoanAccount::class)->withTrashed();
+    }
+
+    /**
+     * Relation with SavingCollection Table
+     */
+    public function SavingCollection()
+    {
+        return $this->hasMany(SavingCollection::class)->withTrashed();
+    }
+
+    /**
+     * Relation with LoanCollection Table
+     */
+    public function LoanCollection()
+    {
+        return $this->hasMany(LoanCollection::class)->withTrashed();
+    }
+
+    /**
+     * Relation with SavingWithdrawal Table
+     */
+    public function SavingWithdrawal()
+    {
+        return $this->hasMany(SavingWithdrawal::class);
+    }
+
+    /**
+     * Relation with LoanSavingWithdrawal Table
+     */
+    public function LoanSavingWithdrawal()
+    {
+        return $this->hasMany(LoanSavingWithdrawal::class);
     }
 
     /**

@@ -137,6 +137,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     // Client additional routes
     Route::prefix('client/registration')->name('client.registration.')->group(function () {
+        Route::PUT('field-update/{id}', [ClientRegistrationController::class, 'fieldUpdate'])->name('fieldUpdate');
+        Route::PUT('center-update/{id}', [ClientRegistrationController::class, 'centerUpdate'])->name('centerUpdate');
+        Route::PUT('acc-no-update/{id}', [ClientRegistrationController::class, 'accNoUpdate'])->name('accNoUpdate');
         Route::GET('count-accounts/{id}', [ClientRegistrationController::class, 'countAccounts'])->name('count_accounts');
         Route::GET('occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('occupations');
         Route::GET('saving/nominee/occupations', [SavingAccountController::class, 'get_nominee_occupations'])->name('saving.occupations');

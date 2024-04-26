@@ -20,6 +20,7 @@ use App\Http\Traits\BelongsToCategoryTrait;
 use App\Models\client\GuarantorRegistration;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\LoanAccountActionHistory;
+use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanAccount extends Model
@@ -31,6 +32,7 @@ class LoanAccount extends Model
         BelongsToCenterTrait,
         BelongsToCategoryTrait,
         BelongsToAuthorTrait,
+        BelongsToClientRegistrationTrait,
         BelongsToApproverTrait;
 
     /**

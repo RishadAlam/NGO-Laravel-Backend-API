@@ -13,6 +13,7 @@ use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Models\client\ClientRegistration;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\client\FieldUpdateRequest;
 use App\Models\client\ClientRegistrationActionHistory;
 use App\Http\Requests\client\ClientRegistrationStoreRequest;
 use App\Http\Requests\client\ClientRegistrationUpdateRequest;
@@ -29,6 +30,7 @@ class ClientRegistrationController extends Controller
         $this->middleware('can:pending_client_registration_update')->only('update');
         $this->middleware('can:pending_client_registration_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_client_registration_approval')->only('approved');
+        $this->middleware('can:field_update')->only('fieldUpdate');
     }
 
     /**
@@ -163,6 +165,37 @@ class ClientRegistrationController extends Controller
         ];
 
         return create_response(null, $data);
+    }
+
+    /**
+     * Update the Field.
+     */
+    public function fieldUpdate(FieldUpdateRequest $request, string $id)
+    {
+        $data       = (object) $request->validated();
+        $client     = ClientRegistration::with('Field:id,name')->find($id);
+
+        if (Helper::areValuesEqual($data->id, $client->field_id)) {
+            return create_validation_error_response(__('customValidations.field.choose_new_field'));
+        } else {
+            $histData = [
+                'field' => "<p class='text-danger'>- {$client->field->name}</p><p class='text-success'>+ {$data->name}</p>"
+            ];
+        }
+
+        DB::transaction(function () use ($id, $client, $data, $histData) {
+            $client->update(['field_id' => $data->id]);
+            $client->SavingAccount()->update(['field_id' => $data->id]);
+            $client->LoanAccount()->update(['field_id' => $data->id]);
+            $client->SavingCollection()->update(['field_id' => $data->id]);
+            $client->LoanCollection()->update(['field_id' => $data->id]);
+            $client->SavingWithdrawal()->update(['field_id' => $data->id]);
+            $client->LoanSavingWithdrawal()->update(['field_id' => $data->id]);
+
+            ClientRegistrationActionHistory::create(self::setActionHistory($id, 'update', $histData));
+        });
+
+        return create_response(__('customValidations.client.registration.update'));
     }
 
     /**
