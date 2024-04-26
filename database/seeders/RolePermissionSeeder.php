@@ -127,12 +127,12 @@ class RolePermissionSeeder extends Seeder
             [
                 'groupName'     => 'client_register_account',
                 'permissions'   => [
-                    'account_update',
-                    'account_delete',
-                    'account_permanently_delete',
-                    'field_update',
-                    'center_update',
-                    'acc_no_update',
+                    'client_register_account_update',
+                    'client_register_account_delete',
+                    'client_register_account_permanently_delete',
+                    'client_register_account_field_update',
+                    'client_register_account_center_update',
+                    'client_register_account_acc_no_update',
                 ]
             ],
             // Regular Saving Collection

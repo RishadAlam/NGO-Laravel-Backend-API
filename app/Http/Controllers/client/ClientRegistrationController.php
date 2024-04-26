@@ -30,11 +30,12 @@ class ClientRegistrationController extends Controller
         $this->middleware('permission:pending_client_registration_list_view|pending_client_registration_list_view_as_admin')->only('pending_forms');
         $this->middleware('can:client_registration')->only('store');
         $this->middleware('can:pending_client_registration_update')->only('update');
+        $this->middleware('can:client_register_account_delete')->only('destroy');
         $this->middleware('can:pending_client_registration_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_client_registration_approval')->only('approved');
-        $this->middleware('can:field_update')->only('fieldUpdate');
-        $this->middleware('can:center_update')->only('centerUpdate');
-        $this->middleware('can:acc_no_update')->only('accNoUpdate');
+        $this->middleware('can:client_register_account_field_update')->only('fieldUpdate');
+        $this->middleware('can:client_register_account_center_update')->only('centerUpdate');
+        $this->middleware('can:client_register_account_acc_no_update')->only('accNoUpdate');
     }
 
     /**
@@ -73,7 +74,7 @@ class ClientRegistrationController extends Controller
      */
     public function show(string $id)
     {
-        $client = ClientRegistration::client()->find($id);
+        $client = ClientRegistration::client()->withTrashed()->find($id);
         return create_response(null, $client);
     }
 
@@ -133,7 +134,15 @@ class ClientRegistrationController extends Controller
     public function destroy(string $id)
     {
         DB::transaction(function () use ($id) {
-            ClientRegistration::find($id)->delete();
+            $client = ClientRegistration::find($id);
+            $client->delete();
+            $client->SavingAccount()->delete();
+            $client->LoanAccount()->delete();
+            $client->SavingCollection()->delete();
+            $client->LoanCollection()->delete();
+            $client->SavingWithdrawal()->delete();
+            $client->LoanSavingWithdrawal()->delete();
+
             ClientRegistrationActionHistory::create(self::setActionHistory($id, 'delete', []));
         });
 
