@@ -104,6 +104,7 @@ class LoanAccountController extends Controller
     public function show(string $id)
     {
         $account = LoanAccount::approve()
+            ->with(['LoanAccountActionHistory', 'LoanAccountActionHistory.Author:id,name,image_uri'])
             ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
             ->field('id', 'name',)
             ->center('id', 'name',)

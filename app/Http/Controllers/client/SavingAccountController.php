@@ -51,6 +51,7 @@ class SavingAccountController extends Controller
     {
         $saving = SavingAccount::withTrashed()
             ->approve()
+            ->with(['SavingAccountActionHistory', 'SavingAccountActionHistory.Author:id,name,image_uri'])
             ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
             ->field('id', 'name',)
             ->center('id', 'name',)

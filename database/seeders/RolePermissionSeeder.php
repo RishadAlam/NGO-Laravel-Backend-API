@@ -127,12 +127,35 @@ class RolePermissionSeeder extends Seeder
             [
                 'groupName'     => 'client_register_account',
                 'permissions'   => [
+                    'client_register_account_action_history',
                     'client_register_account_update',
                     'client_register_account_delete',
                     'client_register_account_permanently_delete',
                     'client_register_account_field_update',
                     'client_register_account_center_update',
                     'client_register_account_acc_no_update',
+                ]
+            ],
+            // Client Saving Account
+            [
+                'groupName'     => 'client_saving_account',
+                'permissions'   => [
+                    'client_saving_account_action_history',
+                    'client_saving_account_update',
+                    'client_saving_account_delete',
+                    'client_saving_account_permanently_delete',
+                    'client_saving_account_category_update',
+                ]
+            ],
+            // Client Loan Account
+            [
+                'groupName'     => 'client_loan_account',
+                'permissions'   => [
+                    'client_loan_account_action_history',
+                    'client_loan_account_update',
+                    'client_loan_account_delete',
+                    'client_loan_account_permanently_delete',
+                    'client_loan_account_category_update',
                 ]
             ],
             // Regular Saving Collection

@@ -69,7 +69,7 @@ class ClientRegistration extends Model
      */
     public function ClientRegistrationActionHistory()
     {
-        return $this->hasMany(ClientRegistrationActionHistory::class);
+        return $this->hasMany(ClientRegistrationActionHistory::class, 'registration_id');
     }
 
     /**
@@ -234,6 +234,7 @@ class ClientRegistration extends Model
     public function scopeClient($query)
     {
         $query->approve()
+            ->with(['ClientRegistrationActionHistory', 'ClientRegistrationActionHistory.Author:id,name,image_uri'])
             ->Field('id', 'name')
             ->Center('id', 'name')
             ->Author('id', 'name')
