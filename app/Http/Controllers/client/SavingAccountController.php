@@ -19,6 +19,7 @@ use App\Models\category\CategoryConfig;
 use App\Models\client\SavingAccountCheck;
 use Illuminate\Support\Facades\Validator;
 use App\Models\client\SavingAccountActionHistory;
+use App\Http\Requests\client\CategoryUpdateRequest;
 use App\Http\Requests\client\SavingAccountStoreRequest;
 use App\Http\Requests\client\SavingAccountUpdateRequest;
 
@@ -165,6 +166,37 @@ class SavingAccountController extends Controller
         SavingAccount::find($id)->forceDelete();
         return create_response(__('customValidations.client.saving.p_delete'));
     }
+
+    /**
+     * Update the Category.
+     */
+    public function categoryUpdate(CategoryUpdateRequest $request, string $id)
+    {
+        $data       = (object) $request->validated();
+        $account     = SavingAccount::with('Category:id,name,is_default')->find($id);
+
+        if (Helper::areValuesEqual($data->id, $account->category_id)) {
+            return create_validation_error_response(__('customValidations.category.choose_new_category'));
+        } else {
+            $oldCategory =  $account->category->is_default ? __("customValidations.category.default.{$account->category->name}") : $account->category->name;
+            $newCategory =  $data->is_default ? __("customValidations.category.default.{$data->name}") : $data->name;
+
+            $histData = [
+                'category' => "<p class='text-danger'>- {$oldCategory}</p><p class='text-success'>+ {$newCategory}</p>"
+            ];
+        }
+
+        DB::transaction(function () use ($id, $account, $data, $histData) {
+            $account->update(['category_id' => $data->id]);
+            $account->SavingCollection()->update(['category_id' => $data->id]);
+            $account->SavingWithdrawal()->update(['category_id' => $data->id]);
+
+            SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $id, 'update', $histData));
+        });
+
+        return create_response(__('customValidations.client.saving.update'));
+    }
+
 
     /**
      * Pending Forms

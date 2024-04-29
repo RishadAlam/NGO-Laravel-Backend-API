@@ -14,6 +14,7 @@ use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
 use App\Http\Traits\BelongsToApproverTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
+use App\Models\Withdrawal\SavingWithdrawal;
 use App\Models\Collections\SavingCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Traits\BelongsToClientRegistrationTrait;
@@ -83,6 +84,14 @@ class SavingAccount extends Model
     public function SavingCollection()
     {
         return $this->hasMany(SavingCollection::class)->withTrashed();
+    }
+
+    /**
+     * Relation with Saving Withdrawal Table
+     */
+    public function SavingWithdrawal()
+    {
+        return $this->hasMany(SavingWithdrawal::class);
     }
 
     /**

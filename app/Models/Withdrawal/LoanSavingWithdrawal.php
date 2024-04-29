@@ -23,7 +23,6 @@ class LoanSavingWithdrawal extends Model
         BelongsToCategoryTrait,
         BelongsToAuthorTrait,
         BelongsToApproverTrait,
-        BelongsToSavingAccountTrait,
         BelongsToClientRegistrationTrait,
         BelongsToLoanAccountTrait;
 

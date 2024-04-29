@@ -140,6 +140,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::PUT('field-update/{id}', [ClientRegistrationController::class, 'fieldUpdate'])->name('fieldUpdate');
         Route::PUT('center-update/{id}', [ClientRegistrationController::class, 'centerUpdate'])->name('centerUpdate');
         Route::PUT('acc-no-update/{id}', [ClientRegistrationController::class, 'accNoUpdate'])->name('accNoUpdate');
+        Route::PUT('saving/category-update/{id}', [SavingAccountController::class, 'categoryUpdate'])->name('categoryUpdate');
+        Route::PUT('loan/category-update/{id}', [LoanAccountController::class, 'categoryUpdate'])->name('categoryUpdate');
         Route::GET('count-accounts/{id}', [ClientRegistrationController::class, 'countAccounts'])->name('count_accounts');
         Route::GET('occupations', [ClientRegistrationController::class, 'get_client_occupations'])->name('occupations');
         Route::GET('saving/nominee/occupations', [SavingAccountController::class, 'get_nominee_occupations'])->name('saving.occupations');
