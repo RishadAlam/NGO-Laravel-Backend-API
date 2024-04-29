@@ -21,6 +21,7 @@ use App\Models\client\LoanAccountCheck;
 use App\Models\accounts\ExpenseCategory;
 use App\Models\client\LoanAccountActionHistory;
 use App\Http\Requests\client\LoanApprovalRequest;
+use App\Http\Requests\client\CategoryUpdateRequest;
 use App\Http\Requests\client\LoanAccountStoreRequest;
 use App\Http\Requests\client\LoanAccountUpdateRequest;
 
@@ -38,6 +39,7 @@ class LoanAccountController extends Controller
         $this->middleware('permission:pending_loan_acc_permanently_delete|pending_loan_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_loan_acc_approval')->only('approved');
         $this->middleware('can:pending_loan_approval')->only('loan_approved');
+        $this->middleware('can:client_loan_account_category_update')->only('categoryUpdate');
     }
 
     /**
@@ -168,6 +170,36 @@ class LoanAccountController extends Controller
     {
         LoanAccount::find($id)->forceDelete();
         return create_response(__('customValidations.client.loan.p_delete'));
+    }
+
+    /**
+     * Update the Category.
+     */
+    public function categoryUpdate(CategoryUpdateRequest $request, string $id)
+    {
+        $data       = (object) $request->validated();
+        $account     = LoanAccount::with('Category:id,name,is_default')->find($id);
+
+        if (Helper::areValuesEqual($data->id, $account->category_id)) {
+            return create_validation_error_response(__('customValidations.category.choose_new_category'));
+        } else {
+            $oldCategory =  $account->category->is_default ? __("customValidations.category.default.{$account->category->name}") : $account->category->name;
+            $newCategory =  $data->is_default ? __("customValidations.category.default.{$data->name}") : $data->name;
+
+            $histData = [
+                'category' => "<p class='text-danger'>- {$oldCategory}</p><p class='text-success'>+ {$newCategory}</p>"
+            ];
+        }
+
+        DB::transaction(function () use ($id, $account, $data, $histData) {
+            $account->update(['category_id' => $data->id]);
+            $account->LoanCollection()->update(['category_id' => $data->id]);
+            $account->LoanSavingWithdrawal()->update(['category_id' => $data->id]);
+
+            LoanAccountActionHistory::create(Helper::setActionHistory('loan_account_id', $id, 'update', $histData));
+        });
+
+        return create_response(__('customValidations.client.loan.update'));
     }
 
     /**

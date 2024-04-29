@@ -20,6 +20,7 @@ use App\Http\Traits\BelongsToCategoryTrait;
 use App\Models\client\GuarantorRegistration;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\client\LoanAccountActionHistory;
+use App\Models\Withdrawal\LoanSavingWithdrawal;
 use App\Http\Traits\BelongsToClientRegistrationTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -83,6 +84,14 @@ class LoanAccount extends Model
     public function LoanCollection()
     {
         return $this->hasMany(LoanCollection::class)->withTrashed();
+    }
+
+    /**
+     * Relation with Loan Saving Withdrawal Table
+     */
+    public function LoanSavingWithdrawal()
+    {
+        return $this->hasMany(LoanSavingWithdrawal::class);
     }
 
     /**

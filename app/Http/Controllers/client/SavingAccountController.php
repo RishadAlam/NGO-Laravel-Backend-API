@@ -35,6 +35,7 @@ class SavingAccountController extends Controller
         $this->middleware('can:pending_saving_acc_update')->only('update');
         $this->middleware('can:pending_saving_acc_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_saving_acc_approval')->only('approved');
+        $this->middleware('can:client_saving_account_category_update')->only('categoryUpdate');
     }
 
     /**
@@ -196,7 +197,6 @@ class SavingAccountController extends Controller
 
         return create_response(__('customValidations.client.saving.update'));
     }
-
 
     /**
      * Pending Forms
