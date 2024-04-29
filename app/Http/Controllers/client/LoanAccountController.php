@@ -105,7 +105,8 @@ class LoanAccountController extends Controller
      */
     public function show(string $id)
     {
-        $account = LoanAccount::approve()
+        $account = LoanAccount::withTrashed()
+            ->approve()
             ->with(['LoanAccountActionHistory', 'LoanAccountActionHistory.Author:id,name,image_uri'])
             ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
             ->field('id', 'name',)
@@ -156,7 +157,11 @@ class LoanAccountController extends Controller
     public function destroy(string $id)
     {
         DB::transaction(function () use ($id) {
-            LoanAccount::find($id)->delete();
+            $client = LoanAccount::find($id);
+            $client->delete();
+            $client->LoanCollection()->delete();
+            $client->LoanSavingWithdrawal()->delete();
+
             LoanAccountActionHistory::create(Helper::setActionHistory('loan_account_id', $id, 'delete', []));
         });
 

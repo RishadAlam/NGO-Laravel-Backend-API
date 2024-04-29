@@ -152,7 +152,11 @@ class SavingAccountController extends Controller
     public function destroy(string $id)
     {
         DB::transaction(function () use ($id) {
-            SavingAccount::find($id)->delete();
+            $client = SavingAccount::find($id);
+            $client->delete();
+            $client->SavingCollection()->delete();
+            $client->SavingWithdrawal()->delete();
+
             SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $id, 'delete', []));
         });
 
