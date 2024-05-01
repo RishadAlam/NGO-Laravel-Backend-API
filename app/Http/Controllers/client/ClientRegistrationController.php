@@ -29,7 +29,7 @@ class ClientRegistrationController extends Controller
     {
         $this->middleware('permission:pending_client_registration_list_view|pending_client_registration_list_view_as_admin')->only('pending_forms');
         $this->middleware('can:client_registration')->only('store');
-        $this->middleware('can:pending_client_registration_update')->only('update');
+        $this->middleware('permission:pending_client_registration_update|client_register_account_update')->only('update');
         $this->middleware('can:client_register_account_delete')->only('destroy');
         $this->middleware('can:pending_client_registration_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_client_registration_approval')->only('approved');

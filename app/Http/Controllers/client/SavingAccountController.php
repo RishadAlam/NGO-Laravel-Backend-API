@@ -32,7 +32,7 @@ class SavingAccountController extends Controller
     {
         $this->middleware('permission:pending_saving_acc_list_view|pending_saving_acc_list_view_as_admin')->only('pending_forms');
         $this->middleware('can:saving_acc_registration')->only('store');
-        $this->middleware('can:pending_saving_acc_update')->only('update');
+        $this->middleware('permission:pending_saving_acc_update|client_saving_account_update')->only('update');
         $this->middleware('can:pending_saving_acc_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_saving_acc_approval')->only('approved');
         $this->middleware('can:client_saving_account_category_update')->only('categoryUpdate');

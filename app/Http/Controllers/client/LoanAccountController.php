@@ -114,6 +114,7 @@ class LoanAccountController extends Controller
             ->category('id', 'name', 'is_default')
             ->author('id', 'name')
             ->approver('id', 'name')
+            ->loanApprover('id', 'name')
             ->find($id);
 
         return create_response(null, $account);

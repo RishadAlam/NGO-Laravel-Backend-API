@@ -57,6 +57,16 @@ trait HelperScopesTrait
     }
 
     /**
+     * Author Relation Scope
+     */
+    public function scopeLoanApprover($query, ...$arg)
+    {
+        $query->with("LoanApprover", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
      * Account Relation Scope
      */
     public function scopeAccount($query, ...$arg)

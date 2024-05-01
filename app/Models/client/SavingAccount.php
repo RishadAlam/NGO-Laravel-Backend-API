@@ -59,6 +59,8 @@ class SavingAccount extends Model
         'description',
         'status',
         'is_approved',
+        'approved_by',
+        'approved_at',
         'creator_id',
     ];
 
@@ -141,6 +143,9 @@ class SavingAccount extends Model
         $query->ClientRegistrationID($id)
             ->approve()
             ->active()
+            ->field('id', 'name')
+            ->center('id', 'name')
+            ->clientRegistration('id', 'acc_no', 'name', 'image_uri')
             ->Category('id', 'name', 'is_default')
             ->Author('id', 'name')
             ->Approver('id', 'name');

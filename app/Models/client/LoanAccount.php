@@ -67,6 +67,10 @@ class LoanAccount extends Model
         'status',
         'is_approved',
         'is_loan_approved',
+        'loan_approved_by',
+        'approved_by',
+        'approved_at',
+        'is_loan_approved_at',
         'creator_id',
     ];
 
@@ -102,6 +106,16 @@ class LoanAccount extends Model
     public function ClientRegistration()
     {
         return $this->belongsTo(ClientRegistration::class)->withTrashed();
+    }
+
+    /**
+     * Relationship belongs to User model
+     *
+     * @return response()
+     */
+    public function LoanApprover()
+    {
+        return $this->belongsTo(User::class, 'loan_approved_by', 'id')->withTrashed();
     }
 
     /**
@@ -209,9 +223,13 @@ class LoanAccount extends Model
         $query->ClientRegistrationID($id)
             ->approve()
             ->active()
+            ->field('id', 'name')
+            ->center('id', 'name')
+            ->clientRegistration('id', 'acc_no', 'name', 'image_uri')
             ->Category('id', 'name', 'is_default')
             ->Author('id', 'name')
-            ->Approver('id', 'name');
+            ->Approver('id', 'name')
+            ->loanApprover('id', 'name');
     }
 
     /**
@@ -236,9 +254,9 @@ class LoanAccount extends Model
             ->hold()
             ->Category('id', 'name', 'is_default')
             ->Author('id', 'name')
-            ->Approver('id', 'name');
+            ->Approver('id', 'name')
+            ->loanApprover('id', 'name');
     }
-
     /**
      * Get Specific resource
      */
@@ -249,6 +267,7 @@ class LoanAccount extends Model
             ->closed()
             ->Category('id', 'name', 'is_default')
             ->Author('id', 'name')
-            ->Approver('id', 'name');
+            ->Approver('id', 'name')
+            ->loanApprover('id', 'name');
     }
 }
