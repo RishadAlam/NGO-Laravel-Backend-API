@@ -13,7 +13,7 @@ class AuditReportController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:cooperative_audit_report_list_view')->only('index');
+        $this->middleware('can:cooperative_audit_report_view')->only('index');
         $this->middleware('can:cooperative_audit_report_update')->only('update');
     }
 
