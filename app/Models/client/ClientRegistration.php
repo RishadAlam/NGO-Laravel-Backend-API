@@ -169,6 +169,26 @@ class ClientRegistration extends Model
     }
 
     /**
+     * Count All Account 
+     */
+    public static function countAllAccounts(string $id)
+    {
+        return (object) [
+            // Saving Accounts
+            "activeSavings"  => SavingAccount::clientRegistrationID($id)->approve()->active()->count(),
+            "pendingSavings" => SavingAccount::clientRegistrationID($id)->pending()->count(),
+            "holdSavings"    => SavingAccount::clientRegistrationID($id)->approve()->hold()->count(),
+            "closedSavings"  => SavingAccount::clientRegistrationID($id)->approve()->closed()->count(),
+
+            // Loan Accounts
+            "activeLoans"    => LoanAccount::clientRegistrationID($id)->approve()->active()->count(),
+            "pendingLoans"   => LoanAccount::clientRegistrationID($id)->pending()->count(),
+            "holdLoans"      => LoanAccount::clientRegistrationID($id)->approve()->hold()->count(),
+            "closedLoans"    => LoanAccount::clientRegistrationID($id)->approve()->closed()->count(),
+        ];
+    }
+
+    /**
      * Pending Saving Registration Forms Scope.
      */
     public function scopeInfo($query)

@@ -446,6 +446,7 @@ return [
             'delete'            => 'The Client Profile has been successfully deleted.',
             'p_delete'          => 'The Client Profile has been permanently deleted.',
             'approved'          => 'The Client Profile has been successfully approved.',
+            'counted_accounts'  => 'You need to delete all savings and loan account.',
         ],
 
         /*

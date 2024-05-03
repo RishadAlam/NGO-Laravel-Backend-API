@@ -133,6 +133,12 @@ class ClientRegistrationController extends Controller
      */
     public function destroy(string $id)
     {
+        $accounts = ClientRegistration::countAllAccounts($id);
+
+        if ($accounts->activeSavings > 0 || $accounts->pendingSavings > 0 || $accounts->holdSavings > 0 || $accounts->activeLoans > 0 || $accounts->pendingLoans > 0 || $accounts->holdLoans > 0) {
+            return create_validation_error_response(__('customValidations.client.registration.counted_accounts'));
+        }
+
         DB::transaction(function () use ($id) {
             $client = ClientRegistration::find($id);
             $client->delete();
@@ -163,21 +169,7 @@ class ClientRegistrationController extends Controller
      */
     public function countAccounts(string $id)
     {
-        $data = (object) [
-            // Saving Accounts
-            "activeSavings"  => SavingAccount::clientRegistrationID($id)->approve()->active()->count(),
-            "pendingSavings" => SavingAccount::clientRegistrationID($id)->pending()->count(),
-            "holdSavings"    => SavingAccount::clientRegistrationID($id)->approve()->hold()->count(),
-            "closedSavings"  => SavingAccount::clientRegistrationID($id)->approve()->closed()->count(),
-
-            // Loan Accounts
-            "activeLoans"    => LoanAccount::clientRegistrationID($id)->approve()->active()->count(),
-            "pendingLoans"   => LoanAccount::clientRegistrationID($id)->pending()->count(),
-            "holdLoans"      => LoanAccount::clientRegistrationID($id)->approve()->hold()->count(),
-            "closedLoans"    => LoanAccount::clientRegistrationID($id)->approve()->closed()->count(),
-        ];
-
-        return create_response(null, $data);
+        return create_response(null, ClientRegistration::countAllAccounts($id));
     }
 
     /**
