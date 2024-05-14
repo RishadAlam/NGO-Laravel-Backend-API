@@ -2,6 +2,7 @@
 
 namespace App\Models\Collections;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\field\Field;
 use App\Models\center\Center;
@@ -63,6 +64,84 @@ class SavingCollection extends Model
     public function SavingCollectionActionHistory()
     {
         return $this->hasMany(SavingCollectionActionHistory::class);
+    }
+
+    /**
+     * Current Month Saving Collection summary
+     */
+    public static function savingCollectionSummery()
+    {
+        $currentDate    = [Carbon::now()->startOfMonth()->startOfDay(), Carbon::now()->endOfMonth()->endOfDay()];
+        $lastMonthDate  = [Carbon::now()->subMonths()->startOfMonth()->startOfDay(), Carbon::now()->subMonths()->endOfMonth()->endOfDay()];
+
+        $LMTSavingCollection  = static::approve()->where('category_id', '!=', Category::whereName('dps')->value('id'))->whereBetween('created_at', $lastMonthDate)->sum('deposit');
+        $CMTSavingCollSummary = static::approve()->where('category_id', '!=', Category::whereName('dps')->value('id'))->whereBetween('created_at', $currentDate)->groupBy('created_at')->selectRaw('SUM(deposit) as amount, created_at as date')->get();
+        $CMTSavingCollection  = !empty($CMTSavingCollSummary) ? $CMTSavingCollSummary->sum('amount') : 0;
+
+        return [
+            'last_amount'       => $LMTSavingCollection,
+            'current_amount'    => $CMTSavingCollection,
+            'data'              => $CMTSavingCollSummary,
+            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 1))) * 100)
+        ];
+    }
+
+    /**
+     * Current Month DPS Collection summary
+     */
+    public static function CurrentMonthDpsCollectionSummery()
+    {
+        $currentDate    = [Carbon::now()->startOfMonth()->startOfDay(), Carbon::now()->endOfMonth()->endOfDay()];
+        $lastMonthDate  = [Carbon::now()->subMonths()->startOfMonth()->startOfDay(), Carbon::now()->subMonths()->endOfMonth()->endOfDay()];
+
+        $LMTSavingCollection  = SavingCollection::approve()->where('category_id', Category::whereName('dps')->value('id'))->whereBetween('created_at', $lastMonthDate)->sum('deposit');
+        $CMTSavingCollSummary = SavingCollection::approve()->where('category_id', Category::whereName('dps')->value('id'))->whereBetween('created_at', $currentDate)->groupBy('created_at')->selectRaw('SUM(deposit) as amount, created_at as date')->get();
+        $CMTSavingCollection  = !empty($CMTSavingCollSummary) ? $CMTSavingCollSummary->sum('amount') : 0;
+
+        return  [
+            'last_amount'       => $LMTSavingCollection,
+            'current_amount'    => $CMTSavingCollection,
+            'data'              => $CMTSavingCollSummary,
+            'cmp_amount'        => ceil((($CMTSavingCollection - $LMTSavingCollection) / ($LMTSavingCollection != 0 ? $LMTSavingCollection : ($CMTSavingCollection != 0 ? $CMTSavingCollection : 1))) * 100)
+        ];
+    }
+
+    /**
+     * Today Collection sources
+     */
+    public static function currentDaySavingCollectionSources()
+    {
+        $sources = static::with('Category:id,name,is_default')
+            ->today()
+            ->groupBy('category_id')
+            ->selectRaw('SUM(deposit) as amount, category_id')->get();
+
+        return $sources->map(function ($source) {
+            return (object)[
+                'name'          => $source->Category->name,
+                'is_default'    => $source->Category->is_default,
+                'amount'        => $source->amount
+            ];
+        });
+    }
+
+    /**
+     * Today Collection
+     */
+    public static function currentDaySavingCollection()
+    {
+        return static::today()
+            ->clientRegistration('id', 'name', 'image_uri')
+            ->category('id', 'name', 'is_default')
+            ->field('id', 'name')
+            ->center('id', 'name')
+            ->account('id', 'name', 'is_default')
+            ->author('id', 'name', 'image_uri')
+            ->when(!Auth::user()->can('view_dashboard_as_admin'), function ($query) {
+                $query->CreatedBy(Auth::user()->id);
+            })
+            ->latest()
+            ->get(['id', 'field_id', 'center_id', 'category_id', 'client_registration_id', 'account_id', 'creator_id', 'acc_no', 'installment', 'deposit', 'description', 'created_at']);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models\client;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\field\Field;
 use App\Models\center\Center;
@@ -124,6 +125,26 @@ class LoanAccount extends Model
     public function Guarantors()
     {
         return $this->hasMany(Guarantor::class);
+    }
+
+    /**
+     * Current Month Loan Distribution summary
+     */
+    public static function loanDistributionSummery()
+    {
+        $currentDate    = [Carbon::now()->startOfMonth()->format('Y-m-d'), Carbon::now()->endOfMonth()->format('Y-m-d')];
+        $lastMonthData  = [Carbon::now()->subMonths()->startOfMonth()->format('Y-m-d'), Carbon::now()->subMonths()->endOfMonth()->format('Y-m-d')];
+
+        $LMTLoanDistribute  = static::approve('is_loan_approved')->whereBetween('start_date', $lastMonthData)->sum('loan_given');
+        $CMTLoanDistSummary = static::approve('is_loan_approved')->whereBetween('start_date', $currentDate)->groupBy('start_date')->selectRaw('SUM(loan_given) as amount, start_date as date')->get();
+        $CMTLoanDistribute  = !empty($CMTLoanDistSummary) ? $CMTLoanDistSummary->sum('amount') : 0;
+
+        return  [
+            'last_amount'       => $LMTLoanDistribute,
+            'current_amount'    => $CMTLoanDistribute,
+            'data'              => $CMTLoanDistSummary,
+            'cmp_amount'        => ceil((($CMTLoanDistribute - $LMTLoanDistribute) / ($LMTLoanDistribute != 0 ? $LMTLoanDistribute : ($CMTLoanDistribute != 0 ? $CMTLoanDistribute : 1))) * 100)
+        ];
     }
 
     /**

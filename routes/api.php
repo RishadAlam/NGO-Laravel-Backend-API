@@ -18,6 +18,7 @@ use App\Http\Controllers\Audit\AuditReportController;
 use App\Http\Controllers\category\CategoryController;
 use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\client\LoanAccountController;
+use App\Http\Controllers\dashboard\DashboardController;
 use App\Http\Controllers\client\SavingAccountController;
 use App\Http\Controllers\Audit\AuditReportMetaController;
 use App\Http\Controllers\Audit\AuditReportPageController;
@@ -126,6 +127,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
      * Here you can see all the API routes that have been additionally added to
      * the resource controller
      */
+    Route::GET('dashboard', [DashboardController::class, 'index']);
     Route::GET('users/permissions/{id}', [UserController::class, 'get_user_permissions']);
     Route::GET('permissions/{id}', [PermissionController::class, 'index'])->name('permissions.index');
     Route::GET('users/active', [UserController::class, 'get_active_users']);
@@ -207,7 +209,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('saving/pending-forms', [SavingAccountController::class, 'pending_forms'])->name('saving.pendingForms');
         Route::GET('loan/pending-forms', [LoanAccountController::class, 'pending_forms'])->name('loan.pendingForms');
         Route::GET('loan/pending-loans', [LoanAccountController::class, 'pending_loans'])->name('loan.pendingLoans');
-        Route::GET('loan/current-month-summary', [LoanAccountController::class, 'loan_distribution_summery'])->name('loan.distribution');
 
         // Registration Approval Routes
         Route::PUT('approved/{id}', [ClientRegistrationController::class, 'approved'])->name('approved');
@@ -221,22 +222,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         // Approval Routes
         Route::POST('saving/approved', [SavingCollectionController::class, 'approved'])->name('saving.approved');
         Route::POST('loan/approved', [LoanCollectionController::class, 'approved'])->name('loan.approved');
-
-        // Current Collection Summary routes
-        Route::GET('current-day-top-collectionist', [UserController::class, 'current_day_top_collectionist'])->name('users.current_day_top_collectionist');
-
-        Route::GET('saving/current-day-collection', [SavingCollectionController::class, 'current_day_saving_collection'])->name('saving.current_day_saving_collection');
-        Route::GET('saving/current-day-withdrawal', [SavingCollectionController::class, 'current_day_saving_withdrawal'])->name('saving.current_day_saving_withdrawal');
-        Route::GET('saving/current-day-collection-sources', [SavingCollectionController::class, 'current_day_saving_collection_sources'])->name('saving.current_day_saving_collection_sources');
-        Route::GET('saving/current-month-collection-summary', [SavingCollectionController::class, 'saving_collection_summery'])->name('saving.saving_collection_summery');
-        Route::GET('saving/current-month-dps-collection-summary', [SavingCollectionController::class, 'dps_collection_summery'])->name('saving.dps_collection_summary');
-
-        Route::GET('loan/current-day-collection', [LoanCollectionController::class, 'current_day_loan_collection'])->name('loan.current_day_loan_collection');
-        Route::GET('loan/current-day-withdrawal', [LoanCollectionController::class, 'current_day_saving_withdrawal'])->name('loan.current_day_loan_saving_withdrawal');
-        Route::GET('loan/current-day-collection-sources', [LoanCollectionController::class, 'current_day_loan_collection_sources'])->name('loan.current_day_loan_collection_sources');
-        Route::GET('loan/current-month-collection-summary', [LoanCollectionController::class, 'loan_collection_summery'])->name('loan.loan_collection_summery');
-        Route::GET('loan/current-month-monthly_loan-collection-summary', [LoanCollectionController::class, 'monthly_loan_collection_summery'])->name('loan.monthly_loan_collection_summary');
-        Route::GET('loan/current-month-loan-saving-collection-summary', [LoanCollectionController::class, 'loan_saving_collection_summery'])->name('loan.loan_saving_collection_summery');
     });
     Route::prefix('withdrawal')->group(function () {
         // Pending Withdrawal Routes

@@ -230,26 +230,6 @@ class LoanAccountController extends Controller
     }
 
     /**
-     * Current Month Loan Distribution summary
-     */
-    public function loan_distribution_summery()
-    {
-        $currentDate    = [Carbon::now()->startOfMonth()->format('Y-m-d'), Carbon::now()->endOfMonth()->format('Y-m-d')];
-        $lastMonthData  = [Carbon::now()->subMonths()->startOfMonth()->format('Y-m-d'), Carbon::now()->subMonths()->endOfMonth()->format('Y-m-d')];
-
-        $LMTLoanDistribute  = LoanAccount::approve('is_loan_approved')->whereBetween('start_date', $lastMonthData)->sum('loan_given');
-        $CMTLoanDistSummary = LoanAccount::approve('is_loan_approved')->whereBetween('start_date', $currentDate)->groupBy('start_date')->selectRaw('SUM(loan_given) as amount, start_date as date')->get();
-        $CMTLoanDistribute  = !empty($CMTLoanDistSummary) ? $CMTLoanDistSummary->sum('amount') : 0;
-
-        return create_response(null, [
-            'last_amount'       => $LMTLoanDistribute,
-            'current_amount'    => $CMTLoanDistribute,
-            'data'              => $CMTLoanDistSummary,
-            'cmp_amount'        => ceil((($CMTLoanDistribute - $LMTLoanDistribute) / ($LMTLoanDistribute != 0 ? $LMTLoanDistribute : ($CMTLoanDistribute != 0 ? $CMTLoanDistribute : 1))) * 100)
-        ]);
-    }
-
-    /**
      * Account short Summery
      */
     public function get_short_summery(string $id)

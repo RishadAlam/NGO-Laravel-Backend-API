@@ -2,6 +2,7 @@
 
 namespace App\Models\Withdrawal;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToFieldTrait;
@@ -45,6 +46,25 @@ class SavingWithdrawal extends Model
         'description',
         'creator_id',
     ];
+
+    /**
+     * Today Collection
+     */
+    public static function currentDaySavingWithdrawal()
+    {
+        return static::today()
+            ->clientRegistration('id', 'name', 'image_uri')
+            ->category('id', 'name', 'is_default')
+            ->field('id', 'name')
+            ->center('id', 'name')
+            ->account('id', 'name', 'is_default')
+            ->author('id', 'name', 'image_uri')
+            ->when(!Auth::user()->can('view_dashboard_as_admin'), function ($query) {
+                $query->CreatedBy(Auth::user()->id);
+            })
+            ->latest()
+            ->get(['id', 'field_id', 'center_id', 'category_id', 'client_registration_id', 'account_id', 'creator_id', 'acc_no', 'balance', 'amount', 'balance_remaining', 'description', 'created_at']);
+    }
 
     /**
      * Pending Saving Registration Forms Scope.
