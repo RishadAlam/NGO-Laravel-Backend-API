@@ -7,19 +7,20 @@ use App\Models\User;
 use App\Models\UsersVerify;
 use App\Mail\EmailVerifyMail;
 use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\OtpResendRequest;
 use App\Mail\RegistrationGreetingsMail;
+use App\Http\Requests\VerifyUserRequest;
 use App\Http\Requests\RegistrationRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgetPasswordRequest;
 use App\Http\Requests\OTPVerificationRequest;
-use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
@@ -467,5 +468,26 @@ class AuthController extends Controller
         $userData = User::findOrFail(auth()->user()->id);
 
         return response(self::createAuthorizedRes($userData, __('customValidations.staff.profile_update')), 200);
+    }
+
+    /**
+     * reset Password
+     *
+     * @param App\Http\Requests\VerifyUserRequest $request
+     * @return Illuminate\Http\Response
+     */
+    public function verify_user(VerifyUserRequest $request)
+    {
+        $password = $request->validated()['password'];
+        if (!Hash::check($password, Auth::user()->password)) {
+            return $this->create_validation_error_response(
+                'message',
+                __('customValidations.passwordChange.notMatch')
+            );
+        }
+
+        return $this->create_response(
+            __('customValidations.authorize.successful')
+        );
     }
 }
