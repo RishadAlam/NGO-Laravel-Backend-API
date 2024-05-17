@@ -8,6 +8,7 @@ use App\Models\accounts\Income;
 use App\Models\accounts\Expense;
 use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\Log;
+use App\Http\Traits\HelperScopesTrait;
 use App\Models\accounts\IncomeCategory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\accounts\ExpenseCategory;
@@ -20,7 +21,7 @@ use Illuminate\Support\Collection as SupportCollection;
 
 class AuditReport extends Model
 {
-    use HasFactory;
+    use HasFactory, HelperScopesTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -288,8 +289,14 @@ class AuditReport extends Model
     private static function getClientList()
     {
         return ClientRegistration::with([
-            'ActiveSavingAccount:client_registration_id,balance',
-            'ActiveLoanAccount:client_registration_id,balance,total_loan_remaining'
+            'ActiveSavingAccount' => function ($query) {
+                $query->approve()
+                    ->select('client_registration_id', 'balance');
+            },
+            'ActiveLoanAccount' => function ($query) {
+                $query->approve('is_loan_approved')
+                    ->select('client_registration_id', 'balance', 'total_loan_remaining');
+            }
         ])
             ->get(['id', 'name', 'acc_no', 'share'])
             ->map(function ($client) {
