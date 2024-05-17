@@ -115,6 +115,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('authorization', 'authorization');
         Route::POST('registration', 'registration');
         Route::POST('logout', 'logout');
+        Route::POST('verify-user', 'verify_user');
         Route::PUT('change-password', 'change_password');
         Route::PUT('profile-update', 'profile_update');
     });
@@ -213,8 +214,10 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         // Registration Approval Routes
         Route::PUT('approved/{id}', [ClientRegistrationController::class, 'approved'])->name('approved');
         Route::PUT('saving/approved/{id}', [SavingAccountController::class, 'approved'])->name('saving.approved');
+        Route::PUT('saving/change-status/{id}', [SavingAccountController::class, 'changeStatus'])->name('saving.changeStatus');
         Route::PUT('loan/approved/{id}', [LoanAccountController::class, 'approved'])->name('loan.approved');
         Route::PUT('loan/loan-approved/{id}', [LoanAccountController::class, 'loan_approved'])->name('loan.loanApproved');
+        Route::PUT('loan/change-status/{id}', [LoanAccountController::class, 'changeStatus'])->name('loan.changeStatus');
     });
 
     // Collection Approval Routes
