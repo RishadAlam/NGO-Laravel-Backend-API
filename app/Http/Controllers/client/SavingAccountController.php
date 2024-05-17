@@ -22,6 +22,7 @@ use App\Models\client\SavingAccountActionHistory;
 use App\Http\Requests\client\CategoryUpdateRequest;
 use App\Http\Requests\client\SavingAccountStoreRequest;
 use App\Http\Requests\client\SavingAccountUpdateRequest;
+use App\Http\Requests\client\SavingAccountChangeStatusRequest;
 
 class SavingAccountController extends Controller
 {
@@ -36,6 +37,7 @@ class SavingAccountController extends Controller
         $this->middleware('can:pending_saving_acc_permanently_delete')->only('permanently_destroy');
         $this->middleware('can:pending_saving_acc_approval')->only('approved');
         $this->middleware('can:client_saving_account_category_update')->only('categoryUpdate');
+        $this->middleware('can:client_saving_account_change_status')->only('changeStatus');
     }
 
     /**
@@ -275,6 +277,32 @@ class SavingAccountController extends Controller
         });
 
         return create_response(__('customValidations.client.saving.approved'));
+    }
+
+    /**
+     * Change Status the specified Resource
+     */
+    public function changeStatus(SavingAccountChangeStatusRequest $request, string $id)
+    {
+        $status = $request->validated()['status'];
+        $savingAccount = SavingAccount::find($id);
+
+        if (!$savingAccount) {
+            return create_response(__('customValidations.client.saving.not_found'));
+        }
+
+        $oldStatus  = $savingAccount->status ? __('customValidations.common.active') : __('customValidations.common.hold');
+        $newStatus  = $status ? __('customValidations.common.active') : __('customValidations.common.hold');
+        $histData   = [
+            'status' => "<p class='text-danger'>- {$oldStatus}</p><p class='text-success'>+ {$newStatus}</p>"
+        ];
+
+        DB::transaction(function () use ($savingAccount, $status, $id, $histData) {
+            $savingAccount->update(['status' => $status]);
+            SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $id, 'update', $histData));
+        });
+
+        return create_response(__('customValidations.client.saving.status'));
     }
 
     /**

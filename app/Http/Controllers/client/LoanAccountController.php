@@ -24,6 +24,7 @@ use App\Http\Requests\client\LoanApprovalRequest;
 use App\Http\Requests\client\CategoryUpdateRequest;
 use App\Http\Requests\client\LoanAccountStoreRequest;
 use App\Http\Requests\client\LoanAccountUpdateRequest;
+use App\Http\Requests\client\LoanAccountChangeStatusRequest;
 
 class LoanAccountController extends Controller
 {
@@ -40,6 +41,7 @@ class LoanAccountController extends Controller
         $this->middleware('can:pending_loan_acc_approval')->only('approved');
         $this->middleware('can:pending_loan_approval')->only('loan_approved');
         $this->middleware('can:client_loan_account_category_update')->only('categoryUpdate');
+        $this->middleware('can:client_loan_account_change_status')->only('changeStatus');
     }
 
     /**
@@ -367,6 +369,32 @@ class LoanAccountController extends Controller
         });
 
         return create_response(__('customValidations.client.loan.approved'));
+    }
+
+    /**
+     * Change Status the specified Resource
+     */
+    public function changeStatus(LoanAccountChangeStatusRequest $request, string $id)
+    {
+        $status = $request->validated()['status'];
+        $savingAccount = LoanAccount::find($id);
+
+        if (!$savingAccount) {
+            return create_response(__('customValidations.client.saving.not_found'));
+        }
+
+        $oldStatus  = $savingAccount->status ? __('customValidations.common.active') : __('customValidations.common.hold');
+        $newStatus  = $status ? __('customValidations.common.active') : __('customValidations.common.hold');
+        $histData   = [
+            'status' => "<p class='text-danger'>- {$oldStatus}</p><p class='text-success'>+ {$newStatus}</p>"
+        ];
+
+        DB::transaction(function () use ($savingAccount, $status, $id, $histData) {
+            $savingAccount->update(['status' => $status]);
+            LoanAccountActionHistory::create(Helper::setActionHistory('loan_account_id', $id, 'update', $histData));
+        });
+
+        return create_response(__('customValidations.client.loan.status'));
     }
 
     /**

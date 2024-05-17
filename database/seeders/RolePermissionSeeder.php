@@ -143,6 +143,7 @@ class RolePermissionSeeder extends Seeder
                     'client_saving_account_action_history',
                     'client_saving_account_update',
                     'client_saving_account_delete',
+                    'client_saving_account_change_status',
                     'client_saving_account_permanently_delete',
                     'client_saving_account_category_update',
                 ]
@@ -154,6 +155,7 @@ class RolePermissionSeeder extends Seeder
                     'client_loan_account_action_history',
                     'client_loan_account_update',
                     'client_loan_account_delete',
+                    'client_loan_account_change_status',
                     'client_loan_account_permanently_delete',
                     'client_loan_account_category_update',
                 ]

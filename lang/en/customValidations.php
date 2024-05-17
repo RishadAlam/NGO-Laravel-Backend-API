@@ -160,6 +160,8 @@ return [
         "interest_installment"              => "Interest Installment",
         "total_payable_loan_installment"    => "Total Loan Installment",
         "total_payable_interest"            => "Total Payable Interest",
+        "hold"                              => "Hold",
+        "active"                            => "Active",
     ],
 
     /*
@@ -457,6 +459,7 @@ return [
         'saving' => [
             'successful'        => 'The Saving Account has been successfully registered.',
             'update'            => 'The Saving Account has been successfully updated.',
+            'status'            => 'The Saving Account Status has been successfully updated.',
             'account_check'     => 'The Saving Account has been successfully Checked.',
             'delete'            => 'The Saving Account has been successfully deleted.',
             'p_delete'          => 'The Saving Account has been permanently deleted.',
@@ -472,6 +475,7 @@ return [
         'loan' => [
             'successful'        => 'The Loan Account has been successfully registered.',
             'update'            => 'The Loan Account has been successfully updated.',
+            'status'            => 'The Loan Account Status has been successfully updated.',
             'account_check'     => 'The Loan Account has been successfully Checked.',
             'delete'            => 'The Loan Account has been successfully deleted.',
             'p_delete'          => 'The Loan Account has been permanently deleted.',
