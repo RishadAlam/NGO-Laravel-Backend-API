@@ -13,6 +13,14 @@ use App\Http\Requests\ClientAccountChecks\LoanAccountCheckStoreRequest;
 class LoanAccountCheckController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:client_loan_account_check')->only('store');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()

@@ -23,9 +23,11 @@ use App\Http\Controllers\client\SavingAccountController;
 use App\Http\Controllers\Audit\AuditReportMetaController;
 use App\Http\Controllers\Audit\AuditReportPageController;
 use App\Http\Controllers\config\CategoryConfigController;
+use App\Http\Controllers\closing\LoanAccClosingController;
 use App\Http\Controllers\accounts\IncomeCategoryController;
 use App\Http\Controllers\accounts\AccountTransferController;
 use App\Http\Controllers\accounts\ExpenseCategoryController;
+use App\Http\Controllers\closing\SavingAccClosingController;
 use App\Http\Controllers\client\ClientRegistrationController;
 use App\Http\Controllers\accounts\AccountWithdrawalController;
 use App\Http\Controllers\Collections\LoanCollectionController;
@@ -332,6 +334,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::prefix('withdrawal')->group(function () {
         Route::apiResource('saving', SavingWithdrawalController::class);
         Route::apiResource('loan-saving', LoanSavingWithdrawalController::class);
+    });
+
+    // Closing Routes
+    Route::prefix('closing')->group(function () {
+        Route::apiResource('saving', SavingAccClosingController::class);
+        Route::apiResource('loan', LoanAccClosingController::class);
     });
 
     // Accounts Routes

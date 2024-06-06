@@ -13,6 +13,14 @@ use App\Http\Requests\ClientAccountChecks\SavingAccountCheckStoreRequest;
 class SavingAccountCheckController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:client_saving_account_check')->only('store');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
