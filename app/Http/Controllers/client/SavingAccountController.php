@@ -218,12 +218,14 @@ class SavingAccountController extends Controller
      */
     public function get_short_summery(string $id)
     {
-        $account = SavingAccount::withTrashed()->find($id, ['total_installment', 'total_withdrawn', 'balance']);
+        $account = SavingAccount::withTrashed()->find($id, ['id', 'total_installment', 'total_withdrawn', 'balance']);
         $check = SavingAccountCheck::where('saving_account_id', $id)->orderBy('created_at', 'DESC')->first(['created_at', 'next_check_in_at']);
 
         return create_response(null, [
             "installment"       => $account->total_installment ?? 0,
-            "total_withdraw"    => $account->total_withdrawn ?? 0,
+            'total_withdrawn'   => $account->total_withdrawn,
+            'total_withdraw'    => $account->SavingWithdrawal->sum('amount'),
+            'total_fees'        => $account->SavingAccountFee->sum('amount'),
             "balance"           => $account->balance ?? 0,
             "last_check"        => $check->created_at ?? null,
             "next_check"        => $check->next_check_in_at ?? null,

@@ -9,6 +9,7 @@ use App\Models\center\Center;
 use App\Models\client\Guarantor;
 use App\Models\category\Category;
 use Illuminate\Support\Facades\Auth;
+use App\Models\client\LoanAccountFee;
 use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToFieldTrait;
@@ -97,6 +98,14 @@ class LoanAccount extends Model
     public function LoanSavingWithdrawal()
     {
         return $this->hasMany(LoanSavingWithdrawal::class);
+    }
+
+    /**
+     * Relation with Loan Collection Table
+     */
+    public function LoanAccountFee()
+    {
+        return $this->hasMany(LoanAccountFee::class);
     }
 
     /**

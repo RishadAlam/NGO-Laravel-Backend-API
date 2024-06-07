@@ -236,11 +236,14 @@ class LoanAccountController extends Controller
      */
     public function get_short_summery(string $id)
     {
-        $account = LoanAccount::withTrashed()->find($id, ['loan_given', 'payable_installment', 'total_payable_interest', 'total_rec_installment', 'total_withdrawn', 'balance', 'total_loan_rec', 'total_loan_remaining', 'total_interest_rec', 'total_interest_remaining']);
+        $account = LoanAccount::withTrashed()
+            ->find($id, ['id', 'loan_given', 'payable_installment', 'total_payable_interest', 'total_rec_installment', 'total_withdrawn', 'balance', 'total_loan_rec', 'total_loan_remaining', 'total_interest_rec', 'total_interest_remaining']);
         $check = LoanAccountCheck::where('loan_account_id', $id)->orderBy('created_at', 'DESC')->first(['created_at', 'next_check_in_at']);
 
         $installment        = $account->total_rec_installment;
-        $total_withdraw     = $account->total_withdrawn;
+        $total_withdrawn    = $account->total_withdrawn;
+        $total_withdraw     = $account->LoanSavingWithdrawal->sum('amount');
+        $total_fees         = $account->LoanAccountFee->sum('amount');
         $balance            = $account->balance;
         $loan_recovered     = $account->total_loan_rec;
         $loan_remaining     = $account->total_loan_remaining;
@@ -253,7 +256,9 @@ class LoanAccountController extends Controller
 
         return create_response(null, [
             "installment"               => "{$installment}/{$account->payable_installment}",
+            "total_withdrawn"           => $total_withdrawn,
             "total_withdraw"            => $total_withdraw,
+            "total_fees"                => $total_fees,
             "balance"                   => $balance,
             "loan_given"                => $account->loan_given,
             "loan_recovered"            => $loan_recovered,
