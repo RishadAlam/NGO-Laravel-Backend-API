@@ -9,7 +9,9 @@ use App\Models\accounts\Account;
 use App\Models\accounts\Expense;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\accounts\IncomeCategory;
 use App\Models\accounts\AccountTransfer;
+use App\Models\accounts\ExpenseCategory;
 use App\Models\accounts\AccountWithdrawal;
 use App\Models\accounts\AccountActionHistory;
 use App\Http\Requests\accounts\AccountStoreRequest;
@@ -168,6 +170,7 @@ class AccountController extends Controller
                 'id',
                 DB::raw("'income' as type"),
                 'account_id',
+                'income_category_id as category_id',
                 'amount',
                 'previous_balance',
                 'balance',
@@ -188,6 +191,7 @@ class AccountController extends Controller
                 'id',
                 DB::raw("'expense' as type"),
                 'account_id',
+                'expense_category_id as category_id',
                 'amount',
                 'previous_balance',
                 'balance',
@@ -208,6 +212,7 @@ class AccountController extends Controller
                 'id',
                 DB::raw("'withdrawal' as type"),
                 'account_id',
+                DB::raw("NULL as category_id"),
                 'amount',
                 'previous_balance',
                 'balance',
@@ -247,13 +252,27 @@ class AccountController extends Controller
         $transactions = $incomes
             ->unionAll($expenses)
             ->unionAll($withdrawals)
-            ->orderBy('date', 'DESC')
+            ->orderBy('created_at', 'DESC')
             ->get();
+
+        // Transform the data
+        $transactions = $transactions->map(function ($transaction) {
+            if ($transaction->type == 'income') {
+                $transaction->category = IncomeCategory::find($transaction->category_id, ['id', 'name', 'is_default']);
+            } elseif ($transaction->type == 'expense') {
+                $transaction->category = ExpenseCategory::find($transaction->category_id, ['id', 'name', 'is_default']);
+            } else {
+                $transaction->category = null;
+            }
+
+            unset($transaction->category_id);
+            return $transaction;
+        });
 
         $transactions = collect($transactions)
             ->merge($send_money)
             ->merge($received_money)
-            ->sortByDesc('date')
+            ->sortByDesc('created_at')
             ->values()
             ->all();
 
