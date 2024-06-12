@@ -2,10 +2,21 @@
 
 namespace App\Http\Controllers\closing;
 
+use App\Helpers\Helper;
+use App\Models\AppConfig;
 use Illuminate\Http\Request;
+use App\Models\accounts\Income;
+use App\Models\accounts\Account;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
+use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
+use App\Models\client\SavingAccountFee;
+use App\Models\client\AccountFeesCategory;
+use App\Models\client\SavingAccountClosing;
+use App\Models\client\SavingAccountActionHistory;
+use App\Http\Requests\ClientAccClosing\StoreSavingAccountClosingRequest;
 
 class SavingAccClosingController extends Controller
 {
@@ -20,9 +31,26 @@ class SavingAccClosingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSavingAccountClosingRequest $request)
     {
-        //
+        $data = (object) $request->validated();
+
+        if ($data->closing_fee > $data->balance) {
+            return create_validation_error_response(__('customValidations.accounts.saving.insufficient_balance'), 'balance');
+        }
+
+        $isApproved = AppConfig::get_config('saving_account_closing_approval');
+
+        return DB::transaction(function () use ($data, $isApproved) {
+            SavingAccountClosing::create(SavingAccountClosing::setFieldMap($data, true, $isApproved));
+
+            if ($isApproved) {
+                SavingAccountClosing::handleApprovedAccountClosing($data);
+                return create_response(__('customValidations.client.saving.delete'));
+            } else {
+                return create_response(__('customValidations.client.saving.delete_request'));
+            }
+        });
     }
 
     /**

@@ -26,6 +26,10 @@ class AccountFeesCategorySeeder extends Seeder
                 'name'          => 'transaction_fee',
                 'is_default'    => true,
                 'creator_id'    => auth()->id()
+            ], [
+                'name'          => 'closing_fee',
+                'is_default'    => true,
+                'creator_id'    => auth()->id()
             ]
         ];
 

@@ -17,8 +17,8 @@ class AppConfigSeeder extends Seeder
             [
                 "meta_key"      => "company_details",
                 "meta_value"    => json_encode([
-                    "company_name"          => "Jonokollan kormojibi co-oparetive society ltd",
-                    "company_short_name"    => "Jonokollan",
+                    "company_name"          => "আমার সমিতি",
+                    "company_short_name"    => "আমার সমিতি",
                     "company_address"       => "",
                     "company_logo"          => null,
                     "company_logo_uri"      => null,
