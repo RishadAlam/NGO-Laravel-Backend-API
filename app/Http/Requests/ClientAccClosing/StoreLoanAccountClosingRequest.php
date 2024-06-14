@@ -11,7 +11,7 @@ class StoreLoanAccountClosingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class StoreLoanAccountClosingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'account_id'            => 'required|numeric',
+            'balance'               => 'required|numeric',
+            'total_balance'         => 'required|numeric',
+            'closing_fee'           => 'required|numeric',
+            'closing_fee_acc_id'    => 'required|numeric',
+            'description'           => 'required',
         ];
     }
 }

@@ -7,6 +7,7 @@ use App\Models\AppConfig;
 use Illuminate\Http\Request;
 use App\Models\accounts\Income;
 use App\Models\accounts\Account;
+use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;

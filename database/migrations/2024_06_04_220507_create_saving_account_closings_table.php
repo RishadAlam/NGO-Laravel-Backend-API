@@ -16,8 +16,9 @@ return new class extends Migration
             $table->foreignId('saving_account_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
-            $table->foreignId('account_id')->nullable()->constrained()->cascadeOnUpdate('cascade')->nullOnDelete();
-            $table->integer('balance');
+            $table->foreignId('account_id')->nullable()->constrained()->cascadeOnUpdate('cascade')->nullOnDelete()->comment('Closing Fee Store Account Id');
+            $table->integer('closing_fee')->default(0);
+            $table->integer('main_balance');
             $table->integer('interest');
             $table->integer('total_balance');
             $table->mediumText('description')->nullable();

@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\closing;
 
+use App\Models\AppConfig;
 use Illuminate\Http\Request;
 use App\Models\client\LoanAccount;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\category\CategoryConfig;
+use App\Models\client\LoanAccountClosing;
+use App\Http\Requests\ClientAccClosing\StoreLoanAccountClosingRequest;
 
 class LoanAccClosingController extends Controller
 {
@@ -20,9 +24,34 @@ class LoanAccClosingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreLoanAccountClosingRequest $request)
     {
-        //
+        $data = (object) $request->validated();
+
+        if ($data->total_balance < 0) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
+        }
+
+        $isApproved = AppConfig::get_config('loan_account_closing_approval');
+        $account    = LoanAccount::with('Category:id,name,is_default')->find($data->account_id);
+
+        if ($account->total_loan_remaining > 0) {
+            return create_validation_error_response(__('customValidations.client.loan.loan_err'), 'total_loan_remaining');
+        }
+        if ($account->total_interest_remaining > 0) {
+            return create_validation_error_response(__('customValidations.client.loan.interest_err'), 'total_interest_remaining');
+        }
+
+        return DB::transaction(function () use ($data, $account, $isApproved) {
+            LoanAccountClosing::create(LoanAccountClosing::setFieldMap($data, $account, true, $isApproved));
+
+            if ($isApproved) {
+                LoanAccountClosing::handleApprovedAccountClosing($data, $account);
+                return create_response(__('customValidations.client.saving.delete'));
+            } else {
+                return create_response(__('customValidations.client.saving.delete_request'));
+            }
+        });
     }
 
     /**

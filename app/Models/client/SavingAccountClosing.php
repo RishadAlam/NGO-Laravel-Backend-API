@@ -25,7 +25,7 @@ class SavingAccountClosing extends Model
         'creator_id',
         'approved_by',
         'account_id',
-        'balance',
+        'main_balance',
         'interest',
         'total_balance',
         'description',
@@ -44,7 +44,7 @@ class SavingAccountClosing extends Model
     public static function setFieldMap($data, $isStore, $isApproved)
     {
         $map = [
-            'balance'       => $data->balance,
+            'main_balance'  => $data->balance,
             'interest'      => $data->interest,
             'total_balance' => $data->total_balance,
             'description'   => $data->description,
@@ -55,6 +55,7 @@ class SavingAccountClosing extends Model
                 'saving_account_id' => $data->account_id,
                 'creator_id'        => auth()->id(),
                 'account_id'        => $data->closing_fee_acc_id,
+                'closing_fee'       => $data->closing_fee,
             ];
         }
 

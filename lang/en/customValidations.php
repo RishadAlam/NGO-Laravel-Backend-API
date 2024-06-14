@@ -482,7 +482,9 @@ return [
             'delete'            => 'The Loan Account has been successfully deleted.',
             'p_delete'          => 'The Loan Account has been permanently deleted.',
             'approved'          => 'The Loan Account has been successfully approved.',
-            'not_found'         => 'Loan account not found!'
+            'not_found'         => 'Loan account not found!',
+            'loan_err'          => 'Outstanding Loan Detected.',
+            'interest_err'      => 'Outstanding Interest Detected.',
         ],
 
         /*

@@ -16,10 +16,12 @@ return new class extends Migration
             $table->foreignId('loan_account_id')->constrained()->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
-            $table->foreignId('account_id')->nullable()->constrained()->cascadeOnUpdate('cascade')->nullOnDelete();
+            $table->foreignId('account_id')->nullable()->constrained()->cascadeOnUpdate('cascade')->nullOnDelete()->comment('Closing Fee Store Account Id');
             $table->integer('payable_installment');
             $table->integer('total_rec_installment')->comment('Total recovered installment');
-            $table->integer('balance');
+            $table->integer('closing_fee')->default(0);
+            $table->integer('main_balance');
+            $table->integer('total_balance');
             $table->integer('loan_given');
             $table->integer('total_loan_rec');
             $table->integer('total_loan_remaining');
