@@ -35,8 +35,8 @@ class SavingAccClosingController extends Controller
     {
         $data = (object) $request->validated();
 
-        if ($data->closing_fee > $data->balance) {
-            return create_validation_error_response(__('customValidations.accounts.saving.insufficient_balance'), 'balance');
+        if ($data->total_balance < 0) {
+            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
         }
 
         $isApproved = AppConfig::get_config('saving_account_closing_approval');

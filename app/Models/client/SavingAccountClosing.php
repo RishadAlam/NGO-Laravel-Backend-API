@@ -70,7 +70,7 @@ class SavingAccountClosing extends Model
 
     public static function handleApprovedAccountClosing($data)
     {
-        $account = SavingAccount::with('Category:id,name,is_default')->find($data->id);
+        $account = SavingAccount::with('Category:id,name,is_default')->find($data->account_id);
         $categoryConf = CategoryConfig::categoryID($account->category_id)
             ->first(['saving_acc_closing_fee', 's_col_fee_acc_id']);
 
@@ -85,10 +85,10 @@ class SavingAccountClosing extends Model
     public static function processClosingFee($account, $categoryConf)
     {
         $categoryName = !$account->category->is_default ? $account->category->name : __("customValidations.category.default.{$account->category->name}");
-        $description = __('customValidations.common.acc_no') . ' = ' . $account->acc_no . ', ' .
+        $description = __('customValidations.common.acc_no') . ' = ' . Helper::tsNumbers($account->acc_no) . ', ' .
             __('customValidations.common.category') . ' = ' . $categoryName . ', ' .
             __('customValidations.common.saving') . ' ' . __('customValidations.common.closing') . ' ' .
-            __('customValidations.common.fee') . ' = ' . $categoryConf->saving_acc_closing_fee;
+            __('customValidations.common.fee') . ' = ' . Helper::tsNumbers($categoryConf->saving_acc_closing_fee);
 
         $categoryId = AccountFeesCategory::where('name', 'closing_fee')->value('id');
         $feeAccount = Account::find($categoryConf->s_col_fee_acc_id);
