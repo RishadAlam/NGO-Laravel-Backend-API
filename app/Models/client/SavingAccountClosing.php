@@ -8,6 +8,7 @@ use App\Models\accounts\Account;
 use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Withdrawal\SavingWithdrawal;
 use App\Http\Traits\BelongsToSavingAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -80,7 +81,23 @@ class SavingAccountClosing extends Model
         }
 
         static::deleteAccountAndAssociations($account);
+        static::processWithdrawal($account);
         SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $account->id, 'delete', []));
+    }
+
+    private static function processWithdrawal($account)
+    {
+        $categoryName   = !$account->category->is_default ? $account->category->name : __("customValidations.category.default.{$account->category->name}");
+        $data           = [
+            'amount' => $account->balance,
+            'description' => __('customValidations.common.acc_no') . ' = ' . Helper::tsNumbers($account->acc_no) . ', ' .
+                __('customValidations.common.category') . ' = ' . $categoryName . ', ' .
+                __('customValidations.common.saving') . ' ' . __('customValidations.common.closing') . ' ' .
+                __('customValidations.common.withdrawal') . ' = ' . Helper::tsNumbers($account->balance)
+        ];
+
+        $withdrawal = SavingWithdrawal::create(SavingWithdrawal::fieldMapping($account, (object) $data, true));
+        SavingWithdrawal::processWithdrawal($withdrawal, null, null, null, (array) $data);
     }
 
     public static function processClosingFee($account, $categoryConf)
@@ -89,7 +106,7 @@ class SavingAccountClosing extends Model
         $description = __('customValidations.common.acc_no') . ' = ' . Helper::tsNumbers($account->acc_no) . ', ' .
             __('customValidations.common.category') . ' = ' . $categoryName . ', ' .
             __('customValidations.common.saving') . ' ' . __('customValidations.common.closing') . ' ' .
-            __('customValidations.common.fee') . ' = ' . Helper::tsNumbers($categoryConf->saving_acc_closing_fee);
+            __('customValidations.common.withdrawal') . ' = ' . Helper::tsNumbers($categoryConf->saving_acc_closing_fee);
 
         $categoryId = AccountFeesCategory::where('name', 'closing_fee')->value('id');
         $feeAccount = Account::find($categoryConf->s_col_fee_acc_id);

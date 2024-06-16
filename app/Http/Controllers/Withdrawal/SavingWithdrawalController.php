@@ -63,7 +63,7 @@ class SavingWithdrawalController extends Controller
                     return $validationErrors;
                 }
 
-                $field_map = self::fieldMapping($account, $data, true);
+                $field_map = SavingWithdrawal::fieldMapping($account, $data, true);
                 if ($is_approved) {
                     $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['saving_withdrawal_fee', 's_with_fee_acc_id']);
                     $fee            = $categoryConf->saving_withdrawal_fee;
@@ -74,7 +74,7 @@ class SavingWithdrawalController extends Controller
                     }
 
                     $withdrawal = SavingWithdrawal::create($field_map);
-                    self::processWithdrawal($withdrawal, null, $fee, $feeAccId, (array) $data);
+                    SavingWithdrawal::processWithdrawal($withdrawal, null, $fee, $feeAccId, (array) $data);
                 } else {
                     SavingWithdrawal::create($field_map);
                 }
@@ -133,7 +133,7 @@ class SavingWithdrawalController extends Controller
             return $validationErrors;
         }
 
-        $withdrawal->update(self::fieldMapping($account, $data));
+        $withdrawal->update(SavingWithdrawal::fieldMapping($account, $data));
         return create_response(__('customValidations.client.withdrawal.update'));
     }
 
@@ -180,7 +180,7 @@ class SavingWithdrawalController extends Controller
                 }
 
                 // Process Withdrawal
-                self::processWithdrawal($withdrawal, $account, $fee, $feeAccId, $requestData);
+                SavingWithdrawal::processWithdrawal($withdrawal, $account, $fee, $feeAccId, $requestData);
                 return create_response(__('customValidations.client.withdrawal.approved'));
             });
         } catch (\Exception $e) {
@@ -232,98 +232,5 @@ class SavingWithdrawalController extends Controller
         }
 
         return false;
-    }
-
-    /**
-     * Field Mapping Withdrawal Data
-     *
-     * @param SavingAccount $account
-     * @param object $requestData
-     * @param boolean $is_store
-     * @return array
-     */
-    private static function fieldMapping(SavingAccount $account, object $requestData, $is_store = false)
-    {
-        $field_map = [
-            'balance'       => $account->balance,
-            'amount'        => $requestData->amount,
-            'description'   => $requestData->description,
-        ];
-        if ($is_store) {
-            $field_map += [
-                'field_id'                  => $account->field_id,
-                'center_id'                 => $account->center_id,
-                'category_id'               => $account->category_id,
-                'client_registration_id'    => $account->client_registration_id,
-                'saving_account_id'         => $account->id,
-                'acc_no'                    => $account->acc_no,
-                'creator_id'                => auth()->id(),
-            ];
-        }
-
-        return $field_map;
-    }
-
-    /**
-     * Process withdrawal
-     *
-     * @param SavingWithdrawal $withdrawal
-     * @param Account $account
-     * @param int $fee
-     * @param int $feeAccId
-     * @param array $requestData
-     */
-    private static function processWithdrawal(SavingWithdrawal $withdrawal, Account $account = null, int $fee, int $feeAccId, array $requestData): void
-    {
-        $data           = (object) $requestData;
-        $savingAccount  = $withdrawal->SavingAccount;
-
-        $expenseCatId   = ExpenseCategory::where('name', 'saving_withdrawal')->value('id');
-        $categoryName   = !$withdrawal->category->is_default ? $withdrawal->category->name :  __("customValidations.category.default.{$withdrawal->category->name}");
-        $acc_no         = Helper::tsNumbers($withdrawal->acc_no);
-        $amount         = Helper::tsNumbers("৳{$withdrawal->amount}/-");
-        $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.category') . ' = ' . $categoryName . ', ' . __('customValidations.common.saving') . ' ' . __('customValidations.common.withdrawal') . ' = ' . $amount;
-
-        if (isset($data->account) && !empty($account)) {
-            Expense::store(
-                $data->account,
-                $expenseCatId,
-                $withdrawal->amount,
-                $account->balance,
-                $description
-            );
-            $account->increment('total_withdrawal', $withdrawal->amount);
-        }
-        if (!empty($fee) && $fee > 0) {
-            $categoryId     = AccountFeesCategory::where('name', 'withdrawal_fee')->value('id');
-            $feeAccount     = Account::find($feeAccId);
-            $incomeCatId    = IncomeCategory::where('name', 'withdrawal_fee')->value('id');
-
-            SavingAccountFee::create([
-                'saving_account_id'         => $savingAccount->id,
-                'account_fees_category_id'  => $categoryId,
-                'creator_id'                => auth()->id(),
-                'amount'                    => $fee,
-                'description'               => $description
-            ]);
-            Income::store(
-                $feeAccId,
-                $incomeCatId,
-                $fee,
-                $feeAccount->balance,
-                $description
-            );
-            $feeAccount->increment('total_deposit', $fee);
-            $savingAccount->increment('total_withdrawn', $fee);
-        }
-
-        $savingAccount->increment('total_withdrawn', $withdrawal->amount);
-        $withdrawal->update(
-            [
-                'is_approved' => true,
-                'approved_by' => auth()->id(),
-                'approved_at' => Carbon::now()
-            ]
-        );
     }
 }

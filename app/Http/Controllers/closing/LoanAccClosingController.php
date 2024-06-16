@@ -46,7 +46,7 @@ class LoanAccClosingController extends Controller
             LoanAccountClosing::create(LoanAccountClosing::setFieldMap($data, $account, true, $isApproved));
 
             if ($isApproved) {
-                LoanAccountClosing::handleApprovedAccountClosing($data, $account);
+                LoanAccountClosing::handleApprovedAccountClosing($account);
                 return create_response(__('customValidations.client.saving.delete'));
             } else {
                 return create_response(__('customValidations.client.saving.delete_request'));

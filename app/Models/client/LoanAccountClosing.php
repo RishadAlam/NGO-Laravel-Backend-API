@@ -85,7 +85,7 @@ class LoanAccountClosing extends Model
         return $map;
     }
 
-    public static function handleApprovedAccountClosing($data, $account)
+    public static function handleApprovedAccountClosing($account)
     {
         $categoryConf = CategoryConfig::categoryID($account->category_id)
             ->first(['loan_acc_closing_fee', 'l_col_fee_acc_id']);
