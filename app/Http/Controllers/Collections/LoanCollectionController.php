@@ -63,13 +63,13 @@ class LoanCollectionController extends Controller
 
             DB::transaction(function () use ($field_map, $data) {
                 LoanCollection::create($field_map);
-                LoanAccount::find($data->loan_account_id)
-                    ->incrementEach([
-                        'total_rec_installment' => $data->installment,
-                        'total_deposited'       => $data->deposit,
-                        'total_loan_rec'        => $data->loan,
-                        'total_interest_rec'    => $data->interest,
-                    ]);
+                $loanAccount = LoanAccount::find($data->loan_account_id);
+                if ($loanAccount) {
+                    $loanAccount->increment('total_rec_installment', $data->installment);
+                    $loanAccount->increment('total_deposited', $data->deposit);
+                    $loanAccount->increment('total_loan_rec', $data->loan);
+                    $loanAccount->increment('total_interest_rec', $data->interest);
+                }
                 Account::find($data->account_id)
                     ->increment('total_deposit', $data->total);
             });
@@ -148,13 +148,14 @@ class LoanCollectionController extends Controller
                 ->update(['is_approved' => true, 'approved_by' => auth()->id(), 'approved_at' => Carbon::now('Asia/Dhaka')]);
 
             foreach ($collections as  $collection) {
-                LoanAccount::find($collection->loan_account_id)
-                    ->incrementEach([
-                        'total_rec_installment' => $collection->installment,
-                        'total_deposited'       => $collection->deposit,
-                        'total_loan_rec'        => $collection->loan,
-                        'total_interest_rec'    => $collection->interest,
-                    ]);
+                $loanAccount = LoanAccount::find($collection->loan_account_id);
+
+                if ($loanAccount) {
+                    $loanAccount->increment('total_rec_installment', $collection->installment);
+                    $loanAccount->increment('total_deposited', $collection->deposit);
+                    $loanAccount->increment('total_loan_rec', $collection->loan);
+                    $loanAccount->increment('total_interest_rec', $collection->interest);
+                }
                 Account::find($collection->account_id)
                     ->increment('total_deposit', $collection->total);
             }

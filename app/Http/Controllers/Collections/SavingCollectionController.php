@@ -63,11 +63,13 @@ class SavingCollectionController extends Controller
 
             DB::transaction(function () use ($field_map, $data) {
                 SavingCollection::create($field_map);
-                SavingAccount::find($data->saving_account_id)
-                    ->incrementEach([
-                        'total_installment' => $data->installment,
-                        'total_deposited'   => $data->deposit,
-                    ]);
+                $savingAccount = SavingAccount::find($data->saving_account_id);
+
+                if ($savingAccount) {
+                    $savingAccount->increment('total_installment', $data->installment);
+                    $savingAccount->increment('total_deposited', $data->deposit);
+                }
+
                 Account::find($data->account_id)
                     ->increment('total_deposit', $data->deposit);
             });
@@ -189,11 +191,12 @@ class SavingCollectionController extends Controller
                 ->update(['is_approved' => true, 'approved_by' => auth()->id(), 'approved_at' => Carbon::now('Asia/Dhaka')]);
 
             foreach ($collections as  $collection) {
-                SavingAccount::find($collection->saving_account_id)
-                    ->incrementEach([
-                        'total_installment' => $collection->installment,
-                        'total_deposited'   => $collection->deposit,
-                    ]);
+                $savingAccount = SavingAccount::find($collection->saving_account_id);
+                if ($savingAccount) {
+                    $savingAccount->increment('total_installment', $collection->installment);
+                    $savingAccount->increment('total_deposited', $collection->deposit);
+                }
+
                 Account::find($collection->account_id)
                     ->increment('total_deposit', $collection->deposit);
             }
