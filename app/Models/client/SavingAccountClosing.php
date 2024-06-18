@@ -5,9 +5,11 @@ namespace App\Models\client;
 use App\Helpers\Helper;
 use App\Models\accounts\Income;
 use App\Models\accounts\Account;
+use App\Models\accounts\Expense;
 use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\accounts\ExpenseCategory;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Http\Traits\BelongsToSavingAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -72,32 +74,59 @@ class SavingAccountClosing extends Model
 
     public static function handleApprovedAccountClosing($data)
     {
-        $account = SavingAccount::with('Category:id,name,is_default')->find($data->account_id);
-        $categoryConf = CategoryConfig::categoryID($account->category_id)
+        $withdrawal_account = null;
+        $account            = SavingAccount::with('Category:id,name,is_default')->find($data->account_id);
+        $categoryConf       = CategoryConfig::categoryID($account->category_id)
             ->first(['saving_acc_closing_fee', 's_col_fee_acc_id']);
 
+        if (!empty($data->withdrawal_account_id)) {
+            $withdrawal_account = Account::find($data->withdrawal_account_id);
+        }
         if ($categoryConf->saving_acc_closing_fee > 0) {
             static::processClosingFee($account, $categoryConf);
         }
+        if (!empty($data->withdrawal_account_id) && !empty($data->interest)) {
+            static::processInterest($account, $data->interest, $data->withdrawal_account_id, $withdrawal_account);
+        }
 
+        static::processWithdrawal($account, $account->balance - $categoryConf->saving_acc_closing_fee, $data->withdrawal_account_id, $withdrawal_account);
         static::deleteAccountAndAssociations($account);
-        static::processWithdrawal($account);
         SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $account->id, 'delete', []));
     }
 
-    private static function processWithdrawal($account)
+    private static function processWithdrawal($account, $amount, $withdrawal_account_id, $withdrawal_account)
     {
         $categoryName   = !$account->category->is_default ? $account->category->name : __("customValidations.category.default.{$account->category->name}");
         $data           = [
-            'amount' => $account->balance,
+            'amount'        => $amount,
+            'account'       => $withdrawal_account_id,
             'description' => __('customValidations.common.acc_no') . ' = ' . Helper::tsNumbers($account->acc_no) . ', ' .
                 __('customValidations.common.category') . ' = ' . $categoryName . ', ' .
                 __('customValidations.common.saving') . ' ' . __('customValidations.common.closing') . ' ' .
-                __('customValidations.common.withdrawal') . ' = ' . Helper::tsNumbers($account->balance)
+                __('customValidations.common.withdrawal') . ' = ' . Helper::tsNumbers($amount)
         ];
 
         $withdrawal = SavingWithdrawal::create(SavingWithdrawal::fieldMapping($account, (object) $data, true));
-        SavingWithdrawal::processWithdrawal($withdrawal, null, null, null, (array) $data);
+        SavingWithdrawal::processWithdrawal($withdrawal, $withdrawal_account, null, null, (array) $data);
+    }
+
+    private static function processInterest($account, $amount, $withdrawal_account_id, $withdrawal_account)
+    {
+        $expenseCatId   = ExpenseCategory::where('name', 'account_closing_interest')->value('id');
+        $categoryName   = !$account->category->is_default ? $account->category->name : __("customValidations.category.default.{$account->category->name}");
+        $description    = __('customValidations.common.acc_no') . ' = ' . Helper::tsNumbers($account->acc_no) . ', ' .
+            __('customValidations.common.category') . ' = ' . $categoryName . ', ' .
+            __('customValidations.common.saving') . ' ' . __('customValidations.common.closing') . ' ' . __('customValidations.common.interest') . ' ' .
+            __('customValidations.common.withdrawal') . ' = ' . Helper::tsNumbers($amount);
+
+        Expense::store(
+            $withdrawal_account_id,
+            $expenseCatId,
+            $amount,
+            $withdrawal_account->balance,
+            $description
+        );
+        $withdrawal_account->increment('total_withdrawal', $amount);
     }
 
     public static function processClosingFee($account, $categoryConf)
