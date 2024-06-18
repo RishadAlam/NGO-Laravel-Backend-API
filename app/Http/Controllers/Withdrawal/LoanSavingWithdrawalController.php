@@ -64,7 +64,7 @@ class LoanSavingWithdrawalController extends Controller
                     return $validationErrors;
                 }
 
-                $field_map = self::fieldMapping($account, $data, true);
+                $field_map = LoanSavingWithdrawal::fieldMapping($account, $data, true);
                 if ($is_approved) {
                     $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['loan_saving_withdrawal_fee', 'ls_with_fee_acc_id']);
                     $fee            = $categoryConf->loan_saving_withdrawal_fee;
@@ -75,7 +75,7 @@ class LoanSavingWithdrawalController extends Controller
                     }
 
                     $withdrawal = LoanSavingWithdrawal::create($field_map);
-                    self::processWithdrawal($withdrawal, null, $fee, $feeAccId, (array) $data);
+                    LoanSavingWithdrawal::processWithdrawal($withdrawal, null, $fee, $feeAccId, (array) $data);
                 } else {
                     LoanSavingWithdrawal::create($field_map);
                 }
@@ -133,7 +133,7 @@ class LoanSavingWithdrawalController extends Controller
             return $validationErrors;
         }
 
-        $withdrawal->update(self::fieldMapping($account, $data));
+        $withdrawal->update(LoanSavingWithdrawal::fieldMapping($account, $data));
         return create_response(__('customValidations.client.withdrawal.update'));
     }
 
@@ -156,36 +156,6 @@ class LoanSavingWithdrawalController extends Controller
         }
 
         return false;
-    }
-
-    /**
-     * Field Mapping Withdrawal Data
-     *
-     * @param LoanAccount $account
-     * @param object $requestData
-     * @param boolean $is_store
-     * @return array
-     */
-    private static function fieldMapping(LoanAccount $account, object $requestData, $is_store = false)
-    {
-        $field_map = [
-            'balance'       => $account->balance,
-            'amount'        => $requestData->amount,
-            'description'   => $requestData->description,
-        ];
-        if ($is_store) {
-            $field_map += [
-                'field_id'                  => $account->field_id,
-                'center_id'                 => $account->center_id,
-                'category_id'               => $account->category_id,
-                'client_registration_id'    => $account->client_registration_id,
-                'loan_account_id'           => $account->id,
-                'acc_no'                    => $account->acc_no,
-                'creator_id'                => auth()->id(),
-            ];
-        }
-
-        return $field_map;
     }
 
     /**
@@ -231,7 +201,7 @@ class LoanSavingWithdrawalController extends Controller
                 }
 
                 // Process Withdrawal
-                self::processWithdrawal($withdrawal, $account, $fee, $feeAccId, $requestData);
+                LoanSavingWithdrawal::processWithdrawal($withdrawal, $account, $fee, $feeAccId, $requestData);
                 return create_response(__('customValidations.client.withdrawal.approved'));
             });
         } catch (\Exception $e) {
@@ -262,68 +232,5 @@ class LoanSavingWithdrawalController extends Controller
             return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'account');
         }
         return false;
-    }
-
-    /**
-     * Process withdrawal
-     *
-     * @param LoanSavingWithdrawal $withdrawal
-     * @param Account $account
-     * @param int $fee
-     * @param int $feeAccId
-     * @param array $requestData
-     */
-    private static function processWithdrawal(LoanSavingWithdrawal $withdrawal, Account $account = null, int $fee, int $feeAccId, array $requestData): void
-    {
-        $data           = (object) $requestData;
-        $loanAccount    = $withdrawal->LoanAccount;
-
-        $expenseCatId   = ExpenseCategory::where('name', 'loan_saving_withdrawal')->value('id');
-        $categoryName   = !$withdrawal->category->is_default ? $withdrawal->category->name :  __("customValidations.category.default.{$withdrawal->category->name}");
-        $acc_no         = Helper::tsNumbers($withdrawal->acc_no);
-        $amount         = Helper::tsNumbers("৳{$withdrawal->amount}/-");
-        $description    = __('customValidations.common.acc_no') . ' = ' . $acc_no . ', ' . __('customValidations.common.category') . ' = ' . $categoryName . ', ' . __('customValidations.common.loan_saving') . ' ' . __('customValidations.common.withdrawal') . ' = ' . $amount;
-
-        if (isset($data->account) && !empty($account)) {
-            Expense::store(
-                $data->account,
-                $expenseCatId,
-                $withdrawal->amount,
-                $account->balance,
-                $description
-            );
-            $account->increment('total_withdrawal', $withdrawal->amount);
-        }
-        if (!empty($fee) && $fee > 0) {
-            $categoryId     = AccountFeesCategory::where('name', 'withdrawal_fee')->value('id');
-            $feeAccount     = Account::find($feeAccId);
-            $incomeCatId    = IncomeCategory::where('name', 'withdrawal_fee')->value('id');
-
-            LoanAccountFee::create([
-                'loan_account_id'           => $loanAccount->id,
-                'account_fees_category_id'  => $categoryId,
-                'creator_id'                => auth()->id(),
-                'amount'                    => $fee,
-                'description'               => $description
-            ]);
-            Income::store(
-                $feeAccId,
-                $incomeCatId,
-                $fee,
-                $feeAccount->balance,
-                $description
-            );
-            $feeAccount->increment('total_deposit', $fee);
-            $loanAccount->increment('total_withdrawn', $fee);
-        }
-
-        $loanAccount->increment('total_withdrawn', $withdrawal->amount);
-        $withdrawal->update(
-            [
-                'is_approved' => true,
-                'approved_by' => auth()->id(),
-                'approved_at' => Carbon::now()
-            ]
-        );
     }
 }

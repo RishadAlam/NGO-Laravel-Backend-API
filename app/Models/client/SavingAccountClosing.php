@@ -78,6 +78,7 @@ class SavingAccountClosing extends Model
         $account            = SavingAccount::with('Category:id,name,is_default')->find($data->account_id);
         $categoryConf       = CategoryConfig::categoryID($account->category_id)
             ->first(['saving_acc_closing_fee', 's_col_fee_acc_id']);
+        $withdraw_amount    = $account->balance - $categoryConf->saving_acc_closing_fee;
 
         if (!empty($data->withdrawal_account_id)) {
             $withdrawal_account = Account::find($data->withdrawal_account_id);
@@ -88,8 +89,10 @@ class SavingAccountClosing extends Model
         if (!empty($data->withdrawal_account_id) && !empty($data->interest)) {
             static::processInterest($account, $data->interest, $data->withdrawal_account_id, $withdrawal_account);
         }
+        if ($withdraw_amount > 0) {
+            static::processWithdrawal($account, $withdraw_amount, $data->withdrawal_account_id, $withdrawal_account);
+        }
 
-        static::processWithdrawal($account, $account->balance - $categoryConf->saving_acc_closing_fee, $data->withdrawal_account_id, $withdrawal_account);
         static::deleteAccountAndAssociations($account);
         SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $account->id, 'delete', []));
     }

@@ -10,6 +10,7 @@ use App\Models\category\CategoryConfig;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\client\AccountFeesCategory;
 use App\Http\Traits\BelongsToLoanAccountTrait;
+use App\Models\Withdrawal\LoanSavingWithdrawal;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanAccountClosing extends Model
@@ -85,17 +86,42 @@ class LoanAccountClosing extends Model
         return $map;
     }
 
-    public static function handleApprovedAccountClosing($account)
+    public static function handleApprovedAccountClosing($account, $data)
     {
-        $categoryConf = CategoryConfig::categoryID($account->category_id)
-            ->first(['loan_acc_closing_fee', 'l_col_fee_acc_id']);
 
+        $withdrawal_account = null;
+        $categoryConf       = CategoryConfig::categoryID($account->category_id)
+            ->first(['loan_acc_closing_fee', 'l_col_fee_acc_id']);
+        $withdraw_amount    = $account->balance - $categoryConf->loan_acc_closing_fee;
+
+        if (!empty($data->withdrawal_account_id)) {
+            $withdrawal_account = Account::find($data->withdrawal_account_id);
+        }
         if ($categoryConf->loan_acc_closing_fee > 0) {
             static::processClosingFee($account, $categoryConf);
+        }
+        if ($withdraw_amount > 0) {
+            static::processWithdrawal($account, $withdraw_amount,  $data->withdrawal_account_id, $withdrawal_account);
         }
 
         static::deleteAccountAndAssociations($account);
         LoanAccountActionHistory::create(Helper::setActionHistory('loan_account_id', $account->id, 'delete', []));
+    }
+
+    private static function processWithdrawal($account, $amount, $withdrawal_account_id, $withdrawal_account)
+    {
+        $categoryName   = !$account->category->is_default ? $account->category->name : __("customValidations.category.default.{$account->category->name}");
+        $data           = [
+            'amount'        => $amount,
+            'account'       => $withdrawal_account_id,
+            'description'   => __('customValidations.common.acc_no') . ' = ' . Helper::tsNumbers($account->acc_no) . ', ' .
+                __('customValidations.common.category') . ' = ' . $categoryName . ', '  . __('customValidations.common.loan') . '-' .
+                __('customValidations.common.saving') . ' ' . __('customValidations.common.closing') . ' ' .
+                __('customValidations.common.withdrawal') . ' = ' . Helper::tsNumbers($amount)
+        ];
+
+        $withdrawal = LoanSavingWithdrawal::create(LoanSavingWithdrawal::fieldMapping($account, (object) $data, true));
+        LoanSavingWithdrawal::processWithdrawal($withdrawal, $withdrawal_account, null, null, (array) $data);
     }
 
     public static function processClosingFee($account, $categoryConf)
