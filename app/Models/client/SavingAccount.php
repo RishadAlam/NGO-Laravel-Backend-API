@@ -105,6 +105,14 @@ class SavingAccount extends Model
     }
 
     /**
+     * Relation with Saving Account Fee Table
+     */
+    public function SavingAccountClosing()
+    {
+        return $this->hasMany(SavingAccountClosing::class);
+    }
+
+    /**
      * Relationship belongs to ClientRegistration model.
      *
      * @return response()

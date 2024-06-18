@@ -119,6 +119,7 @@ class LoanAccountController extends Controller
             ->loanApprover('id', 'name')
             ->find($id);
 
+        $account['closing_req'] = $account->LoanAccountClosing()->where('is_approved', false)->count();
         return create_response(null, $account);
     }
 

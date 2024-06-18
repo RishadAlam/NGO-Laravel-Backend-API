@@ -64,6 +64,8 @@ class SavingAccountController extends Controller
             ->approver('id', 'name')
             ->find($id);
 
+        $saving['closing_req'] = $saving->SavingAccountClosing()->where('is_approved', false)->count();
+
         return create_response(null, $saving);
     }
 

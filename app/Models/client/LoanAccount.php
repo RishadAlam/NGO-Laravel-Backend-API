@@ -109,6 +109,14 @@ class LoanAccount extends Model
     }
 
     /**
+     * Relation with Loan Collection Table
+     */
+    public function LoanAccountClosing()
+    {
+        return $this->hasMany(LoanAccountClosing::class);
+    }
+
+    /**
      * Relationship belongs to ClientRegistration model
      *
      * @return response()
