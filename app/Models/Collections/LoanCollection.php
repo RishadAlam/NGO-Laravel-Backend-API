@@ -149,6 +149,7 @@ class LoanCollection extends Model
     public static function currentDayLoanCollection()
     {
         return static::today()
+
             ->clientRegistration('id', 'name', 'image_uri')
             ->category('id', 'name', 'is_default')
             ->field('id', 'name')

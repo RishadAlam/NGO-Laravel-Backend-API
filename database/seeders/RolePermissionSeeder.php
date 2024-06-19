@@ -235,6 +235,28 @@ class RolePermissionSeeder extends Seeder
                     'pending_loan_saving_withdrawal_delete',
                 ]
             ],
+            // Pending Request to delete Saving Account
+            [
+                'groupName'     => 'pending_req_to_delete_saving_acc',
+                'permissions'   => [
+                    'pending_req_to_delete_saving_acc_list_view',
+                    'pending_req_to_delete_saving_acc_list_view_as_admin',
+                    'pending_req_to_delete_saving_acc_approval',
+                    'pending_req_to_delete_saving_acc_update',
+                    'pending_req_to_delete_saving_acc_delete',
+                ]
+            ],
+            // Pending Request to delete Loan Account
+            [
+                'groupName'     => 'pending_req_to_delete_loan_acc',
+                'permissions'   => [
+                    'pending_req_to_delete_loan_acc_list_view',
+                    'pending_req_to_delete_loan_acc_list_view_as_admin',
+                    'pending_req_to_delete_loan_acc_approval',
+                    'pending_req_to_delete_loan_acc_update',
+                    'pending_req_to_delete_loan_acc_delete',
+                ]
+            ],
             // Account
             [
                 'groupName'     => 'account_management',

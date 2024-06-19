@@ -72,6 +72,12 @@ class SavingAccountClosing extends Model
         return $map;
     }
 
+    /**
+     * Handle to approved account closing process
+     * @param object $data
+     * 
+     * @return void
+     */
     public static function handleApprovedAccountClosing($data)
     {
         $withdrawal_account = null;
@@ -97,6 +103,16 @@ class SavingAccountClosing extends Model
         SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $account->id, 'delete', []));
     }
 
+    /**
+     * Account Withdrawal Processing
+     * 
+     * @param SavingAccount $account
+     * @param int $amount
+     * @param int $withdrawal_account_id
+     * @param Account $withdrawal_account
+     * 
+     * @return void
+     */
     private static function processWithdrawal($account, $amount, $withdrawal_account_id, $withdrawal_account)
     {
         $categoryName   = !$account->category->is_default ? $account->category->name : __("customValidations.category.default.{$account->category->name}");
@@ -113,6 +129,16 @@ class SavingAccountClosing extends Model
         SavingWithdrawal::processWithdrawal($withdrawal, $withdrawal_account, null, null, (array) $data);
     }
 
+    /**
+     * Account Interest Processing
+     * 
+     * @param SavingAccount $account
+     * @param int $amount
+     * @param int $withdrawal_account_id
+     * @param Account $withdrawal_account
+     * 
+     * @return void
+     */
     private static function processInterest($account, $amount, $withdrawal_account_id, $withdrawal_account)
     {
         $expenseCatId   = ExpenseCategory::where('name', 'account_closing_interest')->value('id');
@@ -132,6 +158,14 @@ class SavingAccountClosing extends Model
         $withdrawal_account->increment('total_withdrawal', $amount);
     }
 
+    /**
+     * Account Closing fee Processing
+     * 
+     * @param SavingAccount $account
+     * @param object $categoryConf
+     * 
+     * @return void
+     */
     public static function processClosingFee($account, $categoryConf)
     {
         $categoryName = !$account->category->is_default ? $account->category->name : __("customValidations.category.default.{$account->category->name}");
@@ -163,6 +197,13 @@ class SavingAccountClosing extends Model
         $account->increment('total_withdrawn', $categoryConf->saving_acc_closing_fee);
     }
 
+    /**
+     * Delete Account And Associations
+     * 
+     * @param SavingAccount $account
+     * 
+     * @return void
+     */
     public static function deleteAccountAndAssociations($account)
     {
         $account->delete();

@@ -14,6 +14,18 @@ use App\Http\Requests\ClientAccClosing\StoreLoanAccountClosingRequest;
 class LoanAccClosingController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('permission:pending_req_to_delete_loan_acc_list_view|pending_req_to_delete_loan_acc_list_view_as_admin')->only('index');
+        $this->middleware('can:client_loan_account_delete')->only('store');
+        $this->middleware('can:pending_req_to_delete_loan_acc_approval')->only('approved');
+        $this->middleware('can:pending_req_to_delete_loan_acc_update')->only('update');
+        $this->middleware('can:pending_req_to_delete_loan_acc_delete')->only('destroy');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
