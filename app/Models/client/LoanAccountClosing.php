@@ -54,6 +54,17 @@ class LoanAccountClosing extends Model
     {
         return $query->pending()
             ->author('id', 'name')
+            ->whereHas('LoanAccount', function ($query) {
+                $query->when(request('field_id'), function ($query) {
+                    $query->where('field_id', request('field_id'));
+                })
+                    ->when(request('center_id'), function ($query) {
+                        $query->centerID(request('center_id'));
+                    })
+                    ->when(request('category_id'), function ($query) {
+                        $query->categoryID(request('category_id'));
+                    });
+            })
             ->with(
                 [
                     'LoanAccount' => function ($query) {
@@ -62,15 +73,6 @@ class LoanAccountClosing extends Model
                             ->field('id', 'name')
                             ->center('id', 'name')
                             ->category('id', 'name', 'is_default')
-                            ->when(request('field_id'), function ($query) {
-                                $query->fieldID(request('field_id'));
-                            })
-                            ->when(request('center_id'), function ($query) {
-                                $query->centerID(request('center_id'));
-                            })
-                            ->when(request('category_id'), function ($query) {
-                                $query->categoryID(request('category_id'));
-                            })
                             ->withTrashed();
                     },
                 ]
