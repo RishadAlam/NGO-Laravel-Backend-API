@@ -38,7 +38,8 @@ class SavingAccClosingController extends Controller
      */
     public function index()
     {
-        //
+        $closings = SavingAccountClosing::pendingClosings()->get();
+        return create_response(null, $closings);
     }
 
     /**

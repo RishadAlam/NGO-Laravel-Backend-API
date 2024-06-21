@@ -30,7 +30,8 @@ class LoanAccClosingController extends Controller
      */
     public function index()
     {
-        //
+        $closing = LoanAccountClosing::pendingClosings()->get();
+        return create_response(null, $closing);
     }
 
     /**

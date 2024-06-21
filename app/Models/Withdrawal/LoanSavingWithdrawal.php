@@ -91,11 +91,13 @@ class LoanSavingWithdrawal extends Model
                 [
                     'LoanAccount' => function ($query) {
                         $query->select('id', 'balance', 'client_registration_id');
-                        $query->ClientRegistration('id', 'name', 'image_uri');
+                        $query->ClientRegistration('id', 'name', 'image_uri')
+                            ->withTrashed();
                     },
                     'Category' => function ($query) {
                         $query->select('id', 'name', 'is_default');
-                        $query->with('CategoryConfig:id,category_id,loan_saving_withdrawal_fee');
+                        $query->with('CategoryConfig:id,category_id,loan_saving_withdrawal_fee')
+                            ->withTrashed();
                     }
                 ]
             )

@@ -6,17 +6,23 @@ use App\Helpers\Helper;
 use App\Models\accounts\Income;
 use App\Models\accounts\Account;
 use App\Models\accounts\Expense;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Traits\HelperScopesTrait;
 use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\accounts\ExpenseCategory;
+use App\Http\Traits\BelongsToAuthorTrait;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Http\Traits\BelongsToSavingAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SavingAccountClosing extends Model
 {
-    use HasFactory, BelongsToSavingAccountTrait;
+    use HasFactory,
+        HelperScopesTrait,
+        BelongsToAuthorTrait,
+        BelongsToSavingAccountTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -34,6 +40,43 @@ class SavingAccountClosing extends Model
         'description',
         'is_approved',
     ];
+
+    /**
+     * Pending Saving Account Closing Forms Scope.
+     */
+    public function scopePendingClosings($query)
+    {
+        return $query->pending()
+            ->author('id', 'name')
+            ->with(
+                [
+                    'SavingAccount' => function ($query) {
+                        $query->select('id', 'acc_no', 'field_id', 'center_id', 'category_id', 'client_registration_id')
+                            ->ClientRegistration('id', 'name', 'image_uri')
+                            ->field('id', 'name')
+                            ->center('id', 'name')
+                            ->category('id', 'name', 'is_default')
+                            ->when(request('field_id'), function ($query) {
+                                $query->fieldID(request('field_id'));
+                            })
+                            ->when(request('center_id'), function ($query) {
+                                $query->centerID(request('center_id'));
+                            })
+                            ->when(request('category_id'), function ($query) {
+                                $query->categoryID(request('category_id'));
+                            })
+                            ->withTrashed();
+                    },
+                ]
+            )
+            ->when(!Auth::user()->can('pending_req_to_delete_saving_acc_list_view_as_admin'), function ($query) {
+                $query->createdBy();
+            })
+            ->when((Auth::user()->can('pending_req_to_delete_saving_acc_list_view_as_admin') && request('user_id')), function ($query) {
+                $query->createdBy(request('user_id'));
+            })
+            ->orderedBy();
+    }
 
     /**
      * Set Field Map
