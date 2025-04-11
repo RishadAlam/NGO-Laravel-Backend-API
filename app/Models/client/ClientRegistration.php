@@ -240,7 +240,9 @@ class ClientRegistration extends Model
                 $query->CenterID(request('center_id'));
             })
             ->when(request('search'), function ($query) {
-                $query->where('acc_no', 'LIKE', '%' . request('search') . '%')
+                $query->where('acc_no', request('search'))
+                    ->orWhere('name', request('search'))
+                    ->orWhere('acc_no', 'LIKE', '%' . request('search') . '%')
                     ->orWhere('name', 'LIKE', '%' . request('search') . '%')
                     ->withTrashed();
             })
