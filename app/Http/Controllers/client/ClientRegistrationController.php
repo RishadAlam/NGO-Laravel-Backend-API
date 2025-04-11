@@ -63,7 +63,7 @@ class ClientRegistrationController extends Controller
             ->center('id', 'name')
             ->author('id', 'name')
             ->filter()
-            ->orderedBy()
+            ->orderedBy('acc_no', 'ASC')
             ->get();
 
         return create_response(null, $client);
