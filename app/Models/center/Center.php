@@ -3,6 +3,7 @@
 namespace App\Models\center;
 
 use App\Models\User;
+use App\Helpers\Helper;
 use App\Models\field\Field;
 use App\Models\client\LoanAccount;
 use App\Models\client\SavingAccount;
@@ -81,11 +82,12 @@ class Center extends Model
      */
     public function scopeSavingCollectionSheet($query, $category_id, $field_id, $user_id = null, $isRegular = true, $date = null)
     {
+        $prefix = Helper::getPermissionPrefix($isRegular);
         $query->fieldID($field_id)
             ->active()
             ->with(
                 [
-                    'SavingAccount' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date) {
+                    'SavingAccount' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date, $prefix) {
                         $query->approve();
                         $query->active();
                         $query->select(
@@ -101,7 +103,7 @@ class Center extends Model
                         $query->categoryID($category_id);
                         $query->ClientRegistration('id', 'name', 'image_uri');
                         $query->with([
-                            'SavingCollection' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date) {
+                            'SavingCollection' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date, $prefix) {
                                 $query->author('id', 'name');
                                 $query->account('id', 'name', 'is_default');
                                 $query->select('id', 'saving_account_id', 'account_id', 'installment', 'deposit', 'description', 'is_approved', 'creator_id', 'created_at');
@@ -117,7 +119,7 @@ class Center extends Model
                                 $query->when($user_id, function ($query) use ($user_id) {
                                     $query->createdBy($user_id);
                                 });
-                                $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . "_saving_collection_list_view_as_admin"), function ($query) {
+                                $query->when(!Auth::user()->can("{$prefix}_saving_collection_list_view_as_admin"), function ($query) {
                                     $query->createdBy();
                                 });
                             }
@@ -132,11 +134,12 @@ class Center extends Model
      */
     public function scopeLoanCollectionSheet($query, $category_id, $field_id, $user_id = null, $isRegular = true, $date = null)
     {
+        $prefix = Helper::getPermissionPrefix($isRegular);
         $query->fieldID($field_id)
             ->active()
             ->with(
                 [
-                    'LoanAccount' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date) {
+                    'LoanAccount' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date, $prefix) {
                         $query->approve();
                         $query->active();
                         $query->select(
@@ -155,7 +158,7 @@ class Center extends Model
                         $query->categoryID($category_id);
                         $query->ClientRegistration('id', 'name', 'image_uri');
                         $query->with([
-                            'LoanCollection' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date) {
+                            'LoanCollection' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date, $prefix) {
                                 $query->author('id', 'name');
                                 $query->account('id', 'name', 'is_default');
                                 $query->select('id', 'loan_account_id', 'account_id', 'installment', 'deposit', 'loan', 'interest', 'total', 'description', 'is_approved', 'creator_id', 'created_at');
@@ -171,7 +174,7 @@ class Center extends Model
                                 $query->when($user_id, function ($query) use ($user_id) {
                                     $query->createdBy($user_id);
                                 });
-                                $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_loan_collection_list_view_as_admin'), function ($query) {
+                                $query->when(!Auth::user()->can("{$prefix}_loan_collection_list_view_as_admin"), function ($query) {
                                     $query->createdBy();
                                 });
                             }

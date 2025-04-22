@@ -3,6 +3,7 @@
 namespace App\Models\category;
 
 use App\Models\User;
+use App\Helpers\Helper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\HelperScopesTrait;
@@ -73,11 +74,12 @@ class Category extends Model
      */
     public function scopeCategorySavingReport($query, $isRegular = true)
     {
+        $prefix = Helper::getPermissionPrefix($isRegular);
         $query->where('saving', true)
             ->active()
             ->with(
                 [
-                    'SavingCollection' => function ($query) use ($isRegular) {
+                    'SavingCollection' => function ($query) use ($isRegular, $prefix) {
                         $query->select(
                             'category_id',
                             DB::raw('SUM(deposit) AS deposit')
@@ -87,7 +89,7 @@ class Category extends Model
                         $query->when($isRegular, function ($query) {
                             $query->today();
                         });
-                        $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_saving_collection_list_view_as_admin'), function ($query) {
+                        $query->when(!Auth::user()->can("{$prefix}_saving_collection_list_view_as_admin"), function ($query) {
                             $query->createdBy();
                         });
                     }
@@ -100,11 +102,12 @@ class Category extends Model
      */
     public function scopeCategoryLoanReport($query, $isRegular = true)
     {
+        $prefix = Helper::getPermissionPrefix($isRegular);
         $query->where('loan', true)
             ->active()
             ->with(
                 [
-                    'LoanCollection' => function ($query) use ($isRegular) {
+                    'LoanCollection' => function ($query) use ($isRegular, $prefix) {
                         $query->select(
                             'category_id',
                             DB::raw('SUM(deposit) AS deposit'),
@@ -117,7 +120,7 @@ class Category extends Model
                         $query->when($isRegular, function ($query) {
                             $query->today();
                         });
-                        $query->when(!Auth::user()->can($isRegular ? 'regular' : 'pending' . '_loan_collection_list_view_as_admin'), function ($query) {
+                        $query->when(!Auth::user()->can("{$prefix}_loan_collection_list_view_as_admin"), function ($query) {
                             $query->createdBy();
                         });
                     }

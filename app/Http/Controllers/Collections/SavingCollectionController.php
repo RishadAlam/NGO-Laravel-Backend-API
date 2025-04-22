@@ -122,6 +122,7 @@ class SavingCollectionController extends Controller
     public function regularCategoryReport()
     {
         $categoryReport = Category::categorySavingReport()->get(['id', 'name', 'is_default']);
+
         return create_response(null, $categoryReport);
     }
 
@@ -131,6 +132,7 @@ class SavingCollectionController extends Controller
     public function pendingCategoryReport()
     {
         $categoryReport = Category::categorySavingReport(false)->get(['id', 'name', 'is_default']);
+
         return create_response(null, $categoryReport);
     }
 
@@ -140,6 +142,7 @@ class SavingCollectionController extends Controller
     public function regularFieldReport($category_id)
     {
         $fieldReport = Field::fieldSavingReport($category_id)->get(['id', 'name']);
+
         return create_response(null, $fieldReport);
     }
 
@@ -149,6 +152,7 @@ class SavingCollectionController extends Controller
     public function pendingFieldReport($category_id)
     {
         $fieldReport = Field::fieldSavingReport($category_id, false)->get(['id', 'name']);
+
         return create_response(null, $fieldReport);
     }
 
@@ -158,6 +162,7 @@ class SavingCollectionController extends Controller
     public function regularCollectionSheet($category_id, $field_id)
     {
         $collections = Center::savingCollectionSheet($category_id, $field_id, request('user_id'))->get(['id', 'name']);
+
         return create_response(null, $collections);
     }
 

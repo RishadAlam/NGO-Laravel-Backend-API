@@ -281,4 +281,9 @@ class Helper
     {
         return $isDefault ? __("{$path}{$name}") : $name;
     }
+
+    public static function getPermissionPrefix($isRegular = true)
+    {
+        return $isRegular ? 'regular' : 'pending';
+    }
 }
