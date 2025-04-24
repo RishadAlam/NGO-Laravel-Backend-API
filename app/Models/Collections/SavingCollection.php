@@ -161,7 +161,14 @@ class SavingCollection extends Model
                             'acc_no',
                             'deposit'
                         );
-                        $query->ClientRegistration('id', 'name', 'image_uri');
+                        $query->whereHas('ClientRegistration', function ($q) {
+                            $q->approve();
+                            $q->whereNull('deleted_at');
+                        })->with(['ClientRegistration' => function ($q) {
+                            $q->approve();
+                            $q->whereNull('deleted_at');
+                            $q->select('id', 'name', 'image_uri');
+                        }]);
                         $query->with([
                             'SavingCollection' => function ($query) use ($category_id) {
                                 $query->author('id', 'name');

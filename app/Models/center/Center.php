@@ -101,7 +101,14 @@ class Center extends Model
                         );
                         $query->fieldID($field_id);
                         $query->categoryID($category_id);
-                        $query->ClientRegistration('id', 'name', 'image_uri');
+                        $query->whereHas('ClientRegistration', function ($q) {
+                            $q->approve();
+                            $q->whereNull('deleted_at');
+                        })->with(['ClientRegistration' => function ($q) {
+                            $q->approve();
+                            $q->whereNull('deleted_at');
+                            $q->select('id', 'name', 'image_uri');
+                        }]);
                         $query->with([
                             'SavingCollection' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date, $prefix) {
                                 $query->author('id', 'name');
@@ -156,7 +163,14 @@ class Center extends Model
                         );
                         $query->fieldID($field_id);
                         $query->categoryID($category_id);
-                        $query->ClientRegistration('id', 'name', 'image_uri');
+                        $query->whereHas('ClientRegistration', function ($q) {
+                            $q->approve();
+                            $q->whereNull('deleted_at');
+                        })->with(['ClientRegistration' => function ($q) {
+                            $q->approve();
+                            $q->whereNull('deleted_at');
+                            $q->select('id', 'name', 'image_uri');
+                        }]);
                         $query->with([
                             'LoanCollection' => function ($query) use ($category_id, $field_id, $user_id, $isRegular, $date, $prefix) {
                                 $query->author('id', 'name');
