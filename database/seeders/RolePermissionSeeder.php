@@ -366,6 +366,15 @@ class RolePermissionSeeder extends Seeder
                     'staff_permission_update',
                 ]
             ],
+            // Registered Account View
+            [
+                'groupName'     => 'registered_account_view',
+                'permissions'   => [
+                    'registered_client_account_list_view',
+                    'registered_saving_account_list_view',
+                    'registered_loan_account_list_view',
+                ]
+            ],
             // App Config
             [
                 'groupName'     => 'settings_and_privacy',

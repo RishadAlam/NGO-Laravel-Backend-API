@@ -246,9 +246,22 @@ class ClientRegistration extends Model
                     ->orWhere('name', 'LIKE', '%' . request('search') . '%')
                     ->withTrashed();
             })
-            ->when(request('limit'), function ($query) {
-                $query->take(request('limit'));
+            ->when(request('latest'), function ($query) {
+                $query->orderedBy('id', 'DESC');
+            })
+            ->when(empty(request('latest')), function ($query) {
+                $query->orderedBy('acc_no', 'ASC');
             });
+
+        if (request()->has('latest')) {
+            $query->orderedBy('id', 'DESC');
+        } else {
+            $query->orderedBy('acc_no', 'ASC');
+        }
+
+        $query->when(request('limit'), function ($query) {
+            $query->take(request('limit'));
+        });
     }
 
     /**
