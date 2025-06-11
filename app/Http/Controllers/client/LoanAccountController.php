@@ -49,7 +49,18 @@ class LoanAccountController extends Controller
      */
     public function index()
     {
-        //
+        $loans = LoanAccount::approve()
+            ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
+            ->field('id', 'name',)
+            ->center('id', 'name',)
+            ->category('id', 'name', 'is_default')
+            ->author('id', 'name')
+            ->approver('id', 'name')
+            ->loanApprover('id', 'name')
+            ->orderedBy('id', 'DESC')
+            ->get();
+
+        return create_response(null, $loans);
     }
 
     /**
@@ -120,6 +131,7 @@ class LoanAccountController extends Controller
             ->find($id);
 
         $account['closing_req'] = $account->LoanAccountClosing()->where('is_approved', false)->count();
+
         return create_response(null, $account);
     }
 
@@ -517,7 +529,9 @@ class LoanAccountController extends Controller
     {
         $histData           = [];
         $fieldsToCompare    = [
-            'start_date', 'duration_date', 'loan_given',
+            'start_date',
+            'duration_date',
+            'loan_given',
             'payable_deposit',
             'payable_installment',
             'payable_interest',

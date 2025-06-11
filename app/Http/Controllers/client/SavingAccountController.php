@@ -45,7 +45,17 @@ class SavingAccountController extends Controller
      */
     public function index()
     {
-        //
+        $savings = SavingAccount::approve()
+            ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
+            ->field('id', 'name',)
+            ->center('id', 'name',)
+            ->category('id', 'name', 'is_default')
+            ->author('id', 'name')
+            ->approver('id', 'name')
+            ->orderedBy('id', 'DESC')
+            ->get();
+
+        return create_response(null, $savings);
     }
 
     /**

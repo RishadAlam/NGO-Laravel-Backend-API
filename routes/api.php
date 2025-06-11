@@ -101,6 +101,22 @@ Route::group(['middleware' => 'LangCheck'], function () {
 
 /*
  * -------------------------------------------------------------------------
+ * Fallback Routes
+ * -------------------------------------------------------------------------
+ *
+ * Here is where you can hit Authenticate routes. All of them are protected
+ * by auth Sanctum middleware and email verified
+ */
+Route::fallback(function () {
+    return response()->json([
+        'success' => false,
+        'message' => 'API endpoint not found.'
+    ], 404);
+});
+
+
+/*
+ * -------------------------------------------------------------------------
  * Protected Routes
  * -------------------------------------------------------------------------
  *
@@ -154,6 +170,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('loan/guarantor/occupations', [LoanAccountController::class, 'get_guarantor_occupations'])->name('loan.occupations');
         Route::GET('loan/guarantor/relations', [LoanAccountController::class, 'get_guarantor_relations'])->name('loan.relations');
         Route::GET('saving/short-summery/{id}', [SavingAccountController::class, 'get_short_summery'])->name('saving.short_summery');
+        Route::GET('saving/get', [SavingAccountController::class, 'index'])->name('saving.index');
+        Route::GET('loan/get', [LoanAccountController::class, 'index'])->name('loan.index');
         Route::GET('loan/short-summery/{id}', [LoanAccountController::class, 'get_short_summery'])->name('loan.short_summery');
     });
 
