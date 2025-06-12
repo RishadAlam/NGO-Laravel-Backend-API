@@ -17,6 +17,7 @@ use App\Http\Traits\BelongsToFieldTrait;
 use App\Models\accounts\ExpenseCategory;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
+use App\Http\Traits\BelongsToAccountTrait;
 use App\Models\client\AccountFeesCategory;
 use App\Http\Traits\BelongsToApproverTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
@@ -34,7 +35,8 @@ class SavingWithdrawal extends Model
         BelongsToAuthorTrait,
         BelongsToApproverTrait,
         BelongsToClientRegistrationTrait,
-        BelongsToSavingAccountTrait;
+        BelongsToSavingAccountTrait,
+        BelongsToAccountTrait;
 
     /**
      * The attributes that are mass assignable.

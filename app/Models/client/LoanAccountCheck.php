@@ -2,12 +2,15 @@
 
 namespace App\Models\client;
 
+use App\Models\User;
+use App\Http\Traits\HelperScopesTrait;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Traits\BelongsToLoanAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanAccountCheck extends Model
 {
-    use HasFactory;
+    use HasFactory, HelperScopesTrait, BelongsToLoanAccountTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -27,4 +30,14 @@ class LoanAccountCheck extends Model
         'checked_by',
         'next_check_in_at',
     ];
+
+    /**
+     * Relationship belongs to User model
+     *
+     * @return response()
+     */
+    public function Checker()
+    {
+        return $this->belongsTo(User::class, 'checked_by', 'id')->withTrashed();
+    }
 }

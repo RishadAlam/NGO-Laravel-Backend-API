@@ -25,7 +25,16 @@ class LoanAccountCheckController extends Controller
      */
     public function index()
     {
-        //
+        if (empty(request('loan_account_id'))) {
+            return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
+        }
+
+        $checks = LoanAccountCheck::where('loan_account_id', request('loan_account_id'))
+            ->checker('id', 'name')
+            ->orderedBy('id', 'DESC')
+            ->get();
+
+        return create_response(null, $checks);
     }
 
     /**

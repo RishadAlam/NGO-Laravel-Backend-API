@@ -42,7 +42,19 @@ class LoanSavingWithdrawalController extends Controller
      */
     public function index()
     {
-        //
+        if (empty(request('loan_account_id'))) {
+            return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
+        }
+
+        $withdrawals = LoanSavingWithdrawal::where('loan_account_id', request('loan_account_id'))
+            ->approve()
+            ->author('id', 'name')
+            ->account('id', 'name', 'is_default')
+            ->approver('id', 'name')
+            ->orderedBy('id', 'DESC')
+            ->get();
+
+        return create_response(null, $withdrawals);
     }
 
     /**
@@ -67,8 +79,8 @@ class LoanSavingWithdrawalController extends Controller
                 $field_map = LoanSavingWithdrawal::fieldMapping($account, $data, true);
                 if ($is_approved) {
                     $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['loan_saving_withdrawal_fee', 'ls_with_fee_acc_id']);
-                    $fee            = $categoryConf->loan_saving_withdrawal_fee;
-                    $feeAccId       = $categoryConf->ls_with_fee_acc_id;
+                    $fee            = $categoryConf->loan_saving_withdrawal_fee ?? 0;
+                    $feeAccId       = $categoryConf->ls_with_fee_acc_id ?? 0;
 
                     if (!empty($fee) && ($data->amount + $fee) > $account->balance) {
                         return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'fee');
@@ -187,8 +199,8 @@ class LoanSavingWithdrawalController extends Controller
                 $requestData    = $request->validated();
                 $withdrawal     = LoanSavingWithdrawal::with(['LoanAccount:id,balance', 'Category:id,name,is_default'])->find($id);
                 $categoryConf   = CategoryConfig::categoryID($withdrawal->category_id)->first(['loan_saving_withdrawal_fee', 'ls_with_fee_acc_id']);
-                $fee            = $categoryConf->loan_saving_withdrawal_fee;
-                $feeAccId       = $categoryConf->ls_with_fee_acc_id;
+                $fee            = $categoryConf->loan_saving_withdrawal_fee ?? 0;
+                $feeAccId       = $categoryConf->ls_with_fee_acc_id ?? 0;
 
                 if (isset($requestData['account'])) {
                     $account = Account::find($requestData['account']);

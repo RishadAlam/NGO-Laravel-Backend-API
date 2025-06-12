@@ -17,6 +17,7 @@ use App\Http\Traits\BelongsToAuthorTrait;
 use App\Http\Traits\BelongsToCenterTrait;
 use App\Models\client\ClientRegistration;
 use App\Http\Traits\BelongsToAccountTrait;
+use App\Http\Traits\BelongsToApproverTrait;
 use App\Http\Traits\BelongsToCategoryTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Traits\BelongsToSavingAccountTrait;
@@ -35,7 +36,8 @@ class SavingCollection extends Model
         BelongsToAuthorTrait,
         BelongsToAccountTrait,
         BelongsToClientRegistrationTrait,
-        BelongsToSavingAccountTrait;
+        BelongsToSavingAccountTrait,
+        BelongsToApproverTrait;
 
     /**
      * The attributes that are mass assignable.

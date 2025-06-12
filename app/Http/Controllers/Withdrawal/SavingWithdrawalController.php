@@ -42,7 +42,19 @@ class SavingWithdrawalController extends Controller
      */
     public function index()
     {
-        //
+        if (empty(request('saving_account_id'))) {
+            return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
+        }
+
+        $withdrawals = SavingWithdrawal::where('saving_account_id', request('saving_account_id'))
+            ->approve()
+            ->author('id', 'name')
+            ->account('id', 'name', 'is_default')
+            ->approver('id', 'name')
+            ->orderedBy('id', 'DESC')
+            ->get();
+
+        return create_response(null, $withdrawals);
     }
 
     /**
@@ -58,7 +70,7 @@ class SavingWithdrawalController extends Controller
                 $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['min_saving_withdrawal', 'max_saving_withdrawal']);
 
                 // Validation
-                $validationErrors = self::validateAmount($data->amount, $account->balance, $categoryConf->min_saving_withdrawal, $categoryConf->max_saving_withdrawal);
+                $validationErrors = self::validateAmount($data->amount, $account->balance, $categoryConf->min_saving_withdrawal ?? 0, $categoryConf->max_saving_withdrawa ?? 0);
                 if (!empty($validationErrors)) {
                     return $validationErrors;
                 }
@@ -66,8 +78,8 @@ class SavingWithdrawalController extends Controller
                 $field_map = SavingWithdrawal::fieldMapping($account, $data, true);
                 if ($is_approved) {
                     $categoryConf   = CategoryConfig::categoryID($account->category_id)->first(['saving_withdrawal_fee', 's_with_fee_acc_id']);
-                    $fee            = $categoryConf->saving_withdrawal_fee;
-                    $feeAccId       = $categoryConf->s_with_fee_acc_id;
+                    $fee            = $categoryConf->saving_withdrawal_fee ?? 0;
+                    $feeAccId       = $categoryConf->s_with_fee_acc_id ?? 0;
 
                     if (!empty($fee) && ($data->amount + $fee) > $account->balance) {
                         return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'fee');
@@ -110,8 +122,8 @@ class SavingWithdrawalController extends Controller
                 'id'        => $account->id,
                 'name'      => $account->ClientRegistration->name,
                 'balance'   => $account->balance,
-                'min'       => $categoryConf->min_saving_withdrawal,
-                'max'       => $categoryConf->max_saving_withdrawal
+                'min'       => $categoryConf->min_saving_withdrawal ?? 0,
+                'max'       => $categoryConf->max_saving_withdrawal ?? 0
             ],
         );
     }
@@ -128,7 +140,7 @@ class SavingWithdrawalController extends Controller
             ->first(['min_saving_withdrawal', 'max_saving_withdrawal']);
 
         // Validation
-        $validationErrors = self::validateAmount($data->amount, $account->balance, $categoryConf->min_saving_withdrawal, $categoryConf->max_saving_withdrawal);
+        $validationErrors = self::validateAmount($data->amount, $account->balance, $categoryConf->min_saving_withdrawal ?? 0, $categoryConf->max_saving_withdrawal ?? 0);
         if (!empty($validationErrors)) {
             return $validationErrors;
         }
@@ -166,8 +178,8 @@ class SavingWithdrawalController extends Controller
                 $requestData    = $request->validated();
                 $withdrawal     = SavingWithdrawal::with(['SavingAccount:id,balance', 'Category:id,name,is_default'])->find($id);
                 $categoryConf   = CategoryConfig::categoryID($withdrawal->category_id)->first(['saving_withdrawal_fee', 's_with_fee_acc_id']);
-                $fee            = $categoryConf->saving_withdrawal_fee;
-                $feeAccId       = $categoryConf->s_with_fee_acc_id;
+                $fee            = $categoryConf->saving_withdrawal_fee ?? 0;
+                $feeAccId       = $categoryConf->s_with_fee_acc_id ?? 0;
 
                 if (isset($requestData['account'])) {
                     $account = Account::find($requestData['account']);

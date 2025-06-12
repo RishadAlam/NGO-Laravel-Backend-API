@@ -46,6 +46,25 @@ class SavingCollectionController extends Controller
     }
 
     /**
+     * Show the specified resource from storage.
+     */
+    public function show(string $savingAccountId)
+    {
+        $collections = SavingCollection::where('saving_account_id', $savingAccountId)
+            ->approve()
+            ->field('id', 'name',)
+            ->center('id', 'name',)
+            ->category('id', 'name', 'is_default')
+            ->author('id', 'name')
+            ->account('id', 'name', 'is_default')
+            ->approver('id', 'name')
+            ->orderedBy('id', 'DESC')
+            ->get();
+
+        return create_response(null, $collections);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(SavingCollectionStoreRequest $request)

@@ -25,7 +25,16 @@ class SavingAccountCheckController extends Controller
      */
     public function index()
     {
-        //
+        if (empty(request('saving_account_id'))) {
+            return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
+        }
+
+        $checks = SavingAccountCheck::where('saving_account_id', request('saving_account_id'))
+            ->checker('id', 'name')
+            ->orderedBy('id', 'DESC')
+            ->get();
+
+        return create_response(null, $checks);
     }
 
     /**
