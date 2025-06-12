@@ -42,15 +42,11 @@ class LoanCollectionController extends Controller
      */
     public function index()
     {
-        //
-    }
+        if (empty(request('loan_account_id'))) {
+            return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
+        }
 
-    /**
-     * Show the specified resource from storage.
-     */
-    public function show(string $loanAccountId)
-    {
-        $collections = LoanCollection::where('loan_account_id', $loanAccountId)
+        $collections = LoanCollection::where('loan_account_id', request('loan_account_id'))
             ->approve()
             ->field('id', 'name',)
             ->center('id', 'name',)
@@ -62,6 +58,14 @@ class LoanCollectionController extends Controller
             ->get();
 
         return create_response(null, $collections);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function show(string $id)
+    {
+        //
     }
 
     /**

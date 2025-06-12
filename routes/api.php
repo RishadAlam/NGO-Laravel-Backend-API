@@ -344,8 +344,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     // Collection Routes
     Route::prefix('collection')->group(function () {
-        Route::apiResource('saving', SavingCollectionController::class);
-        Route::apiResource('loan', LoanCollectionController::class);
+        Route::apiResource('saving', SavingCollectionController::class)->except('show');
+        Route::apiResource('loan', LoanCollectionController::class)->except('show');
     });
 
     // Withdrawal Routes

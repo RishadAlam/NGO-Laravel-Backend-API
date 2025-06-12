@@ -42,15 +42,11 @@ class SavingCollectionController extends Controller
      */
     public function index()
     {
-        //
-    }
+        if (empty(request('saving_account_id'))) {
+            return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
+        }
 
-    /**
-     * Show the specified resource from storage.
-     */
-    public function show(string $savingAccountId)
-    {
-        $collections = SavingCollection::where('saving_account_id', $savingAccountId)
+        $collections = SavingCollection::where('saving_account_id', request('saving_account_id'))
             ->approve()
             ->field('id', 'name',)
             ->center('id', 'name',)
@@ -62,6 +58,14 @@ class SavingCollectionController extends Controller
             ->get();
 
         return create_response(null, $collections);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     */
+    public function show(string $id)
+    {
+        //
     }
 
     /**
