@@ -46,17 +46,10 @@ class SavingWithdrawalController extends Controller
             return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
         }
 
-        if (request('date_range')) {
-            $date_range = json_decode(request('date_range'));
-            $start_date = Carbon::parse($date_range[0])->startOfDay();
-            $end_date   = Carbon::parse($date_range[1])->endOfDay();
-        } else {
-            $start_date = Carbon::now()->startOfMonth();
-            $end_date   = Carbon::now()->endOfDay();
-        }
 
+        $dateRange = Helper::getDateRange(request('date_range'));
         $withdrawals = SavingWithdrawal::where('saving_account_id', request('saving_account_id'))
-            ->whereBetween('created_at', [$start_date, $end_date])
+            ->whereBetween('created_at', $dateRange)
             ->approve()
             ->author('id', 'name')
             ->account('id', 'name', 'is_default')

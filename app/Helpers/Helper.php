@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 
 class Helper
@@ -285,5 +286,19 @@ class Helper
     public static function getPermissionPrefix($isRegular = true)
     {
         return $isRegular ? 'regular' : 'pending';
+    }
+
+    public static function getDateRange($dateRange = null)
+    {
+        if ($dateRange) {
+            $dateRange = json_decode($dateRange);
+            $startDate = Carbon::parse($dateRange[0])->startOfDay();
+            $endDate   = Carbon::parse($dateRange[1])->endOfDay();
+        } else {
+            $startDate = Carbon::now()->startOfMonth();
+            $endDate   = Carbon::now()->endOfDay();
+        }
+
+        return [$startDate, $endDate];
     }
 }

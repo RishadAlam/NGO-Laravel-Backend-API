@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ClientAccountChecks;
 
 use Carbon\Carbon;
+use App\Helpers\Helper;
 use Illuminate\Http\Request;
 use App\Models\client\LoanAccount;
 use App\Http\Controllers\Controller;
@@ -29,17 +30,10 @@ class LoanAccountCheckController extends Controller
             return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
         }
 
-        if (request('date_range')) {
-            $date_range = json_decode(request('date_range'));
-            $start_date = Carbon::parse($date_range[0])->startOfDay();
-            $end_date   = Carbon::parse($date_range[1])->endOfDay();
-        } else {
-            $start_date = Carbon::now()->startOfMonth();
-            $end_date   = Carbon::now()->endOfDay();
-        }
 
+        $dateRange = Helper::getDateRange(request('date_range'));
         $checks = LoanAccountCheck::where('loan_account_id', request('loan_account_id'))
-            ->whereBetween('created_at', [$start_date, $end_date])
+            ->whereBetween('created_at', $dateRange)
             ->author('id', 'name')
             ->orderedBy('id', 'DESC')
             ->get();
