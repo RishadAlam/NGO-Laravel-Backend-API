@@ -54,6 +54,7 @@ class SavingWithdrawalController extends Controller
             ->author('id', 'name')
             ->account('id', 'name', 'is_default')
             ->approver('id', 'name')
+            ->with(['SavingWithdrawalActionHistory', 'SavingWithdrawalActionHistory.Author:id,name,image_uri'])
             ->orderedBy('id', 'DESC')
             ->get();
 

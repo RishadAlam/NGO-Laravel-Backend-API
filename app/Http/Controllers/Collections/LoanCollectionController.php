@@ -56,6 +56,7 @@ class LoanCollectionController extends Controller
             ->author('id', 'name')
             ->account('id', 'name', 'is_default')
             ->approver('id', 'name')
+            ->with(['LoanCollectionActionHistory', 'LoanCollectionActionHistory.Author:id,name,image_uri'])
             ->orderedBy('id', 'DESC')
             ->get();
 
