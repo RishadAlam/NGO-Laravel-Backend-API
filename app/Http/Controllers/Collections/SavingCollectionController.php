@@ -46,7 +46,17 @@ class SavingCollectionController extends Controller
             return create_response(__('customValidations.common.somethingWentWrong'), null, 401, false);
         }
 
+        if (request('date_range')) {
+            $date_range = json_decode(request('date_range'));
+            $start_date = Carbon::parse($date_range[0])->startOfDay();
+            $end_date   = Carbon::parse($date_range[1])->endOfDay();
+        } else {
+            $start_date = Carbon::now()->startOfMonth();
+            $end_date   = Carbon::now()->endOfDay();
+        }
+
         $collections = SavingCollection::where('saving_account_id', request('saving_account_id'))
+            ->whereBetween('created_at', [$start_date, $end_date])
             ->approve()
             ->field('id', 'name',)
             ->center('id', 'name',)
@@ -54,6 +64,7 @@ class SavingCollectionController extends Controller
             ->author('id', 'name')
             ->account('id', 'name', 'is_default')
             ->approver('id', 'name')
+            ->with(['SavingCollectionActionHistory', 'SavingCollectionActionHistory.Author:id,name,image_uri'])
             ->orderedBy('id', 'DESC')
             ->get();
 

@@ -57,16 +57,6 @@ trait HelperScopesTrait
     }
 
     /**
-     * Checker Relation Scope
-     */
-    public function scopeChecker($query, ...$arg)
-    {
-        $query->with("Checker", function ($query) use ($arg) {
-            $query->select(...$arg);
-        });
-    }
-
-    /**
      * Author Relation Scope
      */
     public function scopeLoanApprover($query, ...$arg)

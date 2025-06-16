@@ -36,7 +36,7 @@ class LoanAccountCheck extends Model
      *
      * @return response()
      */
-    public function Checker()
+    public function Author()
     {
         return $this->belongsTo(User::class, 'checked_by', 'id')->withTrashed();
     }
