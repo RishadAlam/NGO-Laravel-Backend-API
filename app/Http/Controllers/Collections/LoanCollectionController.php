@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Collections\LoanCollection;
+use App\Models\client\LoanAccountActionHistory;
 use App\Models\Withdrawal\LoanSavingWithdrawal;
 use App\Models\Collections\LoanCollectionActionHistory;
 use App\Http\Requests\collection\LoanCollectionStoreRequest;
@@ -113,7 +114,7 @@ class LoanCollectionController extends Controller
     {
         $data       = (object) $request->validated();
         $collection = LoanCollection::find($id);
-        $histData   = self::set_update_hist($data, $collection);
+        $histData   = self::setUpdateHistory($data, $collection);
 
         DB::transaction(
             function () use ($id, $collection, $data, $histData) {
@@ -138,7 +139,30 @@ class LoanCollectionController extends Controller
      */
     public function permanently_destroy(string $id)
     {
-        LoanCollection::find($id)->forceDelete();
+        $collection =  LoanCollection::find($id);
+
+        if (!$collection->is_approved) {
+            $collection->forceDelete();
+
+            return create_response(__('customValidations.client.collection.p_delete'));
+        }
+
+        DB::transaction(function () use ($collection) {
+            $loanAccount = LoanAccount::find($collection->loan_account_id);
+
+            if ($loanAccount) {
+                $loanAccount->decrement('total_rec_installment', $collection->installment);
+                $loanAccount->decrement('total_deposited', $collection->deposit);
+                $loanAccount->decrement('total_loan_rec', $collection->loan);
+                $loanAccount->decrement('total_interest_rec', $collection->interest);
+            }
+
+            $histData = self::setDeleteHistory($collection);
+            $collection->forceDelete();
+
+            LoanAccountActionHistory::create(Helper::setActionHistory('loan_account_id', $collection->loan_account_id, 'delete', $histData));
+        });
+
         return create_response(__('customValidations.client.collection.p_delete'));
     }
 
@@ -241,7 +265,7 @@ class LoanCollectionController extends Controller
      *
      * @return array
      */
-    private static function set_update_hist($data, $collection)
+    private static function setUpdateHistory($data, $collection)
     {
         $histData           = [];
         $fieldsToCompare    = ['installment', 'deposit', 'loan', 'interest', 'total', 'description'];
@@ -252,6 +276,28 @@ class LoanCollectionController extends Controller
 
             if (!Helper::areValuesEqual($clientValue, $dataValue)) {
                 $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
+            }
+        }
+
+        return $histData;
+    }
+
+    /**
+     * Set Saving Collection Delete hist
+     *
+     * @param object $data
+     * @return array
+     */
+    private static function setDeleteHistory($data)
+    {
+        $histData           = [];
+        $fieldsToCompare    = ['installment', 'deposit', 'loan', 'interest', 'total', 'description'];
+
+        foreach ($fieldsToCompare as $field) {
+            $dataValue      = $data->{$field} ?? '';
+
+            if (!empty($dataValue)) {
+                $histData[$field] = "<p class='text-danger'>{$dataValue}</p>";
             }
         }
 
