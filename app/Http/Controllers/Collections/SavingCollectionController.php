@@ -17,6 +17,7 @@ use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Models\Collections\SavingCollection;
+use App\Models\client\SavingAccountActionHistory;
 use App\Models\Collections\SavingCollectionActionHistory;
 use App\Http\Requests\collection\SavingCollectionStoreRequest;
 use App\Http\Requests\collection\SavingCollectionUpdateRequest;
@@ -113,7 +114,7 @@ class SavingCollectionController extends Controller
     {
         $data       = (object) $request->validated();
         $collection = SavingCollection::find($id);
-        $histData   = self::set_update_hist($data, $collection);
+        $histData   = self::setUpdateHistory($data, $collection);
 
         DB::transaction(
             function () use ($id, $collection, $data, $histData) {
@@ -138,7 +139,24 @@ class SavingCollectionController extends Controller
      */
     public function permanently_destroy(string $id)
     {
-        SavingCollection::find($id)->forceDelete();
+        $collection = SavingCollection::find($id);
+
+        if (!$collection->is_approved) {
+            $collection->forceDelete();
+
+            return create_response(__('customValidations.client.collection.p_delete'));
+        }
+
+        DB::transaction(function () use ($collection) {
+            SavingAccount::find($collection->saving_account_id)
+                ->decrement('total_deposited', $collection->deposit);
+
+            $histData = self::setDeleteHistory($collection);
+            $collection->forceDelete();
+
+            SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $collection->saving_account_id, 'delete', $histData));
+        });
+
         return create_response(__('customValidations.client.collection.p_delete'));
     }
 
@@ -244,7 +262,7 @@ class SavingCollectionController extends Controller
      *
      * @return array
      */
-    private static function set_update_hist($data, $collection)
+    private static function setUpdateHistory($data, $collection)
     {
         $histData           = [];
         $fieldsToCompare    = ['installment', 'deposit', 'description'];
@@ -255,6 +273,30 @@ class SavingCollectionController extends Controller
 
             if (!Helper::areValuesEqual($clientValue, $dataValue)) {
                 $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
+            }
+        }
+
+        return $histData;
+    }
+
+    /**
+     * Set Saving Collection Delete hist
+     *
+     * @param object $data
+     * @param object $collection
+     *
+     * @return array
+     */
+    private static function setDeleteHistory($data)
+    {
+        $histData           = [];
+        $fieldsToCompare    = ['installment', 'deposit', 'description'];
+
+        foreach ($fieldsToCompare as $field) {
+            $dataValue      = $data->{$field} ?? '';
+
+            if (!empty($dataValue)) {
+                $histData[$field] = "<p class='text-danger'>{$dataValue}</p>";
             }
         }
 
