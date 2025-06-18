@@ -19,6 +19,7 @@ use App\Models\client\SavingAccountFee;
 use App\Models\accounts\ExpenseCategory;
 use App\Models\client\AccountFeesCategory;
 use App\Models\Withdrawal\SavingWithdrawal;
+use App\Models\client\SavingAccountActionHistory;
 use App\Http\Requests\Withdrawal\SavingWithdrawalApprovalRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerStoreRequest;
 use App\Http\Requests\Withdrawal\SavingWithdrawalControllerUpdateRequest;
@@ -158,7 +159,35 @@ class SavingWithdrawalController extends Controller
      */
     public function destroy(string $id)
     {
-        SavingWithdrawal::find($id)->delete();
+        $withdrawal = SavingWithdrawal::find($id);
+
+        if (!$withdrawal->is_approved) {
+            $withdrawal->delete();
+
+            return create_response(__('customValidations.client.withdrawal.delete'));
+        }
+
+        DB::transaction(function () use ($withdrawal) {
+            SavingAccount::find($withdrawal->saving_account_id)
+                ->decrement('total_withdrawn', $withdrawal->amount);
+
+            $histData = Helper::setDeleteHistory(
+                $withdrawal,
+                ['balance', 'amount', 'balance_remaining', 'description'],
+                ['withdrawal' => '']
+            );
+            $withdrawal->delete();
+
+            SavingAccountActionHistory::create(
+                Helper::setActionHistory(
+                    'saving_account_id',
+                    $withdrawal->saving_account_id,
+                    'delete',
+                    $histData
+                )
+            );
+        });
+
         return create_response(__('customValidations.client.withdrawal.delete'));
     }
 

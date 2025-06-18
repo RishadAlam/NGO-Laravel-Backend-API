@@ -60,6 +60,14 @@ class SavingWithdrawal extends Model
     ];
 
     /**
+     * Relation with SavingWithdrawalActionHistory Table.
+     */
+    public function SavingWithdrawalActionHistory()
+    {
+        return $this->hasMany(SavingWithdrawalActionHistory::class);
+    }
+
+    /**
      * Today Collection
      */
     public static function currentDaySavingWithdrawal()

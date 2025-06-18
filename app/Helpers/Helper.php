@@ -29,6 +29,27 @@ class Helper
     }
 
     /**
+     * Set Delete hist
+     *
+     * @param object $data
+     * @param object $withdrawal
+     *
+     * @return array
+     */
+    public static function setDeleteHistory(object $data, array $fieldsToCompare, array $histData = [])
+    {
+        foreach ($fieldsToCompare as $field) {
+            $dataValue      = $data->{$field} ?? '';
+
+            if (!empty($dataValue)) {
+                $histData[$field] = "<p class='text-danger'>{$dataValue}</p>";
+            }
+        }
+
+        return $histData;
+    }
+
+    /**
      * Set Nominee/Guarantor Field Map
      *
      * @param object $data

@@ -151,7 +151,11 @@ class SavingCollectionController extends Controller
             SavingAccount::find($collection->saving_account_id)
                 ->decrement('total_deposited', $collection->deposit);
 
-            $histData = self::setDeleteHistory($collection);
+            $histData = Helper::setDeleteHistory(
+                $collection,
+                ['installment', 'deposit', 'description'],
+                ['saving' => '']
+            );
             $collection->forceDelete();
 
             SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $collection->saving_account_id, 'delete', $histData));
@@ -273,30 +277,6 @@ class SavingCollectionController extends Controller
 
             if (!Helper::areValuesEqual($clientValue, $dataValue)) {
                 $histData[$field] = "<p class='text-danger'>{$clientValue}</p><p class='text-success'>{$dataValue}</p>";
-            }
-        }
-
-        return $histData;
-    }
-
-    /**
-     * Set Saving Collection Delete hist
-     *
-     * @param object $data
-     * @param object $collection
-     *
-     * @return array
-     */
-    private static function setDeleteHistory($data)
-    {
-        $histData           = [];
-        $fieldsToCompare    = ['installment', 'deposit', 'description'];
-
-        foreach ($fieldsToCompare as $field) {
-            $dataValue      = $data->{$field} ?? '';
-
-            if (!empty($dataValue)) {
-                $histData[$field] = "<p class='text-danger'>{$dataValue}</p>";
             }
         }
 
