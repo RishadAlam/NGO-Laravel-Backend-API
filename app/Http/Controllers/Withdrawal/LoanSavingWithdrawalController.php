@@ -17,6 +17,7 @@ use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
 use App\Models\accounts\ExpenseCategory;
 use App\Models\client\AccountFeesCategory;
+use App\Models\client\LoanAccountActionHistory;
 use App\Models\Withdrawal\LoanSavingWithdrawal;
 use App\Http\Requests\Withdrawal\LoanSavingWithdrawalApprovalRequest;
 use App\Http\Requests\Withdrawal\LoanWithdrawalControllerStoreRequest;
@@ -179,7 +180,35 @@ class LoanSavingWithdrawalController extends Controller
      */
     public function destroy(string $id)
     {
-        LoanSavingWithdrawal::find($id)->delete();
+        $withdrawal = LoanSavingWithdrawal::find($id);
+
+        if (!$withdrawal->is_approved) {
+            $withdrawal->delete();
+
+            return create_response(__('customValidations.client.withdrawal.delete'));
+        }
+
+        DB::transaction(function () use ($withdrawal) {
+            LoanAccount::find($withdrawal->loan_account_id)
+                ->decrement('total_withdrawn', $withdrawal->amount);
+
+            $histData = Helper::setDeleteHistory(
+                $withdrawal,
+                ['balance', 'amount', 'balance_remaining', 'description'],
+                ['withdrawal' => '']
+            );
+            $withdrawal->delete();
+
+            LoanAccountActionHistory::create(
+                Helper::setActionHistory(
+                    'loan_account_id',
+                    $withdrawal->loan_account_id,
+                    'delete',
+                    $histData
+                )
+            );
+        });
+
         return create_response(__('customValidations.client.withdrawal.delete'));
     }
 

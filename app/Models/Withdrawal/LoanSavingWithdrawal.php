@@ -61,6 +61,14 @@ class LoanSavingWithdrawal extends Model
     ];
 
     /**
+     * Relation with LoanSavingWithdrawalActionHistory Table
+     */
+    public function LoanSavingWithdrawalActionHistory()
+    {
+        return $this->hasMany(LoanSavingWithdrawalActionHistory::class);
+    }
+
+    /**
      * Today Collection
      */
     public static function currentDaySavingWithdrawal()
