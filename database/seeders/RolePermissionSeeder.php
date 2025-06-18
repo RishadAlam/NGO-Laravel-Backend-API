@@ -148,6 +148,12 @@ class RolePermissionSeeder extends Seeder
                     'client_saving_account_closing',
                     'client_saving_account_permanently_delete',
                     'client_saving_account_category_update',
+                    'client_saving_account_collection_action_history',
+                    'client_saving_account_collection_update',
+                    'client_saving_account_collection_permanently_delete',
+                    'client_saving_account_withdrawal_action_history',
+                    'client_saving_account_withdrawal_update',
+                    'client_saving_account_withdrawal_permanently_delete',
                 ]
             ],
             // Client Loan Account
@@ -162,6 +168,12 @@ class RolePermissionSeeder extends Seeder
                     'client_loan_account_closing',
                     'client_loan_account_permanently_delete',
                     'client_loan_account_category_update',
+                    'client_loan_account_collection_action_history',
+                    'client_loan_account_collection_update',
+                    'client_loan_account_collection_permanently_delete',
+                    'client_loan_account_saving_withdrawal_action_history',
+                    'client_loan_account_saving_withdrawal_update',
+                    'client_loan_account_saving_withdrawal_permanently_delete',
                 ]
             ],
             // Regular Saving Collection
