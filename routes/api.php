@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use App\Models\Audit\AuditReportPage;
 use Illuminate\Support\Facades\Route;
+use App\Models\client\SavingAccountFee;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use Spatie\Permission\Models\Permission;
@@ -34,6 +35,8 @@ use App\Http\Controllers\Collections\LoanCollectionController;
 use App\Http\Controllers\Withdrawal\SavingWithdrawalController;
 use App\Http\Controllers\Collections\SavingCollectionController;
 use App\Http\Controllers\Withdrawal\LoanSavingWithdrawalController;
+use App\Http\Controllers\ClientAccountFees\LoanAccountFeesController;
+use App\Http\Controllers\ClientAccountFees\SavingAccountFeesController;
 use App\Http\Controllers\ClientAccountChecks\LoanAccountCheckController;
 use App\Http\Controllers\ClientAccountChecks\SavingAccountCheckController;
 
@@ -340,6 +343,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::apiResource('/', ClientRegistrationController::class)->parameter('', 'registration');
         Route::apiResource('saving', SavingAccountController::class);
         Route::apiResource('loan', LoanAccountController::class);
+    });
+
+    // Client Account Fees Routes
+    Route::prefix('client/fees')->name('client.registration.')->group(function () {
+        Route::apiResource('saving', SavingAccountFeesController::class)->only('index');
+        Route::apiResource('loan', LoanAccountFeesController::class)->only('index');
     });
 
     // Collection Routes
