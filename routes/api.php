@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Models\Audit\AuditReportPage;
 use Illuminate\Support\Facades\Route;
 use App\Models\client\SavingAccountFee;
@@ -428,14 +429,21 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     // Temp Routes
     Route::POST('/add-permission', function (Request $request) {
-        $permission = Permission::create(
-            [
-                'name' => $request->name,
-                'group_name' => $request->group_name,
-                'guard_name' => 'web',
-            ]
-        );
-        auth()->user()->givePermissionTo($permission);
+        foreach ($request->permissions as $permission) {
+            if (count(Permission::where('name', $permission)->get())) {
+                continue;
+            }
+
+            $newPermission = Permission::create(
+                [
+                    'name' => $permission,
+                    'group_name' => $request->group_name,
+                    'guard_name' => 'web',
+                ]
+            );
+
+            auth()->user()->givePermissionTo($newPermission);
+        }
 
         return response(
             [

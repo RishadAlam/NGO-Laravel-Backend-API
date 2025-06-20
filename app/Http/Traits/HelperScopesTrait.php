@@ -87,6 +87,16 @@ trait HelperScopesTrait
     }
 
     /**
+     * SavingAccount Relation Scope
+     */
+    public function scopeSavingAccount($query, ...$arg)
+    {
+        $query->with("SavingAccount", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
      * Data by user id
      */
     public function scopeCreatedBy($query, $id = null)

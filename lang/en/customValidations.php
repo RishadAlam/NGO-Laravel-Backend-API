@@ -166,6 +166,11 @@ return [
         "installment"                       => "Installment",
         "next_check_in_at"                  => "Next check in at",
         "installment_recovered"             => "Installment Recovered",
+        "installment_remaining"             => "Installment Remaining",
+        'loan_recovered'                    => "Loan Recovered",
+        'loan_remaining'                    => "Loan Remaining",
+        'interest_recovered'                => "Interest Recovered",
+        'interest_remaining'                => "Interest Remaining",
     ],
 
     /*

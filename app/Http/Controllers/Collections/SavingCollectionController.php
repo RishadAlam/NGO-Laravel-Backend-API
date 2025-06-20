@@ -57,6 +57,8 @@ class SavingCollectionController extends Controller
             ->author('id', 'name')
             ->account('id', 'name', 'is_default')
             ->approver('id', 'name')
+            ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
+            ->SavingAccount('id', 'payable_installment', 'payable_deposit', 'payable_interest')
             ->with(['SavingCollectionActionHistory', 'SavingCollectionActionHistory.Author:id,name,image_uri'])
             ->orderedBy('id', 'DESC')
             ->get();
@@ -118,7 +120,24 @@ class SavingCollectionController extends Controller
 
         DB::transaction(
             function () use ($id, $collection, $data, $histData) {
+                $amountDif = 0;
+                if ($collection->is_approved) {
+                    $savingAccount = SavingAccount::find($collection->saving_account_id);
+                    $amountDif = $data->deposit - $collection->deposit;
+                    $installmentDif = $data->installment - $collection->installment;
+
+
+                    if ($amountDif !== 0) {
+                        $savingAccount->increment('total_deposited', $amountDif);
+                    }
+                    if ($installmentDif !== 0) {
+                        $savingAccount->increment('total_installment', $installmentDif);
+                    }
+                }
+
                 $collection->update(self::set_field_map($data));
+
+
                 SavingCollectionActionHistory::create(Helper::setActionHistory('saving_collection_id', $id, 'update', $histData));
             }
         );

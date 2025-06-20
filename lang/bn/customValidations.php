@@ -165,6 +165,11 @@ return [
         "installment"                       => "কিস্তি",
         "next_check_in_at"                  => "পরবর্তী চেক",
         "installment_recovered"             => "আদায়কৃত কিস্তি সংখ্যা",
+        "installment_remaining"             => "বাকি কিস্তি সংখ্যা",
+        'loan_recovered'                    => "ঋণ আদায়",
+        'loan_remaining'                    => "অবশিষ্ট ঋণ",
+        'interest_recovered'                => "লাভ আদায়",
+        'interest_remaining'                => "অবশিষ্ট লাভ",
     ],
 
     /*
