@@ -344,4 +344,16 @@ class Helper
             return $tx;
         })->sortByDesc('created_at')->values();
     }
+
+    /**
+     * check the object null value
+     */
+    public static function getObject($object = null, $data = [])
+    {
+        if (empty($object)) {
+            return;
+        }
+
+        return $object->only($data);
+    }
 }

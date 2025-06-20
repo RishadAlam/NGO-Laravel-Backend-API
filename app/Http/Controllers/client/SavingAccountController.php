@@ -583,9 +583,9 @@ class SavingAccountController extends Controller
                 'category'      => ['name' => 'regular_collection', 'is_default' => true],
                 'description'   => $desc,
                 'amount'        => $collection->deposit,
-                'author'        => self::getObject($collection->author, ['id', 'name']),
-                'approver'      => self::getObject($collection->approver, ['id', 'name']),
-                'account'       => self::getObject($collection->account, ['id', 'name', 'is_default']),
+                'author'        => Helper::getObject($collection->author, ['id', 'name']),
+                'approver'      => Helper::getObject($collection->approver, ['id', 'name']),
+                'account'       => Helper::getObject($collection->account, ['id', 'name', 'is_default']),
                 'approved_at'   => $collection->approved_at,
                 'created_at'    => $collection->created_at,
                 'updated_at'    => $collection->updated_at
@@ -604,7 +604,7 @@ class SavingAccountController extends Controller
         foreach ($withdrawals as $withdrawal) {
             $balance = Helper::tsNumbers("৳{$withdrawal->balance}/-");
             $amount = Helper::tsNumbers("৳{$withdrawal->amount}/-");
-            $balanceRemaining = Helper::tsNumbers("৳{$withdrawal->amount}/-");
+            $balanceRemaining = Helper::tsNumbers("৳{$withdrawal->balance_remaining}/-");
             $desc = '<p>' . __('customValidations.common.balance') . ': ' . $balance . ', ' . __('customValidations.common.amount') . ': ' . $amount . ', ' . __('customValidations.common.balance_remaining') . ': ' . $balanceRemaining .  '</p>' . $withdrawal->description;
 
             $withdrawalsData[] = (object) [
@@ -612,9 +612,9 @@ class SavingAccountController extends Controller
                 'category'      => ['name' => 'withdrawal', 'is_default' => true],
                 'description'   => $desc,
                 'amount'        => $withdrawal->amount,
-                'author'        => self::getObject($withdrawal->author, ['id', 'name']),
-                'approver'      => self::getObject($withdrawal->approver, ['id', 'name']),
-                'account'       => self::getObject($withdrawal->account, ['id', 'name', 'is_default']),
+                'author'        => Helper::getObject($withdrawal->author, ['id', 'name']),
+                'approver'      => Helper::getObject($withdrawal->approver, ['id', 'name']),
+                'account'       => Helper::getObject($withdrawal->account, ['id', 'name', 'is_default']),
                 'approved_at'   => $withdrawal->approved_at,
                 'created_at'    => $withdrawal->created_at,
                 'updated_at'    => $withdrawal->updated_at
@@ -633,10 +633,10 @@ class SavingAccountController extends Controller
         foreach ($fees as $fee) {
             $feesData[] = (object) [
                 'type'          => $fee->type,
-                'category'      => self::getObject($fee->accountFeesCategory, ['id', 'name', 'is_default']),
+                'category'      => Helper::getObject($fee->accountFeesCategory, ['id', 'name', 'is_default']),
                 'description'   => $fee->description,
                 'amount'        => $fee->amount,
-                'author'        => self::getObject($fee->author, ['id', 'name']),
+                'author'        => Helper::getObject($fee->author, ['id', 'name']),
                 'approver'      => null,
                 'account'       => null,
                 'approved_at'   => null,
@@ -666,7 +666,7 @@ class SavingAccountController extends Controller
                 'category'      => null,
                 'description'   => $desc,
                 'amount'        => null,
-                'author'        => self::getObject($check->author, ['id', 'name']),
+                'author'        => Helper::getObject($check->author, ['id', 'name']),
                 'approver'      => null,
                 'account'       => null,
                 'approved_at'   => null,
@@ -676,17 +676,5 @@ class SavingAccountController extends Controller
         }
 
         return $checksData;
-    }
-
-    /**
-     * check the object null value
-     */
-    private static function getObject($object = null, $data = [])
-    {
-        if (empty($object)) {
-            return;
-        }
-
-        return $object->only($data);
     }
 }
