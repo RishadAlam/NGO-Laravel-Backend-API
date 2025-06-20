@@ -111,6 +111,7 @@ return [
         "day"                               => "Day",
         "balance"                           => "Balance",
         "previous_balance"                  => "Previous Balance",
+        "balance_remaining"                 => "Balance Remaining",
         "total_deposit"                     => "Total Deposit",
         "total_withdraw"                    => "Total Withdraw",
         "amount"                            => "Amount",
@@ -162,6 +163,9 @@ return [
         "total_payable_interest"            => "Total Payable Interest",
         "hold"                              => "Hold",
         "active"                            => "Active",
+        "installment"                       => "Installment",
+        "next_check_in_at"                  => "Next check in at",
+        "installment_recovered"             => "Installment Recovered",
     ],
 
     /*

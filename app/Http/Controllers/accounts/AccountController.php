@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\accounts;
 
 use Carbon\Carbon;
+use App\Helpers\Helper;
 use Illuminate\Http\Request;
 use App\Models\accounts\Income;
 use App\Models\accounts\Account;
@@ -151,18 +152,10 @@ class AccountController extends Controller
      */
     public function get_all_transactions($account_id = null)
     {
-        if (request('date_range')) {
-            $date_range = json_decode(request('date_range'));
-            $start_date = Carbon::parse($date_range[0])->startOfDay();
-            $end_date   = Carbon::parse($date_range[1])->endOfDay();
-        } else {
-            $start_date = Carbon::now()->startOfMonth();
-            $end_date   = Carbon::now()->endOfDay();
-        }
-
+        $dateRange = Helper::getDateRange(request('date_range'));
         $incomes = Income::with('Account:id,name,is_default')
             ->with('Author:id,name')
-            ->whereBetween('date', [$start_date, $end_date])
+            ->whereBetween('date', $dateRange)
             ->when($account_id, function ($query) use ($account_id) {
                 $query->where('account_id', $account_id);
             })
@@ -183,7 +176,7 @@ class AccountController extends Controller
 
         $expenses = Expense::with('Account:id,name,is_default')
             ->with('Author:id,name')
-            ->whereBetween('date', [$start_date, $end_date])
+            ->whereBetween('date', $dateRange)
             ->when($account_id, function ($query) use ($account_id) {
                 $query->where('account_id', $account_id);
             })
@@ -204,7 +197,7 @@ class AccountController extends Controller
 
         $withdrawals = AccountWithdrawal::with('Account:id,name,is_default')
             ->with('Author:id,name')
-            ->whereBetween('date', [$start_date, $end_date])
+            ->whereBetween('date', $dateRange)
             ->when($account_id, function ($query) use ($account_id) {
                 $query->where('account_id', $account_id);
             })
@@ -226,7 +219,7 @@ class AccountController extends Controller
         $transfers = AccountTransfer::with('Author:id,name')
             ->with('TxAccount:id,name,is_default')
             ->with('RxAccount:id,name,is_default')
-            ->whereBetween('date', [$start_date, $end_date])
+            ->whereBetween('date', $dateRange)
             ->when($account_id, function ($query) use ($account_id) {
                 $query->where('tx_acc_id', $account_id)
                     ->orWhere('rx_acc_id', $account_id);

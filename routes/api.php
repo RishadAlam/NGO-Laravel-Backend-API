@@ -282,6 +282,18 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     /*
      * -------------------------------------------------------------------------
+     * Api Resources Get All Transaction Routes
+     * -------------------------------------------------------------------------
+     *
+     * Here you can see all the API routes that have been additionally added to
+     * the Get All Transaction method in resource controller
+     */
+    Route::prefix('transactions')->group(function () {
+        Route::GET('saving/{id}', [SavingAccountController::class, 'getAllTransaction']);
+        Route::GET('loan/{id}', [LoanAccountController::class, 'getAllTransaction']);
+    });
+    /*
+     * -------------------------------------------------------------------------
      * Api Resources Collection Additional Routes
      * -------------------------------------------------------------------------
      *

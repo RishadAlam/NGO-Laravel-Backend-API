@@ -16,8 +16,11 @@ use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
 use App\Models\accounts\IncomeCategory;
 use App\Models\category\CategoryConfig;
+use App\Models\client\SavingAccountFee;
 use App\Models\client\SavingAccountCheck;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Withdrawal\SavingWithdrawal;
+use App\Models\Collections\SavingCollection;
 use App\Models\client\SavingAccountActionHistory;
 use App\Http\Requests\client\CategoryUpdateRequest;
 use App\Http\Requests\client\SavingAccountStoreRequest;
@@ -380,6 +383,90 @@ class SavingAccountController extends Controller
     }
 
     /**
+     * Get All Transactions
+     */
+    public function getAllTransaction(string $id)
+    {
+        $dateRange = Helper::getDateRange(request('date_range'));
+        $balance = SavingAccount::find($id, 'balance')->balance;
+
+        $collections = SavingCollection::where('saving_account_id', $id)
+            ->whereBetween('created_at', $dateRange)
+            ->approve()
+            ->select(
+                'id',
+                DB::raw("'credit' as type"),
+                'account_id',
+                'approved_by',
+                'installment',
+                'deposit',
+                'description',
+                'creator_id',
+                'approved_at',
+                'created_at',
+                'updated_at'
+            )->get();
+
+        $withdrawals = SavingWithdrawal::where('saving_account_id', $id)
+            ->whereBetween('created_at', $dateRange)
+            ->approve()
+            ->select(
+                'id',
+                DB::raw("'debit' as type"),
+                'account_id',
+                'approved_by',
+                'balance',
+                'amount',
+                'balance_remaining',
+                'description',
+                'creator_id',
+                'approved_at',
+                'created_at',
+                'updated_at'
+            )->get();
+
+        $fees = SavingAccountFee::where('saving_account_id', $id)
+            ->whereBetween('created_at', $dateRange)
+            ->select(
+                'id',
+                'account_fees_category_id',
+                DB::raw("'debit' as type"),
+                'amount',
+                'description',
+                'creator_id',
+                'created_at',
+                'updated_at'
+            )->get();
+
+        $checks = SavingAccountCheck::where('saving_account_id', $id)
+            ->whereBetween('created_at', $dateRange)
+            ->select(
+                'id',
+                'checked_by',
+                DB::raw("'checked' as type"),
+                'installment_recovered',
+                'balance',
+                'description',
+                'next_check_in_at',
+                'created_at',
+                'updated_at'
+            )->get();
+
+        $transactions = collect(self::formatCollections($collections))
+            ->merge(self::formatWithdrawals($withdrawals))
+            ->merge(self::formatFees($fees))
+            ->merge(self::formatChecks($checks))
+            ->sortBy('created_at')
+            ->values()
+            ->all();
+
+
+        $transactions = Helper::calculateTransactionBalance($transactions, $balance);
+
+        return create_response(null, $transactions);
+    }
+
+    /**
      * Set Saving Acc Field Map
      *
      * @param object $data
@@ -478,5 +565,128 @@ class SavingAccountController extends Controller
                 $uriFieldName  => $file->uri,
             ]);
         }
+    }
+
+    /**
+     * Formate Collections data
+     */
+    private static function formatCollections($collections)
+    {
+        $collectionsData = [];
+        foreach ($collections as $collection) {
+            $installment = Helper::tsNumbers($collection->installment);
+            $deposit = Helper::tsNumbers("৳{$collection->deposit}/-");
+            $desc = '<p>' . __('customValidations.common.installment') . ': ' . $installment . ', ' . __('customValidations.common.deposit') . ': ' . $deposit .  '</p>' . $collection->description;
+
+            $collectionsData[] = (object) [
+                'type'          => $collection->type,
+                'category'      => ['name' => 'regular_collection', 'is_default' => true],
+                'description'   => $desc,
+                'amount'        => $collection->deposit,
+                'author'        => self::getObject($collection->author, ['id', 'name']),
+                'approver'      => self::getObject($collection->approver, ['id', 'name']),
+                'account'       => self::getObject($collection->account, ['id', 'name', 'is_default']),
+                'approved_at'   => $collection->approved_at,
+                'created_at'    => $collection->created_at,
+                'updated_at'    => $collection->updated_at
+            ];
+        }
+
+        return $collectionsData;
+    }
+
+    /**
+     * Formate withdrawals data
+     */
+    private static function formatWithdrawals($withdrawals)
+    {
+        $withdrawalsData = [];
+        foreach ($withdrawals as $withdrawal) {
+            $balance = Helper::tsNumbers("৳{$withdrawal->balance}/-");
+            $amount = Helper::tsNumbers("৳{$withdrawal->amount}/-");
+            $balanceRemaining = Helper::tsNumbers("৳{$withdrawal->amount}/-");
+            $desc = '<p>' . __('customValidations.common.balance') . ': ' . $balance . ', ' . __('customValidations.common.amount') . ': ' . $amount . ', ' . __('customValidations.common.balance_remaining') . ': ' . $balanceRemaining .  '</p>' . $withdrawal->description;
+
+            $withdrawalsData[] = (object) [
+                'type'          => $withdrawal->type,
+                'category'      => ['name' => 'withdrawal', 'is_default' => true],
+                'description'   => $desc,
+                'amount'        => $withdrawal->amount,
+                'author'        => self::getObject($withdrawal->author, ['id', 'name']),
+                'approver'      => self::getObject($withdrawal->approver, ['id', 'name']),
+                'account'       => self::getObject($withdrawal->account, ['id', 'name', 'is_default']),
+                'approved_at'   => $withdrawal->approved_at,
+                'created_at'    => $withdrawal->created_at,
+                'updated_at'    => $withdrawal->updated_at
+            ];
+        }
+
+        return $withdrawalsData;
+    }
+
+    /**
+     * Formate fees data
+     */
+    private static function formatFees($fees)
+    {
+        $feesData = [];
+        foreach ($fees as $fee) {
+            $feesData[] = (object) [
+                'type'          => $fee->type,
+                'category'      => self::getObject($fee->accountFeesCategory, ['id', 'name', 'is_default']),
+                'description'   => $fee->description,
+                'amount'        => $fee->amount,
+                'author'        => self::getObject($fee->author, ['id', 'name']),
+                'approver'      => null,
+                'account'       => null,
+                'approved_at'   => null,
+                'created_at'    => $fee->created_at,
+                'updated_at'    => $fee->updated_at
+            ];
+        }
+
+        return $feesData;
+    }
+
+    /**
+     * Formate checks data
+     */
+    private static function formatChecks($checks)
+    {
+
+        $checksData = [];
+        foreach ($checks as $check) {
+            $installmentRecovered = Helper::tsNumbers($check->installment_recovered);
+            $balance = Helper::tsNumbers("৳{$check->balance}/-");
+            $nextCheck = Helper::tsNumbers(Carbon::parse($check->next_check_in_at)->format('d/m/Y'));
+            $desc = '<p>' . __('customValidations.common.balance') . ': ' . $balance . ', ' . __('customValidations.common.installment_recovered') . ': ' . $installmentRecovered . ', ' . __('customValidations.common.next_check_in_at') . ': ' . $nextCheck .  '</p>' . $check->description;
+
+            $checksData[] = (object) [
+                'type'          => $check->type,
+                'category'      => null,
+                'description'   => $desc,
+                'amount'        => null,
+                'author'        => self::getObject($check->author, ['id', 'name']),
+                'approver'      => null,
+                'account'       => null,
+                'approved_at'   => null,
+                'created_at'    => $check->created_at,
+                'updated_at'    => $check->updated_at
+            ];
+        }
+
+        return $checksData;
+    }
+
+    /**
+     * check the object null value
+     */
+    private static function getObject($object = null, $data = [])
+    {
+        if (empty($object)) {
+            return;
+        }
+
+        return $object->only($data);
     }
 }

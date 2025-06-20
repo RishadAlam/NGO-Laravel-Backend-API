@@ -22,7 +22,7 @@ class LoanAccountFeesController extends Controller
         $fees = LoanAccountFee::where('loan_account_id', request('loan_account_id'))
             ->whereBetween('created_at', $dateRange)
             ->author('id', 'name')
-            ->with(['AccountFeesCategory', 'AccountFeesCategory:id,name,is_default'])
+            ->with('AccountFeesCategory:id,name,is_default')
             ->orderedBy('id', 'DESC')
             ->get();
 

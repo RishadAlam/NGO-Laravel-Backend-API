@@ -110,6 +110,7 @@ return [
         "day"                               => "দিন",
         "balance"                           => "ব্যালেন্স",
         "previous_balance"                  => "পূর্বের ব্যালেন্স",
+        "balance_remaining"                 => "অবশিষ্ট ব্যালেন্স",
         "total_deposit"                     => "সর্বমোট জমা",
         "total_withdraw"                    => "সর্বমোট উত্তোলন",
         "amount"                            => "পরিমাণ",
@@ -161,6 +162,9 @@ return [
         "total_payable_interest"            => "মোট লাভ",
         "hold"                              => "তামাদি",
         "active"                            => "চলমান",
+        "installment"                       => "কিস্তি",
+        "next_check_in_at"                  => "পরবর্তী চেক",
+        "installment_recovered"             => "আদায়কৃত কিস্তি সংখ্যা",
     ],
 
     /*

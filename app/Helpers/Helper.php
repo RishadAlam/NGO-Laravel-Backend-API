@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 
 class Helper
@@ -321,5 +322,26 @@ class Helper
         }
 
         return [$startDate, $endDate];
+    }
+
+    public static function calculateTransactionBalance($transactions, &$balance)
+    {
+        $transactions = collect($transactions);
+
+        $totalCredit = $transactions->where('type', 'credit')->sum('amount');
+        $totalDebit  = $transactions->where('type', 'debit')->sum('amount');
+        $balance     -= $totalCredit - $totalDebit;
+
+        return $transactions->map(function ($tx) use (&$balance) {
+            if ($tx->type === 'credit') {
+                $balance += $tx->amount;
+            } elseif ($tx->type === 'debit') {
+                $balance -= $tx->amount;
+            }
+
+            $tx->balance = $balance;
+
+            return $tx;
+        })->sortByDesc('created_at')->values();
     }
 }
