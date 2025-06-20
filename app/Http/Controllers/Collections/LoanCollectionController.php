@@ -57,6 +57,20 @@ class LoanCollectionController extends Controller
             ->author('id', 'name')
             ->account('id', 'name', 'is_default')
             ->approver('id', 'name')
+            ->clientRegistration('id', 'name', 'image_uri', 'primary_phone')
+            ->loanAccount(
+                'id',
+                'duration_date',
+                'loan_given',
+                'payable_deposit',
+                'payable_installment',
+                'payable_interest',
+                'total_payable_interest',
+                'total_payable_loan_with_interest',
+                'loan_installment',
+                'interest_installment',
+                'is_loan_approved'
+            )
             ->with(['LoanCollectionActionHistory', 'LoanCollectionActionHistory.Author:id,name,image_uri'])
             ->orderedBy('id', 'DESC')
             ->get();
@@ -118,7 +132,34 @@ class LoanCollectionController extends Controller
 
         DB::transaction(
             function () use ($id, $collection, $data, $histData) {
+                $installmentDif = 0;
+                $depositDif = 0;
+                $loanDif = 0;
+                $interestDif = 0;
+
+                if ($collection->is_approved) {
+                    $loanAccount = LoanAccount::find($collection->loan_account_id);
+                    $depositDif = $data->deposit - $collection->deposit;
+                    $installmentDif = $data->installment - $collection->installment;
+                    $loanDif = $data->loan - $collection->loan;
+                    $interestDif = $data->interest - $collection->interest;
+
+                    if ($depositDif !== 0) {
+                        $loanAccount->increment('total_deposited', $depositDif);
+                    }
+                    if ($installmentDif !== 0) {
+                        $loanAccount->increment('total_rec_installment', $installmentDif);
+                    }
+                    if ($loanDif !== 0) {
+                        $loanAccount->increment('total_loan_rec', $loanDif);
+                    }
+                    if ($interestDif !== 0) {
+                        $loanAccount->increment('total_interest_rec', $interestDif);
+                    }
+                }
+
                 $collection->update(self::set_field_map($data));
+
                 LoanCollectionActionHistory::create(Helper::setActionHistory('loan_collection_id', $id, 'update', $histData));
             }
         );

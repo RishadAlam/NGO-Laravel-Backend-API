@@ -97,6 +97,16 @@ trait HelperScopesTrait
     }
 
     /**
+     * LoanAccount Relation Scope
+     */
+    public function scopeLoanAccount($query, ...$arg)
+    {
+        $query->with("LoanAccount", function ($query) use ($arg) {
+            $query->select(...$arg);
+        });
+    }
+
+    /**
      * Data by user id
      */
     public function scopeCreatedBy($query, $id = null)
