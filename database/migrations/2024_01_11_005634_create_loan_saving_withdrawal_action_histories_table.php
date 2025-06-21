@@ -13,8 +13,21 @@ return new class extends Migration
     {
         Schema::create('loan_saving_withdrawal_action_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('loan_saving_withdrawal_id')->constrained('loan_saving_withdrawals')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
-            $table->foreignId('author_id')->nullable()->constrained('users', 'id')->cascadeOnUpdate('cascade')->nullOnDelete();
+
+            // Shorter constraint name
+            $table->unsignedBigInteger('loan_saving_withdrawal_id');
+            $table->foreign('loan_saving_withdrawal_id', 'lswah_lsw_id_fk')
+                ->references('id')
+                ->on('loan_saving_withdrawals')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+            $table->foreignId('author_id')
+                ->nullable()
+                ->constrained('users', 'id')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
+
             $table->string('name');
             $table->string('image_uri')->nullable();
             $table->enum('action_type', ['update', 'delete', 'restore']);
