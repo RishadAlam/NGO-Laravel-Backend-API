@@ -171,6 +171,7 @@ return [
         'loan_remaining'                    => "Loan Remaining",
         'interest_recovered'                => "Interest Recovered",
         'interest_remaining'                => "Interest Remaining",
+        "request_already_exist"             => "Request Already Exists"
     ],
 
     /*

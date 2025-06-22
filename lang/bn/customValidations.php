@@ -170,6 +170,7 @@ return [
         'loan_remaining'                    => "অবশিষ্ট ঋণ",
         'interest_recovered'                => "লাভ আদায়",
         'interest_remaining'                => "অবশিষ্ট লাভ",
+        "request_already_exist"             => "অনুরোধটি ইতিমধ্যেই বিদ্যমান।"
     ],
 
     /*

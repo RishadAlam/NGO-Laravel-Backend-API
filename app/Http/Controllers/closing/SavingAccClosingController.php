@@ -53,9 +53,13 @@ class SavingAccClosingController extends Controller
             return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
         }
 
-        $isApproved = AppConfig::get_config('saving_account_closing_approval');
+        $isExits = SavingAccountClosing::where('saving_account_id', $data->account_id)->first();
+        if (!empty($isExits)) {
+            return create_validation_error_response(__('customValidations.common.request_already_exist'));
+        }
 
-        return DB::transaction(function () use ($data, $isApproved) {
+        return DB::transaction(function () use ($data) {
+            $isApproved = AppConfig::get_config('saving_account_closing_approval');
             SavingAccountClosing::create(SavingAccountClosing::setFieldMap($data, true, $isApproved));
 
             if ($isApproved) {

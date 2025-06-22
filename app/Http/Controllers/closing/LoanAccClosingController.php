@@ -45,9 +45,12 @@ class LoanAccClosingController extends Controller
             return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
         }
 
-        $isApproved = AppConfig::get_config('loan_account_closing_approval');
-        $account    = LoanAccount::with('Category:id,name,is_default')->find($data->account_id);
+        $isExits = LoanAccountClosing::where('loan_account_id', $data->account_id)->first();
+        if (!empty($isExits)) {
+            return create_validation_error_response(__('customValidations.common.request_already_exist'));
+        }
 
+        $account = LoanAccount::with('Category:id,name,is_default')->find($data->account_id);
         if ($account->total_loan_remaining > 0) {
             return create_validation_error_response(__('customValidations.client.loan.loan_err'), 'total_loan_remaining');
         }
@@ -55,7 +58,8 @@ class LoanAccClosingController extends Controller
             return create_validation_error_response(__('customValidations.client.loan.interest_err'), 'total_interest_remaining');
         }
 
-        return DB::transaction(function () use ($data, $account, $isApproved) {
+        return DB::transaction(function () use ($data, $account) {
+            $isApproved = AppConfig::get_config('loan_account_closing_approval');
             LoanAccountClosing::create(LoanAccountClosing::setFieldMap($data, $account, true, $isApproved));
 
             if ($isApproved) {
