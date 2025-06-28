@@ -388,7 +388,7 @@ class SavingAccountController extends Controller
     public function getAllTransaction(string $id)
     {
         $dateRange = Helper::getDateRange(request('date_range'));
-        $balance = SavingAccount::find($id, 'balance')->balance;
+        $balance = SavingAccount::withTrashed()->find($id, 'balance')->balance;
 
         $collections = SavingCollection::where('saving_account_id', $id)
             ->whereBetween('created_at', $dateRange)

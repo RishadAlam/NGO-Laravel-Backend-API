@@ -513,6 +513,19 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | closing Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'closing' => [
+            'successful'        => 'The Closing request has been successfully registered.',
+            'update'            => 'The Closing request has been successfully updated.',
+            'delete'            => 'The Closing request has been successfully deleted.',
+            'approved'          => 'The Closing request has been successfully approved.',
+            'not_found'         => 'Closing request not found!'
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Withdrawal Custom Message
         |--------------------------------------------------------------------------
         */

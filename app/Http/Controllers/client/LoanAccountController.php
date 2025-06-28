@@ -478,7 +478,7 @@ class LoanAccountController extends Controller
     public function getAllTransaction(string $id)
     {
         $dateRange = Helper::getDateRange(request('date_range'));
-        $balance = LoanAccount::find($id, 'balance')->balance;
+        $balance = LoanAccount::withTrashed()->find($id, 'balance')->balance;
 
         $collections = LoanCollection::where('loan_account_id', $id)
             ->whereBetween('created_at', $dateRange)

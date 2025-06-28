@@ -120,6 +120,8 @@ class LoanAccClosingController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        LoanAccountClosing::find($id)->delete();
+
+        return create_response(__('customValidations.client.closing.delete'));
     }
 }

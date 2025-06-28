@@ -116,6 +116,8 @@ class SavingAccClosingController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        SavingAccountClosing::find($id)->delete();
+
+        return create_response(__('customValidations.client.closing.delete'));
     }
 }
