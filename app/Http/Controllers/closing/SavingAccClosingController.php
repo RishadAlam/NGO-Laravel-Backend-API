@@ -120,4 +120,26 @@ class SavingAccClosingController extends Controller
 
         return create_response(__('customValidations.client.closing.delete'));
     }
+
+    /**
+     * Approved the specified resource from storage.
+     */
+    public function approved(string $id)
+    {
+        return DB::transaction(function () use ($id) {
+            $closing = SavingAccountClosing::find($id);
+
+            SavingAccountClosing::handleApprovedAccountClosing((object) [
+                'account_id' => $closing->saving_account_id,
+                'withdrawal_account_id' => $closing->account_id,
+                'interest' => $closing->interest
+            ]);
+
+            $closing->approved_by = auth()->id();
+            $closing->is_approved = true;
+            $closing->save();
+
+            return create_response(__('customValidations.client.saving.delete'));
+        });
+    }
 }

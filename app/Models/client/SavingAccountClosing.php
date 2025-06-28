@@ -125,10 +125,10 @@ class SavingAccountClosing extends Model
      */
     public static function handleApprovedAccountClosing($data)
     {
-        $withdrawal_account = null;
         $account            = SavingAccount::with('Category:id,name,is_default')->find($data->account_id);
-        $categoryConf       = CategoryConfig::categoryID($account->category_id)
-            ->first(['saving_acc_closing_fee', 's_col_fee_acc_id']);
+        $categoryConf       = CategoryConfig::categoryID($account->category_id)->first(['saving_acc_closing_fee', 's_col_fee_acc_id']);
+
+        $withdrawal_account = null;
         $withdraw_amount    = $account->balance - $categoryConf->saving_acc_closing_fee;
 
         if (!empty($data->withdrawal_account_id)) {

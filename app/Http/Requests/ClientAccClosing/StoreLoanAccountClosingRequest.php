@@ -27,7 +27,7 @@ class StoreLoanAccountClosingRequest extends FormRequest
             'total_balance'         => 'required|numeric',
             'closing_fee'           => 'required|numeric',
             'closing_fee_acc_id'    => 'required|numeric',
-            'withdrawal_account_id' => 'sometimes|numeric',
+            'withdrawal_account_id' => 'sometimes|nullable|numeric',
             'description'           => 'required',
         ];
     }

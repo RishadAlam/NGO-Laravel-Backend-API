@@ -124,4 +124,30 @@ class LoanAccClosingController extends Controller
 
         return create_response(__('customValidations.client.closing.delete'));
     }
+
+    /**
+     * Approved the specified resource from storage.
+     */
+    public function approved(string $id)
+    {
+        return DB::transaction(function () use ($id) {
+            $closing = LoanAccountClosing::find($id);
+            $account = LoanAccount::with('Category:id,name,is_default')->find($closing->loan_account_id);
+
+            if ($account->total_loan_remaining > 0) {
+                return create_validation_error_response(__('customValidations.client.loan.loan_err'), 'total_loan_remaining');
+            }
+            if ($account->total_interest_remaining > 0) {
+                return create_validation_error_response(__('customValidations.client.loan.interest_err'), 'total_interest_remaining');
+            }
+
+            LoanAccountClosing::handleApprovedAccountClosing($account, (object) ['withdrawal_account_id' => $closing->account_id]);
+
+            $closing->approved_by = auth()->id();
+            $closing->is_approved = true;
+            $closing->save();
+
+            return create_response(__('customValidations.client.loan.delete'));
+        });
+    }
 }

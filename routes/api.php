@@ -260,6 +260,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::PUT('loan-saving/approved/{id}', [LoanSavingWithdrawalController::class, 'approved']);
     });
 
+    // Account Closing Request Approval Routes
+    Route::prefix('closing')->group(function () {
+        Route::PUT('saving/approved/{id}', [SavingAccClosingController::class, 'approved']);
+        Route::PUT('loan/approved/{id}', [LoanAccClosingController::class, 'approved']);
+    });
+
     /*
      * -------------------------------------------------------------------------
      * Api Resources Permanent Destroy Routes
