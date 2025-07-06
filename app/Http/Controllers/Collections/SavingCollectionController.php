@@ -168,13 +168,15 @@ class SavingCollectionController extends Controller
 
         DB::transaction(function () use ($collection) {
             SavingAccount::find($collection->saving_account_id)
-                ->decrement('total_deposited', $collection->deposit);
+                ->decrement('total_deposited', $collection->deposit)
+                ->decrement('total_installment', $collection->installment);
 
             $histData = Helper::setDeleteHistory(
                 $collection,
                 ['installment', 'deposit', 'description'],
                 ['saving' => '']
             );
+
             $collection->forceDelete();
 
             SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $collection->saving_account_id, 'delete', $histData));
