@@ -21,7 +21,6 @@ class LoanAccClosingController extends Controller
         $this->middleware('permission:pending_req_to_delete_loan_acc_list_view|pending_req_to_delete_loan_acc_list_view_as_admin')->only('index');
         $this->middleware('can:client_loan_account_delete')->only('store');
         $this->middleware('can:pending_req_to_delete_loan_acc_approval')->only('approved');
-        $this->middleware('can:pending_req_to_delete_loan_acc_update')->only('update');
         $this->middleware('can:pending_req_to_delete_loan_acc_delete')->only('destroy');
     }
 
@@ -105,14 +104,6 @@ class LoanAccClosingController extends Controller
                 'closing_fee_acc_id'                => $categoryConf->l_col_fee_acc_id,
             ],
         );
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
     }
 
     /**

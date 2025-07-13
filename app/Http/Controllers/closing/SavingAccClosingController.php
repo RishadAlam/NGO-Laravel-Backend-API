@@ -29,7 +29,6 @@ class SavingAccClosingController extends Controller
         $this->middleware('permission:pending_req_to_delete_saving_acc_list_view|pending_req_to_delete_saving_acc_list_view_as_admin')->only('index');
         $this->middleware('can:client_saving_account_delete')->only('store');
         $this->middleware('can:pending_req_to_delete_saving_acc_approval')->only('approved');
-        $this->middleware('can:pending_req_to_delete_saving_acc_update')->only('update');
         $this->middleware('can:pending_req_to_delete_saving_acc_delete')->only('destroy');
     }
 
@@ -54,6 +53,7 @@ class SavingAccClosingController extends Controller
         }
 
         $isExits = SavingAccountClosing::where('saving_account_id', $data->account_id)->first();
+
         if (!empty($isExits)) {
             return create_validation_error_response(__('customValidations.common.request_already_exist'));
         }
@@ -101,14 +101,6 @@ class SavingAccClosingController extends Controller
                 'closing_fee_acc_id'        => $categoryConf->s_col_fee_acc_id,
             ],
         );
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
     }
 
     /**

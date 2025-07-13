@@ -254,7 +254,6 @@ class RolePermissionSeeder extends Seeder
                     'pending_req_to_delete_saving_acc_list_view',
                     'pending_req_to_delete_saving_acc_list_view_as_admin',
                     'pending_req_to_delete_saving_acc_approval',
-                    'pending_req_to_delete_saving_acc_update',
                     'pending_req_to_delete_saving_acc_delete',
                 ]
             ],
@@ -265,7 +264,6 @@ class RolePermissionSeeder extends Seeder
                     'pending_req_to_delete_loan_acc_list_view',
                     'pending_req_to_delete_loan_acc_list_view_as_admin',
                     'pending_req_to_delete_loan_acc_approval',
-                    'pending_req_to_delete_loan_acc_update',
                     'pending_req_to_delete_loan_acc_delete',
                 ]
             ],

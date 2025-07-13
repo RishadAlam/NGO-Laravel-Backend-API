@@ -384,8 +384,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
     // Closing Routes
     Route::prefix('closing')->group(function () {
-        Route::apiResource('saving', SavingAccClosingController::class);
-        Route::apiResource('loan', LoanAccClosingController::class);
+        Route::apiResource('saving', SavingAccClosingController::class)->except('update');
+        Route::apiResource('loan', LoanAccClosingController::class)->except('update');
     });
 
     // Accounts Routes
