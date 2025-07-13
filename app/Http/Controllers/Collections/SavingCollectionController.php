@@ -230,25 +230,53 @@ class SavingCollectionController extends Controller
      */
     public function regularCollectionSheet($category_id, $field_id)
     {
-        $collections = Center::savingCollectionSheet($category_id, $field_id, request('user_id'))->get(['id', 'name']);
+        $collectionData = Center::savingCollectionSheet($category_id, $field_id, request('user_id'))->get(['id', 'name']);
 
-        return create_response(null, $collections);
+        return create_response(null, [
+            'dates' => [],
+            'collections' => $collectionData
+        ]);
     }
 
     /**
      * Pending Collection Sheet
      */
-    public function pendingCollectionSheet($category_id, $field_id)
+    public function pendingCollectionSheet($categoryId, $fieldId)
     {
-        $collections = Center::savingCollectionSheet(
-            $category_id,
-            $field_id,
+        $latestDates = SavingCollection::where('category_id', $categoryId)
+            ->where('field_id', $fieldId)
+            ->orderByDesc('created_at')
+            ->when(!Auth::user()->can("pending_saving_collection_list_view_as_admin"), function ($query) {
+                $query->createdBy();
+            })
+            ->pluck('created_at')
+            ->toArray();
+
+        $latestDates = collect($latestDates)
+            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->unique()
+            ->values()
+            ->toArray();
+
+
+        $targetDate = request('date')
+            ? Carbon::parse(request('date'))->format('y-m-d')
+            : (!empty($latestDates)
+                ? Carbon::parse($latestDates[0])->format('y-m-d')
+                : Carbon::yesterday()->format('y-m-d'));
+
+        $collectionData = Center::savingCollectionSheet(
+            $categoryId,
+            $fieldId,
             request('user_id'),
             false,
-            request('date') ? Carbon::parse(request('date'))->format('y-m-d') : Carbon::yesterday()->format('y-m-d')
+            $targetDate
         )->get(['id', 'name']);
 
-        return create_response(null, $collections);
+        return create_response(null, [
+            'dates' => $latestDates,
+            'collections' => $collectionData
+        ]);
     }
 
     /**
