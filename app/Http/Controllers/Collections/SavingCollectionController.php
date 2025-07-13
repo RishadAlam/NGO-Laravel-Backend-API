@@ -167,9 +167,16 @@ class SavingCollectionController extends Controller
         }
 
         DB::transaction(function () use ($collection) {
-            SavingAccount::find($collection->saving_account_id)
-                ->decrement('total_deposited', $collection->deposit)
-                ->decrement('total_installment', $collection->installment);
+            $savingAccount = SavingAccount::find($collection->saving_account_id);
+
+            logger('sss', [$collection->saving_account_id, $savingAccount, $collection]);
+
+            if ($savingAccount) {
+                $savingAccount->decrement('total_deposited', $collection->deposit);
+                $savingAccount->decrement('total_installment', $collection->installment);
+            } else {
+                return create_response(__('customValidations.client.saving.not_found'));
+            }
 
             $histData = Helper::setDeleteHistory(
                 $collection,
