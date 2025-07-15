@@ -3,6 +3,8 @@
 namespace App\Helpers;
 
 use Carbon\Carbon;
+use App\Models\field\Field;
+use App\Models\category\Category;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 
@@ -355,5 +357,23 @@ class Helper
         }
 
         return $object->only($data);
+    }
+
+    /**
+     * Get Category Name by id
+     */
+    public static function getCategoryName($id)
+    {
+        $category = Category::find($id, ['name', 'is_default']);
+
+        return $category->is_default ? __("customValidations.category.default.{$category->name}")  : $category->name;
+    }
+
+    /**
+     * Get Field Name by id
+     */
+    public static function getFieldName($id)
+    {
+        return Field::find($id)->name ?? null;
     }
 }

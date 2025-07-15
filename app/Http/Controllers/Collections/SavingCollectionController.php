@@ -199,7 +199,13 @@ class SavingCollectionController extends Controller
     {
         $categoryReport = Category::categorySavingReport()->get(['id', 'name', 'is_default']);
 
-        return create_response(null, $categoryReport);
+        return create_response(
+            null,
+            [
+                'category_name' => null,
+                'report'        => $categoryReport
+            ]
+        );
     }
 
     /**
@@ -209,27 +215,45 @@ class SavingCollectionController extends Controller
     {
         $categoryReport = Category::categorySavingReport(false)->get(['id', 'name', 'is_default']);
 
-        return create_response(null, $categoryReport);
+        return create_response(
+            null,
+            [
+                'category_name' => null,
+                'report'        => $categoryReport
+            ]
+        );
     }
 
     /**
      * Regular Field Report
      */
-    public function regularFieldReport($category_id)
+    public function regularFieldReport($categoryId)
     {
-        $fieldReport = Field::fieldSavingReport($category_id)->get(['id', 'name']);
+        $fieldReport = Field::fieldSavingReport($categoryId)->get(['id', 'name']);
 
-        return create_response(null, $fieldReport);
+        return create_response(
+            null,
+            [
+                'category_name' => Helper::getCategoryName($categoryId),
+                'report' => $fieldReport
+            ]
+        );
     }
 
     /**
      * Pending Field Report
      */
-    public function pendingFieldReport($category_id)
+    public function pendingFieldReport($categoryId)
     {
-        $fieldReport = Field::fieldSavingReport($category_id, false)->get(['id', 'name']);
+        $fieldReport = Field::fieldSavingReport($categoryId, false)->get(['id', 'name']);
 
-        return create_response(null, $fieldReport);
+        return create_response(
+            null,
+            [
+                'category_name' => Helper::getCategoryName($categoryId),
+                'report' => $fieldReport
+            ]
+        );
     }
 
     /**
@@ -240,8 +264,10 @@ class SavingCollectionController extends Controller
         $collectionData = Center::savingCollectionSheet($categoryId, $fieldId, request('user_id'))->get(['id', 'name']);
 
         return create_response(null, [
-            'dates' => [],
-            'collections' => $collectionData
+            'category_name' => Helper::getCategoryName($categoryId),
+            'field_name'    => Helper::getFieldName($fieldId),
+            'dates'         => [],
+            'collections'   => $collectionData
         ]);
     }
 
@@ -281,8 +307,10 @@ class SavingCollectionController extends Controller
         )->get(['id', 'name']);
 
         return create_response(null, [
-            'dates' => $latestDates,
-            'collections' => $collectionData
+            'category_name' => Helper::getCategoryName($categoryId),
+            'field_name'    => Helper::getFieldName($fieldId),
+            'dates'         => $latestDates,
+            'collections'   => $collectionData
         ]);
     }
 
