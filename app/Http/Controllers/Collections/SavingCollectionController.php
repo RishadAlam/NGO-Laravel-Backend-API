@@ -51,8 +51,8 @@ class SavingCollectionController extends Controller
         $collections = SavingCollection::where('saving_account_id', request('saving_account_id'))
             ->whereBetween('created_at', $dateRange)
             ->approve()
-            ->field('id', 'name',)
-            ->center('id', 'name',)
+            ->field('id', 'name')
+            ->center('id', 'name')
             ->category('id', 'name', 'is_default')
             ->author('id', 'name')
             ->account('id', 'name', 'is_default')
@@ -278,6 +278,7 @@ class SavingCollectionController extends Controller
     {
         $latestDates = SavingCollection::where('category_id', $categoryId)
             ->where('field_id', $fieldId)
+            ->where('created_at', '<', Carbon::today())
             ->orderByDesc('created_at')
             ->when(!Auth::user()->can("pending_saving_collection_list_view_as_admin"), function ($query) {
                 $query->createdBy();
