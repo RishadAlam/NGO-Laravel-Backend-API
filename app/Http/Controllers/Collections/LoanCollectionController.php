@@ -323,6 +323,7 @@ class LoanCollectionController extends Controller
     {
         $latestDates = LoanCollection::where('category_id', $categoryId)
             ->where('field_id', $fieldId)
+            ->pending()
             ->where('created_at', '<', Carbon::today())
             ->orderByDesc('created_at')
             ->when(!Auth::user()->can("pending_loan_collection_list_view_as_admin"), function ($query) {
