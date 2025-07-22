@@ -188,11 +188,19 @@ trait HelperScopesTrait
     }
 
     /**
-     * Active
+     * today
      */
     public function scopeToday($query, $key = "created_at")
     {
         $query->whereDate($key, date('Y-m-d'));
+    }
+
+    /**
+     * not today
+     */
+    public function scopeNotToday($query, $key = "created_at")
+    {
+        $query->whereDate($key, '!=', now()->toDateString());
     }
 
     /**

@@ -76,9 +76,13 @@ class Field extends Model
                         $query->when($isRegular, function ($query) {
                             $query->today();
                         });
+                        $query->when(!$isRegular, function ($query) {
+                            $query->notToday();
+                        });
                         $query->when(!Auth::user()->can("{$prefix}_saving_collection_list_view_as_admin"), function ($query) {
                             $query->createdBy();
                         });
+                        $query->withoutTrashed();
                     }
                 ]
             );
@@ -106,9 +110,13 @@ class Field extends Model
                     $query->when($isRegular, function ($query) {
                         $query->today();
                     });
+                    $query->when(!$isRegular, function ($query) {
+                        $query->notToday();
+                    });
                     $query->when(!Auth::user()->can("{$prefix}_loan_collection_list_view_as_admin"), function ($query) {
                         $query->createdBy();
                     });
+                    $query->withoutTrashed();
                 }
             ]
         );
