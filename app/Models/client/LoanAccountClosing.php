@@ -236,6 +236,5 @@ class LoanAccountClosing extends Model
     {
         $account->delete();
         $account->LoanCollection()->delete();
-        $account->LoanSavingWithdrawal()->delete();
     }
 }

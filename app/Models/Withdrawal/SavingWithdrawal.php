@@ -125,10 +125,11 @@ class SavingWithdrawal extends Model
      * @param boolean $is_store
      * @return array
      */
-    public static function fieldMapping(SavingAccount $account, object $requestData, $is_store = false)
+    public static function fieldMapping(SavingAccount $account, object $requestData, $is_store = false, $AdditionalBalance = 0)
     {
+        $balance = $account->balance + $AdditionalBalance;
         $field_map = [
-            'balance'       => $account->balance,
+            'balance'       => $balance,
             'amount'        => $requestData->amount,
             'description'   => $requestData->description,
         ];
