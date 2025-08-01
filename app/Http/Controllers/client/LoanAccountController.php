@@ -498,7 +498,9 @@ class LoanAccountController extends Controller
                 'approved_at',
                 'created_at',
                 'updated_at'
-            )->get();
+            )
+            ->withTrashed()
+            ->get();
 
         $withdrawals = LoanSavingWithdrawal::where('loan_account_id', $id)
             ->whereBetween('created_at', $dateRange)

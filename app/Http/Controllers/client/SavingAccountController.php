@@ -405,7 +405,9 @@ class SavingAccountController extends Controller
                 'approved_at',
                 'created_at',
                 'updated_at'
-            )->get();
+            )
+            ->withTrashed()
+            ->get();
 
         $withdrawals = SavingWithdrawal::where('saving_account_id', $id)
             ->whereBetween('created_at', $dateRange)
