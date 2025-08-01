@@ -73,6 +73,7 @@ class LoanCollectionController extends Controller
             )
             ->with(['LoanCollectionActionHistory', 'LoanCollectionActionHistory.Author:id,name,image_uri'])
             ->orderedBy('id', 'DESC')
+            ->withTrashed()
             ->get();
 
         return create_response(null, $collections);

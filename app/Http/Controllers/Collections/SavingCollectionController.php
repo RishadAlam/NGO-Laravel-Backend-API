@@ -61,6 +61,7 @@ class SavingCollectionController extends Controller
             ->savingAccount('id', 'payable_installment', 'payable_deposit', 'payable_interest')
             ->with(['SavingCollectionActionHistory', 'SavingCollectionActionHistory.Author:id,name,image_uri'])
             ->orderedBy('id', 'DESC')
+            ->withTrashed()
             ->get();
 
         return create_response(null, $collections);
