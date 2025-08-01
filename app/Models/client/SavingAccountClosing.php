@@ -146,7 +146,6 @@ class SavingAccountClosing extends Model
         }
         if (!empty($data->interest)) {
             static::processInterest($account, $data->interest, $data->withdrawal_account_id, $withdrawal_account);
-            sleep(1);
         }
 
         static::deleteAccountAndAssociations($account);
@@ -260,17 +259,17 @@ class SavingAccountClosing extends Model
         $description = __('customValidations.common.acc_no') . ' = ' . Helper::tsNumbers($account->acc_no) . ', ' .
             __('customValidations.common.category') . ' = ' . $categoryName . ', ' .
             __('customValidations.common.saving') . ' ' . __('customValidations.common.closing') . ' ' .
-            __('customValidations.common.withdrawal') . ' = ' . Helper::tsNumbers($categoryConf->saving_acc_closing_fee);
+            __('customValidations.common.fee') . ' = ' . Helper::tsNumbers($categoryConf->saving_acc_closing_fee);
 
         $categoryId = AccountFeesCategory::where('name', 'closing_fee')->value('id');
         $feeAccount = Account::find($categoryConf->s_col_fee_acc_id);
         $incomeCatId = IncomeCategory::where('name', 'closing_fee')->value('id');
 
         SavingAccountFee::create([
-            'saving_account_id' => $account->id,
-            'account_fees_category_id' => $categoryId,
-            'creator_id' => auth()->id(),
-            'amount' => $categoryConf->saving_acc_closing_fee,
+            'saving_account_id'         => $account->id,
+            'account_fees_category_id'  => $categoryId,
+            'creator_id'                => auth()->id(),
+            'amount'                    => $categoryConf->saving_acc_closing_fee,
         ]);
 
         Income::store(

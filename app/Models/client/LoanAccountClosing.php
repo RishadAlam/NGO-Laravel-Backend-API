@@ -151,6 +151,7 @@ class LoanAccountClosing extends Model
         }
         if ($categoryConf->loan_acc_closing_fee > 0) {
             static::processClosingFee($account, $categoryConf);
+            sleep(1);
         }
         if ($withdraw_amount > 0) {
             static::processWithdrawal($account, $withdraw_amount,  $data->withdrawal_account_id, $withdrawal_account);
@@ -183,6 +184,7 @@ class LoanAccountClosing extends Model
         ];
 
         $withdrawal = LoanSavingWithdrawal::create(LoanSavingWithdrawal::fieldMapping($account, (object) $data, true));
+
         LoanSavingWithdrawal::processWithdrawal($withdrawal, $withdrawal_account, null, null, (array) $data);
     }
 
