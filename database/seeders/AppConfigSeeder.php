@@ -27,46 +27,60 @@ class AppConfigSeeder extends Seeder
             [
                 "meta_key"      => "saving_collection_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "loan_collection_approval",
                 "meta_value"    => json_encode(false)
-            ], [
-                "meta_key"      => "money_exchange_approval",
+            ],
+            [
+                "meta_key"      => "account_transactions_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "money_withdrawal_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "client_registration_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "saving_account_registration_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "saving_account_closing_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "loan_account_registration_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "loan_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "loan_account_closing_approval",
                 "meta_value"    => json_encode(false)
-            ], [
+            ],
+            [
                 "meta_key"      => "client_reg_sign_is_required",
                 "meta_value"    => json_encode(true)
-            ], [
+            ],
+            [
                 "meta_key"      => "nominee_reg_sign_is_required",
                 "meta_value"    => json_encode(true)
-            ], [
+            ],
+            [
                 "meta_key"      => "guarantor_reg_sign_is_required",
                 "meta_value"    => json_encode(true)
-            ], [
+            ],
+            [
                 "meta_key"      => "client_reg_fee",
                 "meta_value"    => 0
-            ], [
+            ],
+            [
                 "meta_key"      => "money_transfer_transaction",
                 "meta_value"    => json_encode([
                     "saving_to_saving"              => [

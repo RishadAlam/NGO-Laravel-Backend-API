@@ -469,6 +469,22 @@ class SavingAccountController extends Controller
     }
 
     /**
+     * Get saving accounts
+     */
+    public function getSavingAccounts($fieldId = null, $centerId = null, $categoryId = null)
+    {
+        $accounts = SavingAccount::approve()
+            ->clientRegistration('id', 'name')
+            ->fieldId($fieldId)
+            ->centerId($centerId)
+            ->categoryId($categoryId)
+            ->orderedBy('acc_no', 'ASC')
+            ->get(['id', 'acc_no', 'client_registration_id', 'field_id', 'center_id', 'category_id']);
+
+        return create_response(null, $accounts);
+    }
+
+    /**
      * Set Saving Acc Field Map
      *
      * @param object $data

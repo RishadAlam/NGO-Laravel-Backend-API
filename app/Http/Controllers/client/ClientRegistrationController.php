@@ -286,7 +286,7 @@ class ClientRegistrationController extends Controller
     }
 
     /**
-     * Pending Forms
+     * get accounts
      */
     public function clientAccounts($field_id = null, $center_id = null)
     {
@@ -318,6 +318,22 @@ class ClientRegistrationController extends Controller
             ]
         );
         return create_response(__('customValidations.client.registration.approved'));
+    }
+
+    /**
+     * Get saving accounts
+     */
+    public function getLoanAccounts($fieldId = null, $centerId = null, $categoryId = null)
+    {
+        $accounts = LoanAccount::approve()
+            ->clientRegistration('id', 'name')
+            ->fieldId($fieldId)
+            ->centerId($centerId)
+            ->categoryId($categoryId)
+            ->orderedBy('acc_no', 'ASC')
+            ->get(['id', 'acc_no', 'field_id', 'center_id', 'category_id']);
+
+        return create_response(null, $accounts);
     }
 
     /**

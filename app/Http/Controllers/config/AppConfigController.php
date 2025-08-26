@@ -42,7 +42,7 @@ class AppConfigController extends Controller
         $appSettings = AppConfig::whereIn('meta_key', [
             'saving_collection_approval',
             'loan_collection_approval',
-            'money_exchange_approval',
+            'account_transactions_approval',
             'money_withdrawal_approval',
             'client_registration_approval',
             'saving_account_registration_approval',
