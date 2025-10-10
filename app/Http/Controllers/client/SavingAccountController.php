@@ -485,6 +485,21 @@ class SavingAccountController extends Controller
     }
 
     /**
+     * Get transactional Account Info
+     */
+    public function getTransactionalAccInfo($id)
+    {
+        $account = SavingAccount::find($id, ['id', 'balance']);
+
+        $config = AppConfig::get_config('money_transfer_transaction');
+
+        return create_response(null, [
+            'account' => $account,
+            'config'  => $config
+        ]);
+    }
+
+    /**
      * Set Saving Acc Field Map
      *
      * @param object $data

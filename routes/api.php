@@ -177,6 +177,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('saving/get', [SavingAccountController::class, 'index'])->name('saving.index');
         Route::GET('loan/get', [LoanAccountController::class, 'index'])->name('loan.index');
         Route::GET('loan/short-summery/{id}', [LoanAccountController::class, 'get_short_summery'])->name('loan.short_summery');
+        Route::GET('transaction/saving/{id}', [SavingAccountController::class, 'getTransactionalAccInfo'])->name('saving.get_transactional_acc_info');
+        Route::GET('transaction/loan/{id}', [LoanAccountController::class, 'getTransactionalAccInfo'])->name('saving.get_transactional_acc_info');
     });
 
     // Accounts Additional Routes
