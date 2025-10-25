@@ -82,32 +82,42 @@ class AppConfigSeeder extends Seeder
             ],
             [
                 "meta_key"      => "money_transfer_transaction",
-                "meta_value"    => json_encode([
-                    "saving_to_saving"              => [
-                        "fee"                       => 0,
-                        "fee_store_acc_id"          => 1,
-                        "min"                       => 0,
-                        "max"                       => 0,
-                    ],
-                    "saving_to_loan_saving"         => [
-                        "fee"                       => 0,
-                        "fee_store_acc_id"          => 1,
-                        "min"                       => 0,
-                        "max"                       => 0,
-                    ],
-                    "loan_saving_to_loan_saving"    => [
-                        "fee"                       => 0,
-                        "fee_store_acc_id"          => 1,
-                        "min"                       => 0,
-                        "max"                       => 0,
-                    ],
-                    "loan_saving_to_saving"         => [
-                        "fee"                       => 0,
-                        "fee_store_acc_id"          => 1,
-                        "min"                       => 0,
-                        "max"                       => 0,
-                    ],
-                ])
+                "meta_value"    => json_encode(
+                    [
+                        "saving_to_saving"  =>
+                        [
+                            "fee"                       => 0,
+                            "fee_store_acc_id"          => 1,
+                            "min"                       => 0,
+                            "max"                       => 0,
+                            "approval_required"         => true,
+                        ],
+                        "saving_to_loan"    =>
+                        [
+                            "fee"                       => 0,
+                            "fee_store_acc_id"          => 1,
+                            "min"                       => 0,
+                            "max"                       => 0,
+                            "approval_required"         => true,
+                        ],
+                        "loan_to_loan"  =>
+                        [
+                            "fee"                       => 0,
+                            "fee_store_acc_id"          => 1,
+                            "min"                       => 0,
+                            "max"                       => 0,
+                            "approval_required"         => true,
+                        ],
+                        "loan_to_saving"  =>
+                        [
+                            "fee"                       => 0,
+                            "fee_store_acc_id"          => 1,
+                            "min"                       => 0,
+                            "max"                       => 0,
+                            "approval_required"         => true,
+                        ],
+                    ]
+                )
             ]
         ];
 

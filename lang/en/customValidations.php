@@ -171,7 +171,10 @@ return [
         'loan_remaining'                    => "Loan Remaining",
         'interest_recovered'                => "Interest Recovered",
         'interest_remaining'                => "Interest Remaining",
-        "request_already_exist"             => "Request Already Exists"
+        "request_already_exist"             => "Request Already Exists",
+        "sender_account"                    => "Sender Account",
+        "receiver_account"                  => "Receiver Account",
+        "transaction_type"                  => "Transaction Type",
     ],
 
     /*
@@ -536,6 +539,20 @@ return [
             'p_delete'          => 'The withdrawal has been permanently deleted.',
             'approved'          => 'The withdrawal has been successfully approved.',
             'not_found'         => 'withdrawal not found!'
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Transactions Custom Message
+        |--------------------------------------------------------------------------
+        */
+        'transactions' => [
+            'successful'                => 'The transaction has been successfully registered.',
+            'delete'                    => 'The transaction has been successfully deleted.',
+            'update'                    => 'The transaction information has been successfully updated.',
+            'not_found'                 => 'Transaction not found!',
+            "invalid_transaction_type"  => 'Invalid transaction type.',
+            "invalid_accounts"           => 'Invalid sender or receiver account.',
         ],
     ],
 

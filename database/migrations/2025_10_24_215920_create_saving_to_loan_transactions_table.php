@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('savings_to_savings_transactions', function (Blueprint $table) {
+        Schema::create('saving_to_loan_transactions', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
 
             $table->foreignId('tx_acc_id')->constrained('saving_accounts', 'id')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade')->comment('Transaction Sended Account');
-            $table->foreignId('rx_acc_id')->constrained('saving_accounts', 'id')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade')->comment('Transaction Received Account');
+            $table->foreignId('rx_acc_id')->constrained('loan_accounts', 'id')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade')->comment('Transaction Received Account');
 
             $table->integer('amount');
 
@@ -43,6 +43,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('savings_to_savings_transactions');
+        Schema::dropIfExists('saving_to_loan_transactions');
     }
 };

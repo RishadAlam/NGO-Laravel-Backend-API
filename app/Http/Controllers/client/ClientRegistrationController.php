@@ -331,7 +331,7 @@ class ClientRegistrationController extends Controller
             ->centerId($centerId)
             ->categoryId($categoryId)
             ->orderedBy('acc_no', 'ASC')
-            ->get(['id', 'acc_no', 'field_id', 'center_id', 'category_id']);
+            ->get(['id', 'acc_no', 'client_registration_id', 'field_id', 'center_id', 'category_id']);
 
         return create_response(null, $accounts);
     }

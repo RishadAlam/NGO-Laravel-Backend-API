@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loans_to_loans_transactions', function (Blueprint $table) {
+        Schema::create('saving_to_saving_transactions', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnUpdate('cascade')->nullOnDelete();
 
-            $table->foreignId('tx_acc_id')->constrained('loan_accounts', 'id')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade')->comment('Transaction Sended Account');
-            $table->foreignId('rx_acc_id')->constrained('loan_accounts', 'id')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade')->comment('Transaction Received Account');
+            $table->foreignId('tx_acc_id')->constrained('saving_accounts', 'id')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade')->comment('Transaction Sended Account');
+            $table->foreignId('rx_acc_id')->constrained('saving_accounts', 'id')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade')->comment('Transaction Received Account');
 
             $table->integer('amount');
 
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->boolean('is_approved')->default(false);
 
             $table->timestamp('approved_at')->nullable();
-
+            
             $table->timestamps();
         });
     }
@@ -43,6 +43,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loans_to_loans_transactions');
+        Schema::dropIfExists('saving_to_saving_transactions');
     }
 };

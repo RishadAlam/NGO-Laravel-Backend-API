@@ -141,6 +141,7 @@ class AppConfigController extends Controller
                 "fee_store_acc_id"  => $config->fee_store_acc_id,
                 "min"               => $config->min,
                 "max"               => $config->max,
+                "approval_required" => $config->approval_required,
             ];
         }
         AppConfig::where('meta_key', 'money_transfer_transaction')

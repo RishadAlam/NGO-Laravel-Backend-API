@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loans_to_savings_transactions', function (Blueprint $table) {
+        Schema::create('loan_to_loan_transactions', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('creator_id')->constrained('users')->cascadeOnUpdate('cascade')->cascadeOnDelete('cascade');
@@ -43,6 +43,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loans_to_savings_transactions');
+        Schema::dropIfExists('loan_to_loan_transactions');
     }
 };
