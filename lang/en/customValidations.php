@@ -552,7 +552,11 @@ return [
             'update'                    => 'The transaction information has been successfully updated.',
             'not_found'                 => 'Transaction not found!',
             "invalid_transaction_type"  => 'Invalid transaction type.',
-            "invalid_accounts"           => 'Invalid sender or receiver account.',
+            "invalid_accounts"          => 'Invalid sender or receiver account.',
+            "same_account_transfer"     => "Cannot transfer to the same account.",
+            "amount_below_minimum"      => "Transaction amount is below the minimum limit.",
+            "amount_exceeds_maximum"    => "Transaction amount exceeds the maximum limit.",
+            "insufficient_funds"        => "Insufficient funds."
         ],
     ],
 

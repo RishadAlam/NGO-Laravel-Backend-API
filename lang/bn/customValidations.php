@@ -553,7 +553,10 @@ return [
             'not_found'                 => 'লেনদেন পাওয়া যায়নি!',
             "invalid_transaction_type"  => "অবৈধ লেনদেনের প্রকার।",
             "invalid_accounts"          => "অবৈধ প্রেরক বা গ্রহীতা অ্যাকাউন্ট।",
-            "amount_below_minimum"     => "লেনদেনের পরিমাণ ন্যূনতম পরিমাণের নিচে।"
+            "amount_below_minimum"      => "লেনদেনের পরিমাণ ন্যূনতম পরিমাণের নিচে।",
+            "same_account_transfer"     => "একই অ্যাকাউন্টে স্থানান্তর করা যাবে না।",
+            "amount_exceeds_maximum"    => "লেনদেনের পরিমাণ সর্বোচ্চ পরিমাণ অতিক্রম করেছে।",
+            "insufficient_funds"        => "প্রয়োজনীয় তহবিল নেই।"
         ],
     ],
 
