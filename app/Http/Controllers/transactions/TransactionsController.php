@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\transactions;
 
+use App\Helpers\Helper;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
 use App\Models\accounts\Income;
@@ -10,6 +11,7 @@ use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
+use Illuminate\Support\Facades\Auth;
 use App\Models\accounts\IncomeCategory;
 use App\Models\client\SavingAccountFee;
 use App\Models\client\AccountFeesCategory;
@@ -22,11 +24,58 @@ use App\Http\Requests\transactions\TransactionsRequest;
 class TransactionsController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('permission:pending_client_transactions_list_view|pending_client_transactions_list_view_as_admin')->only('index');
+        $this->middleware('permission:make_saving_transactions|make_loan_transactions')->only('store');
+        // $this->middleware('can:permission_to_make_saving_withdrawal')->only('store');
+        // $this->middleware('can:pending_saving_withdrawal_update')->only('update');
+        // $this->middleware('can:pending_saving_withdrawal_delete')->only('destroy');
+        // $this->middleware('can:pending_saving_withdrawal_approval')->only('approved');
+    }
+    /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(string $type)
     {
-        //
+        $typeMap = [
+            'saving_to_saving' =>  SavingToSavingTransaction::class,
+            'saving_to_loan'   =>  SavingToLoanTransaction::class,
+            'loan_to_saving'   =>  LoanToSavingTransaction::class,
+            'loan_to_loan'     =>  LoanToLoanTransaction::class,
+        ];
+
+        if (!isset($typeMap[$type])) {
+            return create_response(__('customValidations.client.transactions.invalid_transaction_type'), null, 400);
+        }
+
+        $transactionModel = $typeMap[$type];
+
+        $transactions = $transactionModel::pending()
+            ->with(
+                [
+                    'txAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id');
+                        $query->ClientRegistration('id', 'name', 'image_uri')
+                            ->withTrashed();
+                    },
+                    'rxAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id');
+                        $query->ClientRegistration('id', 'name', 'image_uri')
+                            ->withTrashed();
+                    },
+                ]
+            )
+            ->author('id', 'name')
+            ->when(!Auth::user()->can('pending_client_transactions_list_view_as_admin'), function ($query) {
+                $query->CreatedBy(Auth::user()->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return create_response(__('customValidations.common.success'), $transactions);
     }
 
     /**
@@ -108,8 +157,9 @@ class TransactionsController extends Controller
                     // Handle transaction fee
                     if ($config->fee > 0) {
                         $feeAccount  = Account::find($config->fee_store_acc_id);
-                        $description = __('customValidations.common.receiver_account') . ' = ' . $data->rx_acc_id .
-                            ', ' . __('customValidations.common.amount') . ' = ' . $data->amount;
+                        $description = __('customValidations.common.receiver_account') . ' = ' . Helper::tsNumbers($data->rx_acc_id) .
+                            ', ' . __('customValidations.common.amount') . ' = ' . Helper::tsNumbers($data->amount) . __('customValidations.common.send_money') . ' ' .
+                            __('customValidations.common.transaction_fee') . ' = ' . Helper::tsNumbers($config->fee);
 
                         SavingAccountFee::create([
                             'saving_account_id'         => $data->tx_acc_id,

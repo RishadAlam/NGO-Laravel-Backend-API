@@ -31,6 +31,7 @@ use App\Http\Controllers\accounts\AccountTransferController;
 use App\Http\Controllers\accounts\ExpenseCategoryController;
 use App\Http\Controllers\closing\SavingAccClosingController;
 use App\Http\Controllers\client\ClientRegistrationController;
+use App\Http\Controllers\transactions\TransactionsController;
 use App\Http\Controllers\accounts\AccountWithdrawalController;
 use App\Http\Controllers\Collections\LoanCollectionController;
 use App\Http\Controllers\Withdrawal\SavingWithdrawalController;
@@ -40,7 +41,6 @@ use App\Http\Controllers\ClientAccountFees\LoanAccountFeesController;
 use App\Http\Controllers\ClientAccountFees\SavingAccountFeesController;
 use App\Http\Controllers\ClientAccountChecks\LoanAccountCheckController;
 use App\Http\Controllers\ClientAccountChecks\SavingAccountCheckController;
-use App\Http\Controllers\transactions\TransactionsController;
 
 /*
  * ------------------------------------------------------------------------
@@ -305,7 +305,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
 
         // Store Transactions
         Route::POST('/', [TransactionsController::class, 'store']);
+        Route::GET('pending-transactions/{type}', [TransactionsController::class, 'index']);
     });
+
     /*
      * -------------------------------------------------------------------------
      * Api Resources Collection Additional Routes

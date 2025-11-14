@@ -243,28 +243,16 @@ class RolePermissionSeeder extends Seeder
                     'pending_loan_saving_withdrawal_delete',
                 ]
             ],
-            // Saving Account Transactions
+            // Client Account Transactions
             [
-                'groupName'     => 'saving_account_transactions',
+                'groupName'     => 'client_account_transactions',
                 'permissions'   => [
                     'make_saving_transactions',
-                    'pending_saving_transactions_list_view',
-                    'pending_saving_transactions_list_view_as_admin',
-                    'pending_saving_transactions_approval',
-                    'pending_saving_transactions_update',
-                    'pending_saving_transactions_delete',
-                ]
-            ],
-            // Loan Account Transaction
-            [
-                'groupName'     => 'loan_account_transactions',
-                'permissions'   => [
                     'make_loan_transactions',
-                    'pending_loan_transactions_list_view',
-                    'pending_loan_transactions_list_view_as_admin',
-                    'pending_loan_transactions_approval',
-                    'pending_loan_transactions_update',
-                    'pending_loan_transactions_delete',
+                    'pending_client_transactions_list_view',
+                    'pending_client_transactions_list_view_as_admin',
+                    'pending_client_transactions_approval',
+                    'pending_client_transactions_delete',
                 ]
             ],
             // Pending Request to delete Saving Account
