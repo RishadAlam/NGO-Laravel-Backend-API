@@ -9,6 +9,7 @@ use App\Models\accounts\Income;
 use App\Models\accounts\Account;
 use App\Models\client\LoanAccount;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\client\SavingAccount;
 use Illuminate\Support\Facades\Auth;
@@ -30,10 +31,8 @@ class TransactionsController extends Controller
     {
         $this->middleware('permission:pending_client_transactions_list_view|pending_client_transactions_list_view_as_admin')->only('index');
         $this->middleware('permission:make_saving_transactions|make_loan_transactions')->only('store');
-        // $this->middleware('can:permission_to_make_saving_withdrawal')->only('store');
-        // $this->middleware('can:pending_saving_withdrawal_update')->only('update');
-        // $this->middleware('can:pending_saving_withdrawal_delete')->only('destroy');
-        // $this->middleware('can:pending_saving_withdrawal_approval')->only('approved');
+        $this->middleware('can:pending_client_transactions_delete')->only('destroy');
+        $this->middleware('can:pending_saving_withdrawal_approval')->only('approved');
     }
     /**
      * Display a listing of the resource.
@@ -57,13 +56,15 @@ class TransactionsController extends Controller
             ->with(
                 [
                     'txAccount' => function ($query) {
-                        $query->select('id', 'balance', 'client_registration_id');
-                        $query->ClientRegistration('id', 'name', 'image_uri')
+                        $query->select('id', 'balance', 'client_registration_id', 'category_id');
+                        $query->Category('id', 'name', 'is_default');
+                        $query->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
                             ->withTrashed();
                     },
                     'rxAccount' => function ($query) {
-                        $query->select('id', 'balance', 'client_registration_id');
-                        $query->ClientRegistration('id', 'name', 'image_uri')
+                        $query->select('id', 'balance', 'client_registration_id', 'category_id');
+                        $query->Category('id', 'name', 'is_default');
+                        $query->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
                             ->withTrashed();
                     },
                 ]
@@ -189,28 +190,121 @@ class TransactionsController extends Controller
         }
     }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, string $type)
     {
-        //
+        $typeMap = [
+            'saving_to_saving' =>  SavingToSavingTransaction::class,
+            'saving_to_loan'   =>  SavingToLoanTransaction::class,
+            'loan_to_saving'   =>  LoanToSavingTransaction::class,
+            'loan_to_loan'     =>  LoanToLoanTransaction::class,
+        ];
+
+        if (!isset($typeMap[$type])) {
+            return create_response(__('customValidations.client.transactions.invalid_transaction_type'), null, 400);
+        }
+
+        $transactionModel = $typeMap[$type];
+
+        $transactionModel::find($id)?->delete();
+
+        return create_response(__('customValidations.client.transactions.delete'));
+    }
+
+    /**
+     * Approve the specified resource.
+     */
+    public function approved(string $id, string $type)
+    {
+        try {
+            return DB::transaction(function () use ($type, $id) {
+                $userId = auth()->id();
+                // Map transaction types to models — eliminates long switch-case
+                $typeMap = [
+                    'saving_to_saving' => [SavingAccount::class, SavingAccount::class, SavingToSavingTransaction::class],
+                    'saving_to_loan'   => [SavingAccount::class, LoanAccount::class, SavingToLoanTransaction::class],
+                    'loan_to_saving'   => [LoanAccount::class, SavingAccount::class, LoanToSavingTransaction::class],
+                    'loan_to_loan'     => [LoanAccount::class, LoanAccount::class, LoanToLoanTransaction::class],
+                ];
+
+                if (!isset($typeMap[$type])) {
+                    return create_response(__('customValidations.client.transactions.invalid_transaction_type'), null, 400);
+                }
+
+                [$txModel, $rxModel, $transactionModel] = $typeMap[$type];
+                $transaction = $transactionModel::find($id);
+                if (!$transaction) {
+                    return create_response(__('customValidations.client.transactions.not_found'), null, 400);
+                }
+
+                $config = AppConfig::get_config('money_transfer_transaction')->{$type} ?? null;
+                if (!$config) {
+                    return create_response(__('customValidations.client.transactions.invalid_transaction_type'), null, 400);
+                }
+                // Fetch accounts
+                $txAccount = $txModel::find($transaction->tx_acc_id);
+                $rxAccount = $rxModel::find($transaction->rx_acc_id);
+
+                // Validation block
+                if (!$txAccount || !$rxAccount) {
+                    return create_response(__('customValidations.client.transactions.invalid_account'), null, 400);
+                }
+                if ($transaction->tx_acc_id == $transaction->rx_acc_id) {
+                    return create_response(__('customValidations.client.transactions.same_account_transfer'), null, 400);
+                }
+                if ($config->min && $transaction->amount < $config->min) {
+                    return create_response(__('customValidations.client.transactions.amount_below_minimum'), null, 400);
+                }
+                if ($config->max && $transaction->amount > $config->max) {
+                    return create_response(__('customValidations.client.transactions.amount_exceeds_maximum'), null, 400);
+                }
+                if ($txAccount->balance < ($transaction->amount + $config->fee)) {
+                    return create_response(__('customValidations.client.transactions.insufficient_funds'), null, 400);
+                }
+
+                $transaction->update([
+                    'is_approved' => true,
+                    'approved_at' => now(),
+                    'approved_by' => $userId,
+                ]);
+
+                // Update balances
+                $txAccount->increment('total_withdrawn', $transaction->amount);
+                $rxAccount->increment('total_deposited', $transaction->amount);
+
+                // Handle transaction fee
+                if ($config->fee > 0) {
+                    $feeAccount  = Account::find($config->fee_store_acc_id);
+                    $description = __('customValidations.common.receiver_account') . ' = ' . Helper::tsNumbers($transaction->rx_acc_id) .
+                        ', ' . __('customValidations.common.amount') . ' = ' . Helper::tsNumbers($transaction->amount) . __('customValidations.common.send_money') . ', ' .
+                        __('customValidations.common.transaction_fee') . ' = ' . Helper::tsNumbers($config->fee);
+
+                    SavingAccountFee::create([
+                        'saving_account_id'         => $transaction->tx_acc_id,
+                        'account_fees_category_id'  => AccountFeesCategory::where('name', 'transaction_fee')->value('id'),
+                        'creator_id'                => $userId,
+                        'amount'                    => $config->fee,
+                        'description'               => $description,
+                    ]);
+
+                    Income::store(
+                        $config->fee_store_acc_id,
+                        IncomeCategory::where('name', 'money_transfer_transaction_fee')->value('id'),
+                        $config->fee,
+                        $feeAccount->balance,
+                        $description
+                    );
+
+                    $feeAccount->increment('total_deposit', $config->fee);
+                    $txAccount->increment('total_withdrawn', $config->fee);
+                }
+
+                return create_response(__('customValidations.client.transactions.approved'));
+            });
+        } catch (\Throwable $e) {
+            return create_response($e->getMessage(), null, 400, false);
+        }
     }
 }
