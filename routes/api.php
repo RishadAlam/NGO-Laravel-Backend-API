@@ -308,6 +308,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::GET('pending-transactions/{type}', [TransactionsController::class, 'index']);
         Route::DELETE('delete-transactions/{id}/{type}', [TransactionsController::class, 'destroy']);
         Route::GET('approve-transactions/{id}/{type}', [TransactionsController::class, 'approved']);
+        Route::GET('approved-transactions/{id}/{type}', [TransactionsController::class, 'getApprovedTransactions']);
     });
 
     /*

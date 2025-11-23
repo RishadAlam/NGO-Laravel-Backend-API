@@ -265,9 +265,11 @@ class TransactionsController extends Controller
                 }
 
                 $transaction->update([
-                    'is_approved' => true,
-                    'approved_at' => now(),
-                    'approved_by' => $userId,
+                    'tx_prev_balance'   => $txAccount->balance,
+                    'rx_prev_balance'   => $rxAccount->balance,
+                    'is_approved'       => true,
+                    'approved_at'       => now(),
+                    'approved_by'       => $userId,
                 ]);
 
                 // Update balances
@@ -306,5 +308,167 @@ class TransactionsController extends Controller
         } catch (\Throwable $e) {
             return create_response($e->getMessage(), null, 400, false);
         }
+    }
+
+    /**
+     * Get approved transactions.
+     */
+    public function getApprovedTransactions(int $id, string $type)
+    {
+        $dateRange = Helper::getDateRange(request('date_range'));
+        $isSavingAccount = ($type === 'saving');
+        logger('isSavingAccount: ', $dateRange);
+        // Shared columns
+        $columns = [
+            'id',
+            'approved_by',
+            'tx_acc_id',
+            'rx_acc_id',
+            'amount',
+            'tx_prev_balance',
+            'tx_balance',
+            'rx_prev_balance',
+            'rx_balance',
+            'description',
+            'creator_id',
+            'approved_at',
+            'created_at',
+            'updated_at',
+        ];
+
+        /**
+         * ================================
+         * ▶ Saving-to-Saving or Loan-to-Loan
+         * ================================
+         */
+        $sameTypeModel = $isSavingAccount ? SavingToSavingTransaction::query() : LoanToLoanTransaction::query();
+        $transactionType = $isSavingAccount ? "'saving_to_saving' AS transaction_category" : "'loan_to_loan' AS transaction_category";
+
+        $sameTypeTransactions = $sameTypeModel
+            ->select(
+                '*',
+                DB::raw("
+                    CASE 
+                        WHEN tx_acc_id = ? THEN tx_balance
+                        WHEN rx_acc_id = ? THEN rx_balance
+                    END AS balance
+                "),
+                DB::raw("
+                    CASE 
+                        WHEN tx_acc_id = ? THEN 'debit'
+                        WHEN rx_acc_id = ? THEN 'credit'
+                    END AS type
+                "),
+                DB::raw($transactionType)
+            )
+            ->addBinding([$id, $id, $id, $id], 'select')
+            ->where(function ($q) use ($id) {
+                $q->where('tx_acc_id', $id)
+                    ->orWhere('rx_acc_id', $id);
+            })
+            ->approve()
+            ->approver('id', 'name')
+            ->author('id', 'name')
+            ->with(
+                [
+                    'txAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id', 'category_id');
+                        $query->Category('id', 'name', 'is_default');
+                        $query->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
+                            ->withTrashed();
+                    },
+                    'rxAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id', 'category_id');
+                        $query->Category('id', 'name', 'is_default');
+                        $query->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
+                            ->withTrashed();
+                    },
+                ]
+            )
+            ->whereBetween('created_at', $dateRange)
+            ->get();
+
+        /**
+         * ================================
+         * ▶ Saving → Loan
+         * ================================
+         */
+        $savingToLoanType = $isSavingAccount ? "'debit' AS type" : "'credit' AS type";
+
+        $savingToLoanTransactions = SavingToLoanTransaction::select(
+            '*',
+            DB::raw($savingToLoanType),
+            DB::raw("'saving_to_loan' AS transaction_category")
+        )
+            ->where($isSavingAccount ? 'tx_acc_id' : 'rx_acc_id', $id)
+            ->approve()
+            ->approver('id', 'name')
+            ->author('id', 'name')
+            ->with(
+                [
+                    'txAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id', 'category_id');
+                        $query->Category('id', 'name', 'is_default');
+                        $query->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
+                            ->withTrashed();
+                    },
+                    'rxAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id', 'category_id');
+                        $query->Category('id', 'name', 'is_default');
+                        $query->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
+                            ->withTrashed();
+                    },
+                ]
+            )
+            ->whereBetween('created_at', $dateRange)
+            ->get();
+
+        /**
+         * ================================
+         * ▶ Loan → Saving
+         * ================================
+         */
+        $loanToSavingType = $isSavingAccount ? "'credit' AS transaction_type" : "'debit' AS transaction_type";
+
+        $loanToSavingTransactions = LoanToSavingTransaction::select(
+            '*',
+            DB::raw($loanToSavingType),
+            DB::raw("'loan_to_saving' AS transaction_category")
+        )
+            ->where($isSavingAccount ? 'rx_acc_id' : 'tx_acc_id', $id)
+            ->approve()
+            ->approver('id', 'name')
+            ->author('id', 'name')
+            ->with(
+                [
+                    'txAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id', 'category_id');
+                        $query->Category('id', 'name', 'is_default');
+                        $query->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
+                            ->withTrashed();
+                    },
+                    'rxAccount' => function ($query) {
+                        $query->select('id', 'balance', 'client_registration_id', 'category_id');
+                        $query->Category('id', 'name', 'is_default');
+                        $query->ClientRegistration('id', 'acc_no', 'name', 'image_uri')
+                            ->withTrashed();
+                    },
+                ]
+            )
+            ->whereBetween('created_at', $dateRange)
+            ->get();
+
+        /**
+         * ================================
+         * ▶ Final merged collection
+         * ================================
+         */
+        $transactions = $sameTypeTransactions
+            ->merge($savingToLoanTransactions)
+            ->merge($loanToSavingTransactions)
+            ->sortBy('created_at')
+            ->values(); // reindex
+
+        return create_response(null, $transactions);
     }
 }
