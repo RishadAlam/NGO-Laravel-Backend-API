@@ -175,6 +175,10 @@ return [
         "receiver_account"                  => "গ্রহীতার অ্যাকাউন্ট",
         "transaction_type"                  => "লেনদেনের প্রকার",
         "transaction_fee"                   => "লেনদেন ফি",
+        "saving_to_saving"                  => "সঞ্চয় থেকে সঞ্চয়",
+        "saving_to_loan"                    => "সঞ্চয় থেকে ঋণ",
+        "loan_to_saving"                    => "ঋণ থেকে সঞ্চয়",
+        "loan_to_loan"                     => "ঋণ থেকে ঋণ",
     ],
 
     /*

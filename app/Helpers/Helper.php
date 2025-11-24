@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Http\Controllers\transactions\TransactionsController;
 use Carbon\Carbon;
 use App\Models\field\Field;
 use App\Models\category\Category;
@@ -375,5 +376,35 @@ class Helper
     public static function getFieldName($id)
     {
         return Field::find($id)->name ?? null;
+    }
+
+
+
+    /**
+     * Formate transactions data
+     */
+    public static function formatTransactions($type, $id, $dateRange)
+    {
+        $transactionsData = [];
+        $transactions = TransactionsController::getTransactionsStatements($type, $id, $dateRange);
+
+        foreach ($transactions as $transaction) {
+            $desc = '<p>' . __("customValidations.common.{$transaction->transaction_category}") . ' ' . __('customValidations.common.transaction') .  '</p>' . $transaction->description;
+
+            $transactionsData[] = (object) [
+                'type'          => $transaction->type,
+                'category'      => ['name' => 'transactions', 'is_default' => true],
+                'description'   => $desc,
+                'amount'        => $transaction->amount,
+                'author'        => Helper::getObject($transaction->author, ['id', 'name']),
+                'approver'      => Helper::getObject($transaction->approver, ['id', 'name']),
+                'account'       => null,
+                'approved_at'   => $transaction->approved_at,
+                'created_at'    => $transaction->created_at,
+                'updated_at'    => $transaction->updated_at
+            ];
+        }
+
+        return $transactionsData;
     }
 }

@@ -183,7 +183,7 @@ class TransactionsController extends Controller
                     }
                 }
 
-                return create_response(__('customValidations.client.transactions.success'));
+                return create_response(__('customValidations.client.transactions.successful'));
             });
         } catch (\Throwable $e) {
             return create_response($e->getMessage(), null, 400, false);
@@ -234,6 +234,7 @@ class TransactionsController extends Controller
                 }
 
                 [$txModel, $rxModel, $transactionModel] = $typeMap[$type];
+
                 $transaction = $transactionModel::find($id);
                 if (!$transaction) {
                     return create_response(__('customValidations.client.transactions.not_found'), null, 400);
@@ -279,7 +280,7 @@ class TransactionsController extends Controller
                 // Handle transaction fee
                 if ($config->fee > 0) {
                     $feeAccount  = Account::find($config->fee_store_acc_id);
-                    $description = __('customValidations.common.receiver_account') . ' = ' . Helper::tsNumbers($transaction->rx_acc_id) .
+                    $description = __('customValidations.common.receiver_account') . ' = ' . Helper::tsNumbers($rxAccount->acc_no) .
                         ', ' . __('customValidations.common.amount') . ' = ' . Helper::tsNumbers($transaction->amount) . __('customValidations.common.send_money') . ', ' .
                         __('customValidations.common.transaction_fee') . ' = ' . Helper::tsNumbers($config->fee);
 
@@ -316,25 +317,16 @@ class TransactionsController extends Controller
     public function getApprovedTransactions(int $id, string $type)
     {
         $dateRange = Helper::getDateRange(request('date_range'));
+        $transactions = self::getTransactionsStatements($type, $id, $dateRange)
+            ->sortBy('created_at')
+            ->values(); // reindex
+
+        return create_response(null, $transactions);
+    }
+
+    public static function getTransactionsStatements($type, $id, $dateRange)
+    {
         $isSavingAccount = ($type === 'saving');
-        logger('isSavingAccount: ', $dateRange);
-        // Shared columns
-        $columns = [
-            'id',
-            'approved_by',
-            'tx_acc_id',
-            'rx_acc_id',
-            'amount',
-            'tx_prev_balance',
-            'tx_balance',
-            'rx_prev_balance',
-            'rx_balance',
-            'description',
-            'creator_id',
-            'approved_at',
-            'created_at',
-            'updated_at',
-        ];
 
         /**
          * ================================
@@ -394,9 +386,11 @@ class TransactionsController extends Controller
          * ================================
          */
         $savingToLoanType = $isSavingAccount ? "'debit' AS type" : "'credit' AS type";
+        $balance = $isSavingAccount ? "tx_balance AS balance" : "rx_balance AS balance";
 
         $savingToLoanTransactions = SavingToLoanTransaction::select(
             '*',
+            DB::raw($balance),
             DB::raw($savingToLoanType),
             DB::raw("'saving_to_loan' AS transaction_category")
         )
@@ -429,9 +423,11 @@ class TransactionsController extends Controller
          * ================================
          */
         $loanToSavingType = $isSavingAccount ? "'credit' AS transaction_type" : "'debit' AS transaction_type";
+        $balance = $isSavingAccount ? "rx_balance AS balance" : "tx_balance AS balance";
 
         $loanToSavingTransactions = LoanToSavingTransaction::select(
             '*',
+            DB::raw($balance),
             DB::raw($loanToSavingType),
             DB::raw("'loan_to_saving' AS transaction_category")
         )
@@ -463,12 +459,8 @@ class TransactionsController extends Controller
          * ▶ Final merged collection
          * ================================
          */
-        $transactions = $sameTypeTransactions
+        return $sameTypeTransactions
             ->merge($savingToLoanTransactions)
-            ->merge($loanToSavingTransactions)
-            ->sortBy('created_at')
-            ->values(); // reindex
-
-        return create_response(null, $transactions);
+            ->merge($loanToSavingTransactions);
     }
 }

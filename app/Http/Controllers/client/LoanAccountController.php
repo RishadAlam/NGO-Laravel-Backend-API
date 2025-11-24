@@ -554,6 +554,7 @@ class LoanAccountController extends Controller
 
         $transactions = collect(self::formatCollections($collections))
             ->merge(self::formatWithdrawals($withdrawals))
+            ->merge(Helper::formatTransactions('loan', $id, $dateRange))
             ->merge(self::formatFees($fees))
             ->merge(self::formatChecks($checks))
             ->sortBy('created_at')

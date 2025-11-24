@@ -25,6 +25,7 @@ use App\Models\client\SavingAccountActionHistory;
 use App\Http\Requests\client\CategoryUpdateRequest;
 use App\Http\Requests\client\SavingAccountStoreRequest;
 use App\Http\Requests\client\SavingAccountUpdateRequest;
+use App\Http\Controllers\transactions\TransactionsController;
 use App\Http\Requests\client\SavingAccountChangeStatusRequest;
 
 class SavingAccountController extends Controller
@@ -456,6 +457,7 @@ class SavingAccountController extends Controller
 
         $transactions = collect(self::formatCollections($collections))
             ->merge(self::formatWithdrawals($withdrawals))
+            ->merge(Helper::formatTransactions('saving', $id, $dateRange))
             ->merge(self::formatFees($fees))
             ->merge(self::formatChecks($checks))
             ->sortBy('created_at')

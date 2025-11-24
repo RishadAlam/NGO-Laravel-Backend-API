@@ -176,6 +176,10 @@ return [
         "receiver_account"                  => "Receiver Account",
         "transaction_type"                  => "Transaction Type",
         "transaction_fee"                   => "Transaction Fee",
+        'saving_to_saving'                  => 'Saving to Saving',
+        'saving_to_loan'                    => 'Saving to Loan',
+        'loan_to_saving'                    => 'Loan to Saving',
+        'loan_to_loan'                      => 'Loan to Loan',
     ],
 
     /*
