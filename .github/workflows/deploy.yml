@@ -39,4 +39,5 @@ jobs:
       - name: Run Artisan Commands
         run: |
           curl -s -X POST \
-          "https://backend.jonokollan.com/__deploy/run?key=${{ secrets.DEPLOY_KEY }}"
+          "https://backend.jonokollan.com/__deploy/run?key=${{ secrets.DEPLOY_KEY }}" \
+          --header 'Accept: application/json'
