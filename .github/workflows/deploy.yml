@@ -1,4 +1,4 @@
-name: Deploy Laravel Backend (cPanel + No SSH)
+name: Laravel Deployment
 
 on:
   release:
@@ -9,37 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ---------------------------
-      # 1️⃣ Checkout repository
-      # ---------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ---------------------------
-      # 2️⃣ Setup PHP
-      # ---------------------------
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          tools: composer
-          coverage: none
+      # 🚀 NO COMPOSER INSTALL
+      # 🚀 NO VENDOR UPLOAD
 
-      # ---------------------------
-      # 3️⃣ Install Composer deps
-      # ---------------------------
-      - name: Install Composer Dependencies
-        run: |
-          composer install \
-            --no-dev \
-            --prefer-dist \
-            --optimize-autoloader \
-            --no-interaction
-
-      # ---------------------------
-      # 4️⃣ Deploy via FTP (SAFE)
-      # ---------------------------
-      - name: Deploy to cPanel via FTP
+      - name: Deploy Code Only (FAST)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
@@ -55,14 +31,12 @@ jobs:
             **/.env
             **/node_modules/**
             **/tests/**
+            **/vendor/**
             storage/**
             bootstrap/cache/*.php
+            **/*.md
 
-      # ---------------------------
-      # 5️⃣ Run Artisan via HTTP
-      # ---------------------------
-      - name: Run Laravel Artisan Commands (HTTP)
+      - name: Run Artisan Commands
         run: |
-          curl -X POST \
-            -H "Accept: application/json" \
-            "https://backend.jonokollan.com/__deploy/run?key=${{ secrets.DEPLOY_KEY }}"
+          curl -s -X POST \
+          "https://backend.jonokollan.com/__deploy/run?key=${{ secrets.DEPLOY_KEY }}"

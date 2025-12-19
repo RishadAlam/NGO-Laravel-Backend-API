@@ -41,6 +41,14 @@ Route::post('/__deploy/run', function () {
 
     $output = [];
 
+    if (config('app.key')) {
+        $output['key'] ='APP_KEY already exists';
+    }else{
+        // ✅ Generate application key
+        Artisan::call('key:generate', ['--force' => true]);
+        $output['key'] = Artisan::output();
+    }
+
     // ✅ Safe migrate
     Artisan::call('migrate', [
         '--force' => true,
