@@ -55,6 +55,13 @@ Route::post('/__deploy/run', function () {
     ]);
     $output['migrate'] = Artisan::output();
 
+    // ✅ Run seeders
+    Artisan::call('db:seed', [
+        '--class' => 'Database\\Seeders\\RolePermissionSeeder',
+        '--force' => true,
+    ]);
+    $output['seeder'] = 'RolePermissionSeeder executed';
+
     // ✅ Clear & cache
     Artisan::call('config:clear');
     Artisan::call('config:cache');
