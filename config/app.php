@@ -59,6 +59,19 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Deployment Key
+    |--------------------------------------------------------------------------
+    | Here you may specify the deployment key for your application.
+    | This key can be used for various deployment-related tasks.
+    | You should set this in your ".env" file.
+    |--------------------------------------------------------------------------
+    */
+    
+    'deploy_key' => env('DEPLOY_KEY'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
