@@ -26,16 +26,17 @@ class DatabaseSeeder extends Seeder
                 // SavingCollectionSeeder::class,
                 // LoanCollectionSeeder::class,
 
-                UserSeeder::class,
+                // UserSeeder::class,
+                // AppConfigSeeder::class,
+                // AccountSeeder::class,
+                // IncomeCategorySeeder::class,
+                // ExpenseCategorySeeder::class,
+                // CategorySeeder::class,
+                // AccountFeesCategorySeeder::class,
+                // AuditReportPageSeeder::class,
+                // AuditReportMetaSeeder::class,
+
                 RolePermissionSeeder::class,
-                AppConfigSeeder::class,
-                AccountSeeder::class,
-                IncomeCategorySeeder::class,
-                ExpenseCategorySeeder::class,
-                CategorySeeder::class,
-                AccountFeesCategorySeeder::class,
-                AuditReportPageSeeder::class,
-                AuditReportMetaSeeder::class
             ]
         );
     }

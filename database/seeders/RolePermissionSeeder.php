@@ -16,12 +16,12 @@ class RolePermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        //Create Role
-        $roleDeveloper  = Role::create(['name' => 'developer', 'is_default' => true]);
-        $roleSuperAdmin = Role::create(['name' => 'super_admin', 'is_default' => true]);
-        $roleAdmin      = Role::create(['name' => 'admin', 'is_default' => true]);
-        $roleManager    = Role::create(['name' => 'manager', 'is_default' => true]);
-        $roleUser       = Role::create(['name' => 'field_officer', 'is_default' => true]);
+        // Create Roles (check existence first)
+        $roleDeveloper  = Role::firstOrCreate(['name' => 'developer'], ['is_default' => true]);
+        $roleSuperAdmin = Role::firstOrCreate(['name' => 'super_admin'], ['is_default' => true]);
+        $roleAdmin      = Role::firstOrCreate(['name' => 'admin'], ['is_default' => true]);
+        $roleManager    = Role::firstOrCreate(['name' => 'manager'], ['is_default' => true]);
+        $roleUser       = Role::firstOrCreate(['name' => 'field_officer'], ['is_default' => true]);
 
         // Permission
         $permissions = [
@@ -426,10 +426,20 @@ class RolePermissionSeeder extends Seeder
         ];
 
         /**
-         * Find user
+         * Find or create user
          */
-        $user = User::where('email', 'sazzadullalamrishad@yahoo.com')->first();
-        $user->assignRole($roleDeveloper);
+        $user = User::firstOrCreate(
+            ['email' => 'sazzadullalamrishad@yahoo.com'],
+            [
+                'name' => 'Developer',
+                'password' => bcrypt('password'), // Set a default password
+            ]
+        );
+        
+        // Assign role if not already assigned
+        if (!$user->hasRole($roleDeveloper)) {
+            $user->assignRole($roleDeveloper);
+        }
 
         // for ($j = 2; $j < 12; $j++) {
         //     $role = Arr::random([$roleSuperAdmin, $roleAdmin, $roleManager, $roleUser]);
@@ -438,15 +448,20 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($permissions as $row) {
             $groupName = $row['groupName'];
-            foreach ($row['permissions'] as $permission) {
-                $permission = Permission::create(
+            foreach ($row['permissions'] as $permissionName) {
+                // Check if permission already exists
+                $permission = Permission::firstOrCreate(
+                    ['name' => $permissionName],
                     [
-                        'name'          => $permission,
-                        'group_name'    => $groupName,
-                        'guard_name'    => 'web'
+                        'group_name' => $groupName,
+                        'guard_name' => 'web'
                     ]
                 );
-                $user->givePermissionTo($permission);
+                
+                // Give permission to user if not already assigned
+                if (!$user->hasPermissionTo($permission)) {
+                    $user->givePermissionTo($permission);
+                }
             }
         }
     }
