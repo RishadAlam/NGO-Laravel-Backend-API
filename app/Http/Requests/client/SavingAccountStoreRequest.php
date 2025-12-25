@@ -58,7 +58,7 @@ class SavingAccountStoreRequest extends FormRequest
             'acc_no'                            => 'required',
             'start_date'                        => 'required|date',
             'duration_date'                     => 'required|date',
-            'payable_installment'               => 'required|numeric|digits_between:1,3',
+            'payable_installment'               => 'required|numeric|digits_between:1,5',
             'payable_deposit'                   => 'required|numeric',
             'payable_interest'                  => 'required|numeric|digits_between:1,3',
             'total_deposit_without_interest'    => 'required|numeric',
