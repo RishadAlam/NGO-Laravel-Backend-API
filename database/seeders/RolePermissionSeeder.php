@@ -423,6 +423,13 @@ class RolePermissionSeeder extends Seeder
                     'cooperative_audit_report_print',
                 ]
             ],
+            // Internal Audit Report
+            [
+                'groupName'     => 'internal_audit_report',
+                'permissions'   => [
+                    'internal_audit_report_view',
+                ]
+            ],
         ];
 
         /**

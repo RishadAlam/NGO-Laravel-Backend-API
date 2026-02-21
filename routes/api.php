@@ -17,6 +17,7 @@ use App\Http\Controllers\accounts\AccountController;
 use App\Http\Controllers\accounts\ExpenseController;
 use App\Http\Controllers\config\AppConfigController;
 use App\Http\Controllers\Audit\AuditReportController;
+use App\Http\Controllers\Audit\InternalAuditReportController;
 use App\Http\Controllers\category\CategoryController;
 use App\Http\Controllers\staffs\PermissionController;
 use App\Http\Controllers\client\LoanAccountController;
@@ -413,6 +414,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::prefix('audit')->group(function () {
         Route::apiResource('meta', AuditReportMetaController::class)->except('show')->names('audit.meta');
         Route::apiResource('page', AuditReportPageController::class)->except('show')->names('audit.page');
+        Route::GET('internal-report', [InternalAuditReportController::class, 'index'])->name('audit.report.internal');
         Route::apiResource('report/co-operative', AuditReportController::class)->only(['index', 'update'])->names('audit.report.co-operative');
     });
 
