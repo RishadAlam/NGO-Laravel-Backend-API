@@ -421,12 +421,6 @@ class RolePermissionSeeder extends Seeder
                     'cooperative_audit_report_view',
                     'cooperative_audit_report_update',
                     'cooperative_audit_report_print',
-                ]
-            ],
-            // Internal Audit Report
-            [
-                'groupName'     => 'internal_audit_report',
-                'permissions'   => [
                     'internal_audit_report_view',
                 ]
             ],
@@ -456,8 +450,8 @@ class RolePermissionSeeder extends Seeder
         foreach ($permissions as $row) {
             $groupName = $row['groupName'];
             foreach ($row['permissions'] as $permissionName) {
-                // Check if permission already exists
-                $permission = Permission::firstOrCreate(
+                // Ensure existing permissions keep canonical group/guard values.
+                $permission = Permission::updateOrCreate(
                     ['name' => $permissionName],
                     [
                         'group_name' => $groupName,
