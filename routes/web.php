@@ -27,7 +27,7 @@ Route::post('/__deploy/run', function () {
     }
 
     // 2️⃣ Secret key check
-    if (request('key') !== env('DEPLOY_KEY')) {
+    if (request('key') !== config('app.deploy_key')) {
         abort(403, 'Invalid key');
     }
 
