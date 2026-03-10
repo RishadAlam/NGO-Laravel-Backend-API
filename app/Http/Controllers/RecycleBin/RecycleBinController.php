@@ -412,7 +412,7 @@ class RecycleBinController extends Controller
                 'search_columns' => ['name', 'email', 'phone'],
                 'with' => ['roles:id,name', 'UserActionHistory.Author:id,name'],
                 'display' => fn(User $record) => $record->name,
-                'image' => fn(User $record) => $record->image_uri,
+                'image' => fn(User $record) => $this->resolveStaffImageUri($record),
                 'metadata' => fn(User $record) => [
                     'email' => $record->email,
                     'phone' => $record->phone,
@@ -459,10 +459,7 @@ class RecycleBinController extends Controller
             $displayName = value($config['display'], $record);
             $metadata = value($config['metadata'], $record);
             $deletedBy = value($config['deleted_by'], $record);
-            $imageUri = value($config['image'] ?? null, $record);
-            if (empty($imageUri)) {
-                $imageUri = $record->getAttribute('image_uri') ?? $record->getAttribute('image');
-            }
+            $imageUri = $this->resolveRecordImageUri($record, value($config['image'] ?? null, $record));
             $restoreError = $this->validateRestoreDependencies($type, $record);
 
             return [
@@ -481,6 +478,44 @@ class RecycleBinController extends Controller
                 'force_deletable' => $canForceDeletePermission && $this->canForceDelete($type, $record),
             ];
         });
+    }
+
+    /**
+     * Resolve one record image URI with robust fallbacks.
+     */
+    private function resolveRecordImageUri(Model $record, mixed $preferredImageUri = null): ?string
+    {
+        $imageUri = $preferredImageUri;
+
+        if (empty($imageUri)) {
+            $imageUri = $record->getAttribute('image_uri');
+        }
+
+        if (empty($imageUri)) {
+            $imageUri = $record->getAttribute('image');
+        }
+
+        if (empty($imageUri)) {
+            return null;
+        }
+
+        return (string) $imageUri;
+    }
+
+    /**
+     * Resolve staff image URI and support filename-only legacy rows.
+     */
+    private function resolveStaffImageUri(User $record): ?string
+    {
+        if (!empty($record->image_uri)) {
+            return (string) $record->image_uri;
+        }
+
+        if (empty($record->image)) {
+            return null;
+        }
+
+        return url('storage/staff/' . ltrim((string) $record->image, '/'));
     }
 
     /**

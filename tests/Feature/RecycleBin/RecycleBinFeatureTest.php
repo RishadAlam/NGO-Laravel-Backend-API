@@ -186,6 +186,35 @@ class RecycleBinFeatureTest extends TestCase
             ->assertJsonPath('success', false);
     }
 
+    public function test_recycle_bin_staff_items_include_image_uri_from_legacy_image_field(): void
+    {
+        $user = $this->createUserWithPermissions(['recycle_bin_view']);
+        $staff = User::factory()->create([
+            'name' => 'Deleted Staff',
+            'email' => 'deleted-staff@example.com',
+            'status' => true,
+            'image' => 'legacy-staff.jpg',
+            'image_uri' => null,
+            'password' => 'password',
+        ]);
+        $staff->delete();
+
+        Sanctum::actingAs($user);
+
+        $response = $this->withHeaders(['Accept-Language' => 'en'])
+            ->getJson('/api/recycle-bin/items?type=staff&all=1');
+
+        $response->assertOk()
+            ->assertJsonPath('success', true);
+
+        $items = collect($response->json('data.items'));
+        $matched = $items->firstWhere('id', $staff->id);
+
+        $this->assertNotNull($matched);
+        $this->assertNotNull($matched['image_uri'] ?? null);
+        $this->assertStringContainsString('/storage/staff/legacy-staff.jpg', $matched['image_uri']);
+    }
+
     private function createUserWithPermissions(array $permissions): User
     {
         $user = User::factory()->create([
