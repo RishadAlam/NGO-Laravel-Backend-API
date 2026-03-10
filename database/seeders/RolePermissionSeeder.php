@@ -384,6 +384,15 @@ class RolePermissionSeeder extends Seeder
                     'staff_permission_update',
                 ]
             ],
+            // Recycle Bin
+            [
+                'groupName'     => 'recycle_bin',
+                'permissions'   => [
+                    'recycle_bin_view',
+                    'recycle_bin_restore',
+                    'recycle_bin_force_delete',
+                ]
+            ],
             // Registered Account View
             [
                 'groupName'     => 'registered_account_view',
@@ -462,6 +471,20 @@ class RolePermissionSeeder extends Seeder
                 // Give permission to user if not already assigned
                 if (!$user->hasPermissionTo($permission)) {
                     $user->givePermissionTo($permission);
+                }
+            }
+        }
+
+        $recycleBinPermissions = [
+            'recycle_bin_view',
+            'recycle_bin_restore',
+            'recycle_bin_force_delete',
+        ];
+
+        foreach ([$roleDeveloper, $roleSuperAdmin, $roleAdmin] as $role) {
+            foreach ($recycleBinPermissions as $permissionName) {
+                if (!$role->hasPermissionTo($permissionName)) {
+                    $role->givePermissionTo($permissionName);
                 }
             }
         }

@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\category\Category;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\category\CategoryConfig;
 use App\Models\category\CategoryActionHistory;
 use App\Http\Requests\category\CategoryStoreRequest;
 use App\Http\Requests\category\CategoryUpdateRequest;
@@ -108,7 +107,6 @@ class CategoryController extends Controller
     {
         DB::transaction(function () use ($id) {
             Category::find($id)->delete();
-            CategoryConfig::where('category_id', $id)->delete();
             CategoryActionHistory::create([
                 "category_id"       => $id,
                 "author_id"         => auth()->id(),

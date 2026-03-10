@@ -568,6 +568,58 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Recycle Bin Custom Message
+    |--------------------------------------------------------------------------
+    */
+    'recycle_bin' => [
+        'type_required'               => 'Recycle bin module type is required.',
+        'invalid_type_requested'       => 'Unsupported recycle bin type requested.',
+        'invalid_type'                 => 'Unsupported recycle bin type.',
+        'record_not_found'             => 'Recycle bin record not found.',
+        'restore_success'              => 'Record restored successfully.',
+        'restore_failed'               => 'Unable to restore this record right now.',
+        'restore_conflict'             => 'Unable to restore this record due to data conflicts.',
+        'force_delete_success'         => 'Record permanently deleted.',
+        'force_delete_failed'          => 'Unable to permanently delete this record right now.',
+        'force_delete_conflict'        => 'Unable to permanently delete this record due to related data.',
+        'force_delete_not_allowed'     => 'This record cannot be permanently deleted.',
+        'force_delete_blocked_by_related' => 'This operation is blocked because related records still exist.',
+        'duplicate_unique_conflict'    => 'This operation failed because it would create duplicate unique data.',
+        'parent_missing'               => ':label was permanently deleted.',
+        'parent_still_trashed'         => ':label is still in the recycle bin. Restore :label first.',
+        'id_fallback'                  => 'ID :id',
+
+        'type' => [
+            'field'             => 'Field',
+            'center'            => 'Center',
+            'category'          => 'Category',
+            'client_registration' => 'Client Registration',
+            'saving_account'    => 'Saving Account',
+            'loan_account'      => 'Loan Account',
+            'account'           => 'Account',
+            'income_category'   => 'Income Category',
+            'expense_category'  => 'Expense Category',
+            'income'            => 'Income',
+            'expense'           => 'Expense',
+            'account_withdrawal' => 'Account Withdrawal',
+            'staff'             => 'Staff',
+            'audit_report_meta' => 'Audit Report Meta',
+        ],
+
+        'label' => [
+            'field'             => 'Field',
+            'center'            => 'Center',
+            'category'          => 'Category',
+            'client_registration' => 'Client registration',
+            'account'           => 'Account',
+            'income_category'   => 'Income category',
+            'expense_category'  => 'Expense category',
+            'audit_report_page' => 'Audit report page',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Audit Custom Message
     |--------------------------------------------------------------------------
     */

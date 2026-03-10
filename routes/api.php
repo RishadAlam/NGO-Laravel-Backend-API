@@ -38,6 +38,7 @@ use App\Http\Controllers\Collections\LoanCollectionController;
 use App\Http\Controllers\Withdrawal\SavingWithdrawalController;
 use App\Http\Controllers\Collections\SavingCollectionController;
 use App\Http\Controllers\Withdrawal\LoanSavingWithdrawalController;
+use App\Http\Controllers\RecycleBin\RecycleBinController;
 use App\Http\Controllers\ClientAccountFees\LoanAccountFeesController;
 use App\Http\Controllers\ClientAccountFees\SavingAccountFeesController;
 use App\Http\Controllers\ClientAccountChecks\LoanAccountCheckController;
@@ -282,6 +283,15 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::prefix('collection')->group(function () {
         Route::DELETE('saving/force-delete/{id}', [SavingCollectionController::class, 'permanently_destroy']);
         Route::DELETE('loan/force-delete/{id}', [LoanCollectionController::class, 'permanently_destroy']);
+    });
+
+    // Recycle Bin
+    Route::prefix('recycle-bin')->group(function () {
+        Route::GET('/', [RecycleBinController::class, 'index']);
+        Route::GET('folders', [RecycleBinController::class, 'folders']);
+        Route::GET('items', [RecycleBinController::class, 'items']);
+        Route::POST('{type}/{id}/restore', [RecycleBinController::class, 'restore']);
+        Route::DELETE('{type}/{id}/force', [RecycleBinController::class, 'forceDelete']);
     });
 
     // =========================================================================
