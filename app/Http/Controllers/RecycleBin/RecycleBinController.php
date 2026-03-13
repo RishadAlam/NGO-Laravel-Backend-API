@@ -660,9 +660,6 @@ class RecycleBinController extends Controller
     private function restoreByType(string $type, Model $record): void
     {
         switch ($type) {
-            case 'client_registration':
-                $this->restoreClientRegistration($record);
-                break;
             case 'saving_account':
                 $this->restoreSavingAccount($record);
                 break;
@@ -750,18 +747,6 @@ class RecycleBinController extends Controller
     {
         $category->restore();
         CategoryConfig::firstOrCreate(['category_id' => $category->id]);
-    }
-
-    /**
-     * Restore client registration with related soft deleted rows.
-     */
-    private function restoreClientRegistration(ClientRegistration $registration): void
-    {
-        $registration->restore();
-        SavingAccount::onlyTrashed()->where('client_registration_id', $registration->id)->restore();
-        LoanAccount::onlyTrashed()->where('client_registration_id', $registration->id)->restore();
-        SavingCollection::onlyTrashed()->where('client_registration_id', $registration->id)->restore();
-        LoanCollection::onlyTrashed()->where('client_registration_id', $registration->id)->restore();
     }
 
     /**
