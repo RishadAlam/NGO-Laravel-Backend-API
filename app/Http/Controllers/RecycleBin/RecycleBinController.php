@@ -28,6 +28,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class RecycleBinController extends Controller
 {
@@ -212,7 +213,7 @@ class RecycleBinController extends Controller
     /**
      * Permanently delete a soft deleted record.
      */
-    public function forceDelete(string $type, string $id)
+    public function forceDelete(Request $request, string $type, string $id)
     {
         $typeConfigs = $this->typeConfigs();
         if (!isset($typeConfigs[$type])) {
@@ -230,9 +231,30 @@ class RecycleBinController extends Controller
             return create_validation_error_response(__('customValidations.recycle_bin.force_delete_not_allowed'), 'message', 422);
         }
 
+        $reassignUserId = null;
+        if ($type === 'staff') {
+            $reassignUserId = (int) $request->input('reassign_user_id');
+            if ($reassignUserId <= 0) {
+                return create_validation_error_response(__('customValidations.recycle_bin.reassign_user_required'), 'reassign_user_id', 422);
+            }
+
+            if ((int) $record->id === $reassignUserId) {
+                return create_validation_error_response(__('customValidations.recycle_bin.reassign_user_same'), 'reassign_user_id', 422);
+            }
+
+            $replacementUserExists = User::query()
+                ->whereKey($reassignUserId)
+                ->where('status', true)
+                ->exists();
+
+            if (!$replacementUserExists) {
+                return create_validation_error_response(__('customValidations.recycle_bin.reassign_user_not_found'), 'reassign_user_id', 422);
+            }
+        }
+
         try {
-            DB::transaction(function () use ($type, $record) {
-                $this->forceDeleteByType($type, $record);
+            DB::transaction(function () use ($type, $record, $reassignUserId) {
+                $this->forceDeleteByType($type, $record, $reassignUserId);
             });
         } catch (QueryException $exception) {
             return create_validation_error_response(
@@ -684,9 +706,112 @@ class RecycleBinController extends Controller
     /**
      * Execute force delete logic by type.
      */
-    private function forceDeleteByType(string $type, Model $record): void
+    private function forceDeleteByType(string $type, Model $record, ?int $reassignUserId = null): void
     {
+        if ($type === 'staff') {
+            $this->reassignAndForceDeleteStaff($record, $reassignUserId);
+            return;
+        }
+
         $record->forceDelete();
+    }
+
+    /**
+     * Reassign related records and force delete a staff record.
+     */
+    private function reassignAndForceDeleteStaff(Model $record, ?int $reassignUserId): void
+    {
+        if (!$record instanceof User || empty($reassignUserId)) {
+            throw new \InvalidArgumentException('Invalid staff reassignment payload.');
+        }
+
+        $this->reassignUserAssociatedRecords((int) $record->id, $reassignUserId);
+
+        // Remove direct role/permission pivots to avoid orphan morph rows.
+        $record->roles()->detach();
+        $record->permissions()->detach();
+
+        $record->forceDelete();
+    }
+
+    /**
+     * Reassign all user-linked records from one staff to another.
+     */
+    private function reassignUserAssociatedRecords(int $fromUserId, int $toUserId): void
+    {
+        foreach ($this->userAssociationColumns() as $table => $columns) {
+            if (!Schema::hasTable($table)) {
+                continue;
+            }
+
+            foreach ($columns as $column) {
+                if (!Schema::hasColumn($table, $column)) {
+                    continue;
+                }
+
+                DB::table($table)
+                    ->where($column, $fromUserId)
+                    ->update([$column => $toUserId]);
+            }
+        }
+    }
+
+    /**
+     * User reference columns that should be reassigned before force deleting staff.
+     */
+    private function userAssociationColumns(): array
+    {
+        return [
+            'fields' => ['creator_id'],
+            'centers' => ['creator_id'],
+            'categories' => ['creator_id'],
+            'accounts' => ['creator_id'],
+            'account_withdrawals' => ['creator_id'],
+            'account_transfers' => ['creator_id'],
+            'income_categories' => ['creator_id'],
+            'expense_categories' => ['creator_id'],
+            'incomes' => ['creator_id'],
+            'expenses' => ['creator_id'],
+            'client_registrations' => ['creator_id', 'approved_by'],
+            'saving_accounts' => ['creator_id', 'approved_by'],
+            'loan_accounts' => ['creator_id', 'approved_by', 'loan_approved_by'],
+            'saving_collections' => ['creator_id', 'approved_by'],
+            'loan_collections' => ['creator_id', 'approved_by'],
+            'saving_withdrawals' => ['creator_id', 'approved_by'],
+            'loan_saving_withdrawals' => ['creator_id', 'approved_by'],
+            'saving_account_checks' => ['checked_by'],
+            'loan_account_checks' => ['checked_by'],
+            'saving_account_closings' => ['creator_id', 'approved_by'],
+            'loan_account_closings' => ['creator_id', 'approved_by'],
+            'saving_account_fees' => ['creator_id'],
+            'loan_account_fees' => ['creator_id'],
+            'account_fees_categories' => ['creator_id'],
+            'audit_report_pages' => ['creator_id'],
+            'audit_report_metas' => ['creator_id'],
+            'audit_reports' => ['last_updated_by'],
+            'saving_to_saving_transactions' => ['creator_id', 'approved_by'],
+            'saving_to_loan_transactions' => ['creator_id', 'approved_by'],
+            'loan_to_saving_transactions' => ['creator_id', 'approved_by'],
+            'loan_to_loan_transactions' => ['creator_id', 'approved_by'],
+            'field_action_histories' => ['author_id'],
+            'center_action_histories' => ['author_id'],
+            'category_action_histories' => ['author_id'],
+            'account_action_histories' => ['author_id'],
+            'account_withdrawal_action_histories' => ['author_id'],
+            'income_action_histories' => ['author_id'],
+            'expense_action_histories' => ['author_id'],
+            'client_registration_action_histories' => ['author_id'],
+            'saving_account_action_histories' => ['author_id'],
+            'loan_account_action_histories' => ['author_id'],
+            'saving_collection_action_histories' => ['author_id'],
+            'loan_collection_action_histories' => ['author_id'],
+            'saving_withdrawal_action_histories' => ['author_id'],
+            'loan_saving_withdrawal_action_histories' => ['author_id'],
+            'audit_report_page_action_histories' => ['author_id'],
+            'audit_report_meta_action_histories' => ['author_id'],
+            'user_action_histories' => ['user_id', 'author_id'],
+            'users_verifies' => ['user_id'],
+        ];
     }
 
     /**

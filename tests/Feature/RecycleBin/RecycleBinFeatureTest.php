@@ -237,6 +237,106 @@ class RecycleBinFeatureTest extends TestCase
         $this->assertDatabaseMissing('fields', ['id' => $field->id]);
     }
 
+    public function test_staff_force_delete_requires_reassign_user_id(): void
+    {
+        $user = $this->createUserWithPermissions(['recycle_bin_force_delete']);
+        $staff = User::factory()->create([
+            'status' => true,
+            'email_verified_at' => now(),
+            'password' => 'password',
+        ]);
+        $staff->delete();
+
+        Sanctum::actingAs($user);
+
+        $this->withHeaders(['Accept-Language' => 'en'])
+            ->deleteJson("/api/recycle-bin/staff/{$staff->id}/force")
+            ->assertStatus(422)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_staff_force_delete_reassigns_associated_records(): void
+    {
+        $actor = $this->createUserWithPermissions(['recycle_bin_force_delete']);
+        $staffToDelete = User::factory()->create([
+            'status' => true,
+            'email_verified_at' => now(),
+            'password' => 'password',
+        ]);
+        $replacementStaff = User::factory()->create([
+            'status' => true,
+            'email_verified_at' => now(),
+            'password' => 'password',
+        ]);
+
+        $field = Field::create([
+            'name' => 'Staff Reassign Field',
+            'description' => 'Staff force delete reassign test',
+            'status' => true,
+            'creator_id' => $staffToDelete->id,
+        ]);
+        $center = Center::create([
+            'field_id' => $field->id,
+            'name' => 'Staff Reassign Center',
+            'description' => 'Staff reassign center',
+            'status' => true,
+            'creator_id' => $staffToDelete->id,
+        ]);
+        $category = Category::create([
+            'name' => 'staff_reassign_category',
+            'group' => 'staff_reassign_test',
+            'saving' => true,
+            'loan' => false,
+            'status' => true,
+            'is_default' => false,
+            'creator_id' => $staffToDelete->id,
+        ]);
+        $registration = $this->createClientRegistration(
+            $field,
+            $center,
+            $staffToDelete,
+            'RB-STF-1001',
+            'Staff Reassign Client'
+        );
+        $savingAccount = SavingAccount::create([
+            'field_id' => $field->id,
+            'center_id' => $center->id,
+            'category_id' => $category->id,
+            'client_registration_id' => $registration->id,
+            'acc_no' => 'RB-STF-SAV-1001',
+            'start_date' => now()->toDateString(),
+            'duration_date' => now()->addYear()->toDateString(),
+            'payable_installment' => 12,
+            'payable_deposit' => 500,
+            'payable_interest' => 5,
+            'is_approved' => true,
+            'creator_id' => $staffToDelete->id,
+            'approved_by' => $staffToDelete->id,
+        ]);
+
+        $staffToDelete->delete();
+
+        Sanctum::actingAs($actor);
+
+        $this->withHeaders(['Accept-Language' => 'en'])
+            ->deleteJson(
+                "/api/recycle-bin/staff/{$staffToDelete->id}/force?reassign_user_id={$replacementStaff->id}"
+            )
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseMissing('users', ['id' => $staffToDelete->id]);
+        $this->assertDatabaseHas('fields', [
+            'id' => $field->id,
+            'creator_id' => $replacementStaff->id,
+        ]);
+        $this->assertDatabaseHas('saving_accounts', [
+            'id' => $savingAccount->id,
+            'creator_id' => $replacementStaff->id,
+            'approved_by' => $replacementStaff->id,
+        ]);
+    }
+
     public function test_user_without_recycle_bin_view_cannot_access_recycle_bin_list(): void
     {
         $user = $this->createUserWithPermissions([]);
