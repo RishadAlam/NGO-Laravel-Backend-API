@@ -180,6 +180,14 @@ trait HelperScopesTrait
     }
 
     /**
+     * Open Account
+     */
+    public function scopeOpen($query)
+    {
+        $query->whereNull('deleted_at');
+    }
+
+    /**
      * Active
      */
     public function scopeApprove($query, $key = "is_approved")
