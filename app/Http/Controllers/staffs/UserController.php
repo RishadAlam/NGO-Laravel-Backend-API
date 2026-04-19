@@ -4,6 +4,7 @@ namespace App\Http\Controllers\staffs;
 
 use App\Models\User;
 use App\Models\UserActionHistory;
+use App\Support\Permissions\PermissionParentCategoryResolver;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
@@ -35,7 +36,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('roles:id,name,is_default')
-            ->with('permissions:id,name,group_name')
+            ->with('permissions:id,name,group_name,parent_group_name')
             ->with(['UserActionHistory', 'UserActionHistory.Author:id,name,image_uri'])
             ->get(['id', 'name', 'email', 'phone', 'image', 'image_uri', 'email_verified_at as verified_at', 'status']);
 
@@ -120,7 +121,11 @@ class UserController extends Controller
             $permissions[] = (object) [
                 'id'            => $permission->id,
                 'name'          => $permission->name,
-                'group_name'    => $permission->group_name
+                'group_name'    => $permission->group_name,
+                'parent_group_name' => PermissionParentCategoryResolver::resolve(
+                    $permission->group_name,
+                    $permission->parent_group_name
+                ),
             ];
         }
 

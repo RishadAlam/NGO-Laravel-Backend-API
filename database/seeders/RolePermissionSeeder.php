@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Support\Permissions\PermissionParentCategoryResolver;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -152,6 +153,8 @@ class RolePermissionSeeder extends Seeder
                     'client_saving_account_collection_update',
                     'client_saving_account_collection_permanently_delete',
                     'client_saving_account_withdrawal_action_history',
+                    'permission_to_make_saving_withdrawal',
+                    'make_saving_transactions',
                 ]
             ],
             // Client Loan Account
@@ -170,6 +173,8 @@ class RolePermissionSeeder extends Seeder
                     'client_loan_account_collection_update',
                     'client_loan_account_collection_permanently_delete',
                     'client_loan_account_saving_withdrawal_action_history',
+                    'permission_to_make_loan_saving_withdrawal',
+                    'make_loan_transactions',
                 ]
             ],
             // Regular Saving Collection
@@ -221,9 +226,8 @@ class RolePermissionSeeder extends Seeder
             ],
             // Saving Withdrawal
             [
-                'groupName'     => 'saving_withdrawal',
+                'groupName'     => 'pending_saving_withdrawal',
                 'permissions'   => [
-                    'permission_to_make_saving_withdrawal',
                     'pending_saving_withdrawal_list_view',
                     'pending_saving_withdrawal_list_view_as_admin',
                     'pending_saving_withdrawal_approval',
@@ -233,9 +237,8 @@ class RolePermissionSeeder extends Seeder
             ],
             // Loan Saving Withdrawal
             [
-                'groupName'     => 'loan_saving_withdrawal',
+                'groupName'     => 'pending_loan_saving_withdrawal',
                 'permissions'   => [
-                    'permission_to_make_loan_saving_withdrawal',
                     'pending_loan_saving_withdrawal_list_view',
                     'pending_loan_saving_withdrawal_list_view_as_admin',
                     'pending_loan_saving_withdrawal_approval',
@@ -245,10 +248,8 @@ class RolePermissionSeeder extends Seeder
             ],
             // Client Account Transactions
             [
-                'groupName'     => 'client_account_transactions',
+                'groupName'     => 'pending_client_account_transactions',
                 'permissions'   => [
-                    'make_saving_transactions',
-                    'make_loan_transactions',
                     'pending_client_transactions_list_view',
                     'pending_client_transactions_list_view_as_admin',
                     'pending_client_transactions_approval',
@@ -458,12 +459,14 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($permissions as $row) {
             $groupName = $row['groupName'];
+            $parentGroupName = PermissionParentCategoryResolver::resolve($groupName);
             foreach ($row['permissions'] as $permissionName) {
                 // Ensure existing permissions keep canonical group/guard values.
                 $permission = Permission::updateOrCreate(
                     ['name' => $permissionName],
                     [
                         'group_name' => $groupName,
+                        'parent_group_name' => $parentGroupName,
                         'guard_name' => 'web'
                     ]
                 );

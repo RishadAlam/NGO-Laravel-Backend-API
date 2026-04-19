@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Permission;
+use App\Support\Permissions\PermissionParentCategoryResolver;
 
 class PermissionController extends Controller
 {
@@ -24,11 +25,37 @@ class PermissionController extends Controller
     public function index(string $id)
     {
         $allPermissions = Permission::orderBy('name')
-            ->get(['id', 'name', 'group_name']);
-        $allGroups = Permission::select('group_name')
-            ->distinct()
-            ->orderBy('group_name')
-            ->get();
+            ->get(['id', 'name', 'group_name', 'parent_group_name'])
+            ->map(function ($permission) {
+                return (object) [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'group_name' => $permission->group_name,
+                    'parent_group_name' => PermissionParentCategoryResolver::resolve(
+                        $permission->group_name,
+                        $permission->parent_group_name
+                    ),
+                ];
+            });
+
+        $allGroups = $allPermissions
+            ->map(function ($permission) {
+                return (object) [
+                    'group_name' => $permission->group_name,
+                    'parent_group_name' => $permission->parent_group_name,
+                ];
+            })
+            ->unique('group_name')
+            ->sortBy('group_name')
+            ->values();
+
+        $allParentGroups = $allGroups
+            ->pluck('parent_group_name')
+            ->unique()
+            ->sort()
+            ->values()
+            ->map(fn ($parentGroupName) => (object) ['parent_group_name' => $parentGroupName]);
+
         $userPermissions = User::find($id)
             ->getPermissionNames();
 
@@ -36,6 +63,7 @@ class PermissionController extends Controller
             null,
             [
                 'allGroups'         => $allGroups,
+                'allParentGroups'   => $allParentGroups,
                 'allPermissions'    => $allPermissions,
                 'userPermissions'   => $userPermissions
             ]

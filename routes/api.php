@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\client\SavingAccountFee;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
+use App\Support\Permissions\PermissionParentCategoryResolver;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\field\FieldController;
 use App\Http\Controllers\staffs\RoleController;
@@ -451,6 +452,11 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     // =========================================================================
 
     Route::POST('/add-permission', function (Request $request) {
+        $parentGroupName = PermissionParentCategoryResolver::resolve(
+            $request->group_name,
+            $request->parent_group_name
+        );
+
         foreach ($request->permissions as $permission) {
             if (count(Permission::where('name', $permission)->get())) {
                 continue;
@@ -460,6 +466,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
                 [
                     'name' => $permission,
                     'group_name' => $request->group_name,
+                    'parent_group_name' => $parentGroupName,
                     'guard_name' => 'web',
                 ]
             );
