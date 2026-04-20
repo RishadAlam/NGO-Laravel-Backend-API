@@ -40,8 +40,8 @@ class PermissionParentCategoryResolver
             'pending_saving_collection' => 'pending_collections',
             'pending_loan_collection' => 'pending_collections',
 
-            'saving_withdrawal' => 'withdrawals',
-            'loan_saving_withdrawal' => 'withdrawals',
+            'pending_saving_withdrawal' => 'withdrawals',
+            'pending_loan_saving_withdrawal' => 'withdrawals',
 
             'pending_client_account_transactions' => 'pending_transactions',
 
