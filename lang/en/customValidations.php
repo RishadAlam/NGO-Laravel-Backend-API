@@ -329,6 +329,7 @@ return [
         'successful'   => 'The role has been successfully registered.',
         'delete'        => 'The role has been successfully deleted.',
         'update'        => 'The role has been successfully updated.',
+        'permission_update' => 'The role permissions have been successfully updated.',
     ],
     /*
     |--------------------------------------------------------------------------

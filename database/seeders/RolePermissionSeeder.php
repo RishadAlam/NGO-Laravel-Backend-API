@@ -395,6 +395,8 @@ class RolePermissionSeeder extends Seeder
                     'role_registration',
                     'role_update',
                     'role_delete',
+                    'role_permission_view',
+                    'role_permission_update',
                 ]
             ],
             // Staffs Permission
@@ -495,19 +497,13 @@ class RolePermissionSeeder extends Seeder
                 if (!$user->hasPermissionTo($permission)) {
                     $user->givePermissionTo($permission);
                 }
-            }
-        }
-
-        $recycleBinPermissions = [
-            'recycle_bin_view',
-            'recycle_bin_restore',
-            'recycle_bin_force_delete',
-        ];
-
-        foreach ([$roleDeveloper, $roleSuperAdmin, $roleAdmin] as $role) {
-            foreach ($recycleBinPermissions as $permissionName) {
-                if (!$role->hasPermissionTo($permissionName)) {
-                    $role->givePermissionTo($permissionName);
+                // Give permission to developer role if not already assigned
+                if (!$roleDeveloper->hasPermissionTo($permissionName)) {
+                    $roleDeveloper->givePermissionTo($permissionName);
+                }
+                // Give permission to super admin role if not already assigned
+                if (!$roleSuperAdmin->hasPermissionTo($permissionName)) {
+                    $roleSuperAdmin->givePermissionTo($permissionName);
                 }
             }
         }

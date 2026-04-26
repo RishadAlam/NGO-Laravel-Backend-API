@@ -2,41 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\ForgetPasswordRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\OTPVerificationRequest;
+use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\RegistrationRequest;
+use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\VerifyUserRequest;
+use App\Mail\EmailVerifyMail;
+use App\Mail\RegistrationGreetingsMail;
 use App\Models\User;
 use App\Models\UsersVerify;
-use App\Mail\EmailVerifyMail;
-use App\Http\Requests\LoginRequest;
-use Illuminate\Support\Facades\URL;
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Http\Requests\OtpResendRequest;
-use App\Mail\RegistrationGreetingsMail;
-use App\Http\Requests\VerifyUserRequest;
-use App\Http\Requests\RegistrationRequest;
-use App\Http\Requests\ProfileUpdateRequest;
-use App\Http\Requests\ResetPasswordRequest;
-use App\Http\Requests\ChangePasswordRequest;
-use App\Http\Requests\ForgetPasswordRequest;
-use App\Http\Requests\OTPVerificationRequest;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
     /**
      * Create validation error Response
      *
-     * @param $key Massage key, $message Message Body, $code Error Code, $success Message Status
+     * @param  $key  Massage key, $message Message Body, $code Error Code, $success Message Status
      * @return Illuminate\Http\Response
      */
     public function create_validation_error_response($key, $message, $code = '401', $success = false)
     {
         return response(
             [
-                'success'   => $success,
-                "errors"    => [
-                    $key    => $message,
+                'success' => $success,
+                'errors' => [
+                    $key => $message,
                 ],
             ],
             $code
@@ -46,7 +44,7 @@ class AuthController extends Controller
     /**
      * Create Response
      *
-     * @param $message Message Body, $code Error Code, $success Message Status
+     * @param  $message  Message Body, $code Error Code, $success Message Status
      * @return Illuminate\Http\Response
      */
     public function create_response($message, $code = '200', $success = true)
@@ -63,8 +61,7 @@ class AuthController extends Controller
     /**
      * Send Otp Mail
      *
-     * @param $email
-     * @return boolean
+     * @return bool
      */
     public static function sendOTP($email, $name, $otp, $expired)
     {
@@ -82,8 +79,7 @@ class AuthController extends Controller
     /**
      * Send Login Credentrials
      *
-     * @param $email
-     * @return boolean
+     * @return bool
      */
     public static function sendCredentials($name, $email, $password)
     {
@@ -100,48 +96,78 @@ class AuthController extends Controller
     /**
      * Create OTP
      *
-     * @param $userId
      * @return array
      */
     public static function createOTP($userId)
     {
-        $otp        = rand(111111, 999999);
-        $expired    = Carbon::now()->addMinutes(5);
+        $otp = rand(111111, 999999);
+        $expired = Carbon::now()->addMinutes(5);
         UsersVerify::create(
             [
-                'user_id'       => $userId,
-                'otp'           => $otp,
-                'expired_at'    => $expired
+                'user_id' => $userId,
+                'otp' => $otp,
+                'expired_at' => $expired,
             ]
         );
 
         return [
-            'otp'       => $otp,
-            'expired'   => $expired
+            'otp' => $otp,
+            'expired' => $expired,
         ];
     }
 
     /**
      * Create Authorized Response
      *
-     * @param $userData
      * @return array
      */
     public static function createAuthorizedRes($userData, $message)
     {
+        $authorizationData = self::buildAuthorizationData($userData);
+
         return [
-            'success'           => true,
-            'message'           => $message,
-            'id'                => $userData->id,
-            'name'              => $userData->name,
-            'email'             => $userData->email,
+            'success' => true,
+            'message' => $message,
+            'id' => $userData->id,
+            'name' => $userData->name,
+            'email' => $userData->email,
             'email_verified_at' => $userData->email_verified_at,
-            'phone'             => $userData->phone,
-            'image'             => $userData->image,
-            'image_uri'         => $userData->image_uri,
-            'status'            => $userData->status,
-            'role'              => $userData->getRoleNames(),
-            'permissions'       => $userData->getPermissionNames()
+            'phone' => $userData->phone,
+            'image' => $userData->image,
+            'image_uri' => $userData->image_uri,
+            'status' => $userData->status,
+            'role' => $authorizationData['roles'],
+            'permissions' => $authorizationData['permissions'],
+        ];
+    }
+
+    /**
+     * Build authorization response data using fresh direct + role assignments.
+     */
+    private static function buildAuthorizationData($userData): array
+    {
+        // Force-refresh relations to avoid stale in-memory role/permission state.
+        $userData->unsetRelation('permissions');
+        $userData->unsetRelation('roles');
+        $userData->load('permissions:id,name', 'roles:id,name', 'roles.permissions:id,name');
+
+        $directPermissionNames = $userData->permissions->pluck('name');
+        $rolePermissionNames = $userData->roles
+            ->flatMap(fn ($role) => $role->permissions->pluck('name'));
+        $effectivePermissionNames = $directPermissionNames
+            ->merge($rolePermissionNames)
+            ->merge($userData->getAllPermissions()->pluck('name'))
+            ->filter(fn ($permissionName) => is_string($permissionName) && trim($permissionName) !== '')
+            ->unique()
+            ->values();
+
+        return [
+            'roles' => $userData->roles
+                ->pluck('name')
+                ->filter(fn ($roleName) => is_string($roleName) && trim($roleName) !== '')
+                ->unique()
+                ->values(),
+            'permissions' => $effectivePermissionNames,
         ];
     }
 
@@ -169,21 +195,22 @@ class AuthController extends Controller
         $data = (object) $request->validated();
         User::create(
             [
-                'name'      => $data->name,
-                'email'     => $data->email,
-                'password'  => bcrypt($data->password),
-                'phone'     => $request->phone
+                'name' => $data->name,
+                'email' => $data->email,
+                'password' => bcrypt($data->password),
+                'phone' => $request->phone,
             ]
         );
 
         self::sendCredentials($data->name, $data->email, $data->password);
+
         return $this->create_response('Registration Successful');
     }
 
     /**
      * Login User
      *
-     * @param App\Http\Requests\LoginRequest $request
+     * @param  App\Http\Requests\LoginRequest  $request
      * @return Illuminate\Http\Response
      */
     public function login(LoginRequest $request)
@@ -191,7 +218,7 @@ class AuthController extends Controller
         $data = (object) $request->validated();
         $user = User::where('email', $data->email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return $this->create_validation_error_response(
                 'email',
                 __('customValidations.login.incorrectEmail')
@@ -199,7 +226,7 @@ class AuthController extends Controller
         } elseif (
             $user
             &&
-            !Hash::check(
+            ! Hash::check(
                 $data->password,
                 $user->password
             )
@@ -208,33 +235,33 @@ class AuthController extends Controller
                 'password',
                 __('customValidations.login.incorrectPassword')
             );
-        } elseif ($user && !$user->email_verified_at) {
+        } elseif ($user && ! $user->email_verified_at) {
             // Create OTP & send it to user email address
             $otpResponse = self::createOTP($user->id);
             self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
 
             return response(
                 [
-                    'success'   => false,
-                    "errors"    => [
-                        'message'   => __('customValidations.otp.otpSent'),
+                    'success' => false,
+                    'errors' => [
+                        'message' => __('customValidations.otp.otpSent'),
                     ],
-                    "otp_sended"    => true,
-                    'user_id'       => $user->id
+                    'otp_sended' => true,
+                    'user_id' => $user->id,
                 ],
                 202
             );
-        } elseif ($user && !$user->status) {
+        } elseif ($user && ! $user->status) {
             return $this->create_validation_error_response(
                 'message',
                 __('customValidations.login.accDeactivate'),
                 '202'
             );
-        } elseif (!Auth::attempt(
+        } elseif (! Auth::attempt(
             [
-                'email'     => $user->email,
-                'password'  => $data->password,
-                'status'    => true
+                'email' => $user->email,
+                'password' => $data->password,
+                'status' => true,
             ]
         )) {
             return $this->create_validation_error_response(
@@ -244,24 +271,26 @@ class AuthController extends Controller
             );
         }
 
-        $user   = Auth::user();
-        $token  = $user->createToken('auth_token')->plainTextToken;
+        $user = Auth::user();
+        $authorizationData = self::buildAuthorizationData($user);
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response(
             [
-                'success'           => true,
-                'message'           => __('customValidations.login.successful'),
-                'access_token'      => $token,
-                'token_type'        => "Bearer",
-                'id'                => $user->id,
-                'name'              => $user->name,
-                'email'             => $user->email,
+                'success' => true,
+                'message' => __('customValidations.login.successful'),
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at,
-                'phone'             => $user->phone,
-                'image'             => $user->image,
-                'image_uri'         => $user->image_uri,
-                'status'            => $user->status,
-                'role'              => $user->getRoleNames(),
-                'permissions'       => $user->getPermissionNames()
+                'phone' => $user->phone,
+                'image' => $user->image,
+                'image_uri' => $user->image_uri,
+                'status' => $user->status,
+                'role' => $authorizationData['roles'],
+                'permissions' => $authorizationData['permissions'],
             ],
             200
         );
@@ -276,20 +305,20 @@ class AuthController extends Controller
     public function logout()
     {
         auth::user()->currentAccessToken()->delete();
+
         return $this->create_response(__('customValidations.logout.successful'));
     }
-
 
     /**
      * Change Password
      *
-     * @param App\Http\Requests\ChangePasswordRequest $request
+     * @param  App\Http\Requests\ChangePasswordRequest  $request
      * @return Illuminate\Http\Response
      */
     public function change_password(ChangePasswordRequest $request)
     {
         $data = (object) $request->validated();
-        if (!Hash::check($data->current_password, Auth::user()->password)) {
+        if (! Hash::check($data->current_password, Auth::user()->password)) {
             return $this->create_validation_error_response(
                 'current_password',
                 __('customValidations.passwordChange.notMatch')
@@ -311,7 +340,7 @@ class AuthController extends Controller
     /**
      * Forget Password
      *
-     * @param App\Http\Requests\ForgetPasswordRequest $request
+     * @param  App\Http\Requests\ForgetPasswordRequest  $request
      * @return Illuminate\Http\Response
      */
     public function forget_password(ForgetPasswordRequest $request)
@@ -319,13 +348,13 @@ class AuthController extends Controller
         $data = (object) $request->validated();
         $user = User::where('email', $data->email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return $this->create_validation_error_response(
                 'message',
                 __('customValidations.forgotPassword.accountNotFound'),
                 404
             );
-        } elseif ($user && !$user->status) {
+        } elseif ($user && ! $user->status) {
             return $this->create_validation_error_response(
                 'message',
                 __('customValidations.login.accDeactivate'),
@@ -335,11 +364,12 @@ class AuthController extends Controller
 
         $otpResponse = self::createOTP($user->id);
         self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
+
         return response(
             [
-                'success'       => true,
-                'message'       => __('customValidations.forgotPassword.successful'),
-                'id'        => $user->id
+                'success' => true,
+                'message' => __('customValidations.forgotPassword.successful'),
+                'id' => $user->id,
             ]
         );
     }
@@ -347,20 +377,20 @@ class AuthController extends Controller
     /**
      * Forget Password
      *
-     * @param App\Http\Requests\OtpResendRequest $request
+     * @param  App\Http\Requests\OtpResendRequest  $request
      * @return Illuminate\Http\Response
      */
     public function otp_resend($id)
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->create_validation_error_response(
                 'message',
                 __('customValidations.forgotPassword.accountNotFound'),
                 404
             );
-        } elseif ($user && !$user->status) {
+        } elseif ($user && ! $user->status) {
             return $this->create_validation_error_response(
                 'message',
                 __('customValidations.login.accDeactivate'),
@@ -370,10 +400,11 @@ class AuthController extends Controller
 
         $otpResponse = self::createOTP($user->id);
         self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
+
         return response(
             [
-                'success'       => true,
-                'message'       => __('customValidations.otp.otpResend'),
+                'success' => true,
+                'message' => __('customValidations.otp.otpResend'),
             ]
         );
     }
@@ -381,7 +412,7 @@ class AuthController extends Controller
     /**
      * Verified Email and OTP
      *
-     * @param App\Http\Requests\OTPVerificationRequest $request
+     * @param  App\Http\Requests\OTPVerificationRequest  $request
      * @return Illuminate\Http\Response
      */
     public function otp_verification(OTPVerificationRequest $request)
@@ -389,7 +420,7 @@ class AuthController extends Controller
         $data = (object) $request->validated();
         $userOtp = UsersVerify::where('otp', $data->otp)->latest()->first(['id', 'user_id', 'expired_at']);
 
-        if (!$userOtp) {
+        if (! $userOtp) {
             return $this->create_validation_error_response(
                 'message',
                 __('customValidations.otp.otpIsInvalid'),
@@ -408,8 +439,8 @@ class AuthController extends Controller
 
         return response(
             [
-                'success'       => true,
-                'message'       => __('customValidations.otp.successful')
+                'success' => true,
+                'message' => __('customValidations.otp.successful'),
             ],
             200
         );
@@ -418,7 +449,7 @@ class AuthController extends Controller
     /**
      * reset Password
      *
-     * @param App\Http\Requests\ResetPasswordRequest $request
+     * @param  App\Http\Requests\ResetPasswordRequest  $request
      * @return Illuminate\Http\Response
      */
     public function reset_password(ResetPasswordRequest $request)
@@ -434,25 +465,25 @@ class AuthController extends Controller
     /**
      * Profile Update
      *
-     * @param App\Http\Requests\ProfileUpdateRequest $request
+     * @param  App\Http\Requests\ProfileUpdateRequest  $request
      * @return Illuminate\Http\Response
      */
     public function profile_update(ProfileUpdateRequest $request)
     {
         $data = (object) $request->validated();
-        if (!empty($data->image)) {
-            if (!empty(auth()->user()->image)) {
-                $path = public_path('storage/staff/' . auth()->user()->image . '');
+        if (! empty($data->image)) {
+            if (! empty(auth()->user()->image)) {
+                $path = public_path('storage/staff/'.auth()->user()->image.'');
                 unlink($path);
             }
-            $extension  = $data->image->extension();
-            $imgName    = 'staff_' . time() . '.' . $extension;
-            $data->image->move(public_path() . '/storage/staff/', $imgName);
+            $extension = $data->image->extension();
+            $imgName = 'staff_'.time().'.'.$extension;
+            $data->image->move(public_path().'/storage/staff/', $imgName);
 
             User::find(auth()->user()->id)
                 ->update(
                     [
-                        'image'     => $imgName,
+                        'image' => $imgName,
                         'image_uri' => URL::to('/storage/staff/', $imgName),
                     ]
                 );
@@ -461,8 +492,8 @@ class AuthController extends Controller
         User::find(auth()->user()->id)
             ->update(
                 [
-                    'name'  => $data->name,
-                    'phone' => $data->phone
+                    'name' => $data->name,
+                    'phone' => $data->phone,
                 ]
             );
         $userData = User::findOrFail(auth()->user()->id);
@@ -473,13 +504,13 @@ class AuthController extends Controller
     /**
      * reset Password
      *
-     * @param App\Http\Requests\VerifyUserRequest $request
+     * @param  App\Http\Requests\VerifyUserRequest  $request
      * @return Illuminate\Http\Response
      */
     public function verify_user(VerifyUserRequest $request)
     {
         $password = $request->validated()['password'];
-        if (!Hash::check($password, Auth::user()->password)) {
+        if (! Hash::check($password, Auth::user()->password)) {
             return $this->create_validation_error_response(
                 'message',
                 __('customValidations.passwordChange.notMatch')

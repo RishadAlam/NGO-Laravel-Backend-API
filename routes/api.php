@@ -148,6 +148,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     Route::GET('dashboard', [DashboardController::class, 'index']);
     Route::GET('users/permissions/{id}', [UserController::class, 'get_user_permissions']);
     Route::GET('permissions/{id}', [PermissionController::class, 'index']);
+    Route::GET('roles/{id}/permissions', [RoleController::class, 'permissions']);
+    Route::PUT('roles/{id}/permissions', [RoleController::class, 'update_permissions']);
     Route::GET('users/active', [UserController::class, 'get_active_users']);
     Route::GET('fields/active', [FieldController::class, 'get_active_fields']);
     Route::GET('centers/active', [CenterController::class, 'get_active_Centers']);

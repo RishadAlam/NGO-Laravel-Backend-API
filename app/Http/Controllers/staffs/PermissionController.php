@@ -24,6 +24,8 @@ class PermissionController extends Controller
      */
     public function index(string $id)
     {
+        $user = User::find($id);
+
         $allPermissions = Permission::orderBy('name')
             ->get(['id', 'name', 'group_name', 'parent_group_name'])
             ->map(function ($permission) {
@@ -56,8 +58,17 @@ class PermissionController extends Controller
             ->values()
             ->map(fn ($parentGroupName) => (object) ['parent_group_name' => $parentGroupName]);
 
-        $userPermissions = User::find($id)
+        $userDirectPermissions = $user
             ->getPermissionNames();
+        $userRolePermissions = $user
+            ->getPermissionsViaRoles()
+            ->pluck('name')
+            ->unique()
+            ->values();
+        $userPermissions = $userDirectPermissions
+            ->merge($userRolePermissions)
+            ->unique()
+            ->values();
 
         return create_response(
             null,
@@ -65,6 +76,8 @@ class PermissionController extends Controller
                 'allGroups'         => $allGroups,
                 'allParentGroups'   => $allParentGroups,
                 'allPermissions'    => $allPermissions,
+                'userDirectPermissions' => $userDirectPermissions,
+                'userRolePermissions' => $userRolePermissions,
                 'userPermissions'   => $userPermissions
             ]
         );

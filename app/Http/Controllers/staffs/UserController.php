@@ -37,11 +37,62 @@ class UserController extends Controller
     {
         $users = User::with('roles:id,name,is_default')
             ->with('permissions:id,name,group_name,parent_group_name')
+            ->with('roles.permissions:id,name,group_name,parent_group_name')
             ->with(['UserActionHistory', 'UserActionHistory.Author:id,name,image_uri'])
             ->get(['id', 'name', 'email', 'phone', 'image', 'image_uri', 'email_verified_at as verified_at', 'status']);
 
         $responseData = [];
         foreach ($users as $key => $user) {
+            $directPermissions = $user->permissions
+                ->map(function ($permission) {
+                    return (object) [
+                        'id' => $permission->id,
+                        'name' => $permission->name,
+                        'group_name' => $permission->group_name,
+                        'parent_group_name' => PermissionParentCategoryResolver::resolve(
+                            $permission->group_name,
+                            $permission->parent_group_name
+                        ),
+                        'inherited' => false,
+                        'is_direct' => true,
+                    ];
+                });
+
+            $rolePermissions = $user->getPermissionsViaRoles()
+                ->map(function ($permission) {
+                    return (object) [
+                        'id' => $permission->id,
+                        'name' => $permission->name,
+                        'group_name' => $permission->group_name,
+                        'parent_group_name' => PermissionParentCategoryResolver::resolve(
+                            $permission->group_name,
+                            $permission->parent_group_name
+                        ),
+                        'inherited' => true,
+                        'is_direct' => false,
+                    ];
+                });
+
+            $permissions = $directPermissions
+                ->concat($rolePermissions)
+                ->groupBy('name')
+                ->map(function ($permissionCollection) {
+                    $firstPermission = $permissionCollection->first();
+                    return (object) [
+                        'id' => $firstPermission->id,
+                        'name' => $firstPermission->name,
+                        'group_name' => $firstPermission->group_name,
+                        'parent_group_name' => $firstPermission->parent_group_name,
+                        'inherited' => $permissionCollection->contains(
+                            fn ($permission) => $permission->inherited === true
+                        ),
+                        'is_direct' => $permissionCollection->contains(
+                            fn ($permission) => $permission->is_direct === true
+                        ),
+                    ];
+                })
+                ->values();
+
             $responseData[$key] = (object) [
                 'id'                => $user->id,
                 'name'              => $user->name,
@@ -54,7 +105,7 @@ class UserController extends Controller
                 'role_id'           => $user->roles[0]->id ?? null,
                 'role_name'         => $user->roles[0]->name ?? null,
                 'role_is_default'   => $user->roles[0]->is_default ?? false,
-                'permissions'       => $user->permissions,
+                'permissions'       => $permissions,
                 'action_history'    => $user->UserActionHistory,
             ];
         }
@@ -115,19 +166,59 @@ class UserController extends Controller
      */
     public function get_user_permissions(string $id)
     {
-        $permissions             = [];
-        $collectionOfPermissions = User::find($id)->permissions;
-        foreach ($collectionOfPermissions as $permission) {
-            $permissions[] = (object) [
-                'id'            => $permission->id,
-                'name'          => $permission->name,
-                'group_name'    => $permission->group_name,
-                'parent_group_name' => PermissionParentCategoryResolver::resolve(
-                    $permission->group_name,
-                    $permission->parent_group_name
-                ),
-            ];
-        }
+        $user = User::with('permissions:id,name,group_name,parent_group_name')
+            ->with('roles.permissions:id,name,group_name,parent_group_name')
+            ->find($id);
+
+        $directPermissions = $user->permissions
+            ->map(function ($permission) {
+                return (object) [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'group_name' => $permission->group_name,
+                    'parent_group_name' => PermissionParentCategoryResolver::resolve(
+                        $permission->group_name,
+                        $permission->parent_group_name
+                    ),
+                    'inherited' => false,
+                    'is_direct' => true,
+                ];
+            });
+
+        $rolePermissions = $user->getPermissionsViaRoles()
+            ->map(function ($permission) {
+                return (object) [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'group_name' => $permission->group_name,
+                    'parent_group_name' => PermissionParentCategoryResolver::resolve(
+                        $permission->group_name,
+                        $permission->parent_group_name
+                    ),
+                    'inherited' => true,
+                    'is_direct' => false,
+                ];
+            });
+
+        $permissions = $directPermissions
+            ->concat($rolePermissions)
+            ->groupBy('name')
+            ->map(function ($permissionCollection) {
+                $firstPermission = $permissionCollection->first();
+                return (object) [
+                    'id' => $firstPermission->id,
+                    'name' => $firstPermission->name,
+                    'group_name' => $firstPermission->group_name,
+                    'parent_group_name' => $firstPermission->parent_group_name,
+                    'inherited' => $permissionCollection->contains(
+                        fn ($permission) => $permission->inherited === true
+                    ),
+                    'is_direct' => $permissionCollection->contains(
+                        fn ($permission) => $permission->is_direct === true
+                    ),
+                ];
+            })
+            ->values();
 
         return create_response(null, $permissions);
     }
