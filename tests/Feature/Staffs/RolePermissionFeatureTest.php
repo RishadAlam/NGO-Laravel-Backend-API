@@ -18,7 +18,7 @@ class RolePermissionFeatureTest extends TestCase
     {
         $viewer = $this->createUserWithPermissions(['role_permission_view']);
         $role = Role::create([
-            'name' => 'role_permissions_index_' . uniqid(),
+            'name' => 'role_permissions_index_'.uniqid(),
             'guard_name' => 'web',
         ]);
 
@@ -34,6 +34,11 @@ class RolePermissionFeatureTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('success', true);
 
+        $this->assertSame($role->id, $response->json('data.role.id'));
+        $this->assertSame($role->name, $response->json('data.role.name'));
+        $this->assertSame(false, $response->json('data.role.is_default'));
+        $this->assertSame(1, $response->json('data.role.permissions_count'));
+
         $this->assertContains($fieldPermission->name, $response->json('data.rolePermissions'));
         $this->assertNotContains($rolePermissionUpdate->name, $response->json('data.rolePermissions'));
 
@@ -44,16 +49,22 @@ class RolePermissionFeatureTest extends TestCase
             ->values();
 
         $this->assertSame('field', $allPermissions['field_list_view']['group_name']);
-        $this->assertSame('fields', $allPermissions['field_list_view']['parent_group_name']);
-        $this->assertSame('fields', $allGroups['field']['parent_group_name']);
-        $this->assertTrue($allParentGroups->contains('fields'));
+        $this->assertSame(
+            PermissionParentCategoryResolver::resolve('field'),
+            $allPermissions['field_list_view']['parent_group_name']
+        );
+        $this->assertSame(
+            PermissionParentCategoryResolver::resolve('field'),
+            $allGroups['field']['parent_group_name']
+        );
+        $this->assertTrue($allParentGroups->contains(PermissionParentCategoryResolver::resolve('field')));
     }
 
     public function test_role_permissions_index_requires_permission(): void
     {
         $user = $this->createUserWithPermissions([]);
         $role = Role::create([
-            'name' => 'role_permissions_index_denied_' . uniqid(),
+            'name' => 'role_permissions_index_denied_'.uniqid(),
             'guard_name' => 'web',
         ]);
 
@@ -68,7 +79,7 @@ class RolePermissionFeatureTest extends TestCase
     {
         $updater = $this->createUserWithPermissions(['role_permission_update']);
         $role = Role::create([
-            'name' => 'role_permissions_update_' . uniqid(),
+            'name' => 'role_permissions_update_'.uniqid(),
             'guard_name' => 'web',
         ]);
 
@@ -98,7 +109,7 @@ class RolePermissionFeatureTest extends TestCase
     {
         $user = $this->createUserWithPermissions([]);
         $role = Role::create([
-            'name' => 'role_permissions_update_denied_' . uniqid(),
+            'name' => 'role_permissions_update_denied_'.uniqid(),
             'guard_name' => 'web',
         ]);
         $permission = $this->createPermission('role_permission_denied_case', 'staff_role');

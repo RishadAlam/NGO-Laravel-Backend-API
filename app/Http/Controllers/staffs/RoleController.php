@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\staffs;
 
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\staffs\StoreRoleRequest;
 use App\Http\Requests\staffs\UpdateRoleRequest;
 use App\Support\Permissions\PermissionParentCategoryResolver;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -31,6 +31,7 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::all(['id', 'name', 'is_default']);
+
         return create_response(null, $roles);
     }
 
@@ -81,6 +82,12 @@ class RoleController extends Controller
         return create_response(
             null,
             [
+                'role' => (object) [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'is_default' => (bool) $role->is_default,
+                    'permissions_count' => $rolePermissions->count(),
+                ],
                 'allGroups' => $allGroups,
                 'allParentGroups' => $allParentGroups,
                 'allPermissions' => $allPermissions,
@@ -94,14 +101,15 @@ class RoleController extends Controller
      */
     public function store(StoreRoleRequest $request)
     {
-        $roleData   = (object) $request->validated();
-        $role       = Role::create(['name' => $roleData->name, 'guard_name' => 'web']);
+        $roleData = (object) $request->validated();
+        $role = Role::create(['name' => $roleData->name, 'guard_name' => 'web']);
+
         return response(
             [
-                'success'   => true,
-                'message'   => __('customValidations.role.successful'),
-                'id'        => $role->id,
-                'name'      => $role->name,
+                'success' => true,
+                'message' => __('customValidations.role.successful'),
+                'id' => $role->id,
+                'name' => $role->name,
             ],
             200
         );
@@ -114,6 +122,7 @@ class RoleController extends Controller
     {
         $role = (object) $request->validated();
         Role::find($id)->update(['name' => $role->name]);
+
         return create_response(__('customValidations.role.update'));
     }
 
@@ -149,6 +158,7 @@ class RoleController extends Controller
     public function destroy(string $id)
     {
         Role::find($id)->delete();
+
         return create_response(__('customValidations.role.delete'));
     }
 }

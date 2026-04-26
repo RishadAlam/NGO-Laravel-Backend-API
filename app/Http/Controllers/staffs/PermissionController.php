@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\staffs;
 
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Permission;
+use App\Models\User;
 use App\Support\Permissions\PermissionParentCategoryResolver;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
@@ -24,7 +24,7 @@ class PermissionController extends Controller
      */
     public function index(string $id)
     {
-        $user = User::find($id);
+        $user = User::with('roles:id,name')->findOrFail($id);
 
         $allPermissions = Permission::orderBy('name')
             ->get(['id', 'name', 'group_name', 'parent_group_name'])
@@ -65,6 +65,10 @@ class PermissionController extends Controller
             ->pluck('name')
             ->unique()
             ->values();
+        $userRoleNames = $user->roles
+            ->pluck('name')
+            ->unique()
+            ->values();
         $userPermissions = $userDirectPermissions
             ->merge($userRolePermissions)
             ->unique()
@@ -73,12 +77,21 @@ class PermissionController extends Controller
         return create_response(
             null,
             [
-                'allGroups'         => $allGroups,
-                'allParentGroups'   => $allParentGroups,
-                'allPermissions'    => $allPermissions,
+                'allGroups' => $allGroups,
+                'allParentGroups' => $allParentGroups,
+                'allPermissions' => $allPermissions,
+                'user' => (object) [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'image_uri' => $user->image_uri,
+                    'status' => (bool) $user->status,
+                    'roles' => $userRoleNames,
+                ],
                 'userDirectPermissions' => $userDirectPermissions,
                 'userRolePermissions' => $userRolePermissions,
-                'userPermissions'   => $userPermissions
+                'userPermissions' => $userPermissions,
             ]
         );
     }
@@ -89,6 +102,7 @@ class PermissionController extends Controller
     public function update(Request $request, string $id)
     {
         User::find($id)->syncPermissions($request->permissions);
+
         return create_response(__('customValidations.permission.update'));
     }
 }

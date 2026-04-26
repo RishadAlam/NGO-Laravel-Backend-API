@@ -47,9 +47,12 @@ class PermissionParentCategoryTest extends TestCase
             ->values();
 
         $this->assertSame('field', $allPermissions['field_list_view']['group_name']);
-        $this->assertSame('fields', $allPermissions['field_list_view']['parent_group_name']);
         $this->assertSame(
-            'pending_collections',
+            PermissionParentCategoryResolver::resolve('field'),
+            $allPermissions['field_list_view']['parent_group_name']
+        );
+        $this->assertSame(
+            PermissionParentCategoryResolver::resolve('pending_loan_collection'),
             $allPermissions['pending_loan_collection_list_view']['parent_group_name']
         );
         $this->assertSame(
@@ -57,13 +60,18 @@ class PermissionParentCategoryTest extends TestCase
             $allPermissions['custom_permission_for_tests']['parent_group_name']
         );
 
-        $this->assertSame('fields', $allGroups['field']['parent_group_name']);
         $this->assertSame(
-            'pending_collections',
+            PermissionParentCategoryResolver::resolve('field'),
+            $allGroups['field']['parent_group_name']
+        );
+        $this->assertSame(
+            PermissionParentCategoryResolver::resolve('pending_loan_collection'),
             $allGroups['pending_loan_collection']['parent_group_name']
         );
-        $this->assertTrue($allParentGroups->contains('fields'));
-        $this->assertTrue($allParentGroups->contains('pending_collections'));
+        $this->assertTrue($allParentGroups->contains(PermissionParentCategoryResolver::resolve('field')));
+        $this->assertTrue(
+            $allParentGroups->contains(PermissionParentCategoryResolver::resolve('pending_loan_collection'))
+        );
 
         $this->assertContains('field_list_view', $response->json('data.userPermissions'));
         $this->assertContains('pending_loan_collection_list_view', $response->json('data.userPermissions'));
@@ -71,6 +79,11 @@ class PermissionParentCategoryTest extends TestCase
         $this->assertContains('field_list_view', $response->json('data.userDirectPermissions'));
         $this->assertContains('custom_permission_for_tests', $response->json('data.userDirectPermissions'));
         $this->assertSame([], $response->json('data.userRolePermissions'));
+
+        $this->assertSame($staff->id, $response->json('data.user.id'));
+        $this->assertSame($staff->name, $response->json('data.user.name'));
+        $this->assertSame($staff->email, $response->json('data.user.email'));
+        $this->assertSame([], $response->json('data.user.roles'));
     }
 
     public function test_permissions_index_includes_role_based_permissions_in_effective_permissions(): void
@@ -80,7 +93,7 @@ class PermissionParentCategoryTest extends TestCase
 
         $rolePermission = $this->createPermission('role_based_permission_for_staff', 'staff');
         $role = Role::create([
-            'name' => 'role_permission_test_' . uniqid(),
+            'name' => 'role_permission_test_'.uniqid(),
             'guard_name' => 'web',
         ]);
         $role->givePermissionTo($rolePermission->name);
@@ -97,6 +110,7 @@ class PermissionParentCategoryTest extends TestCase
         $this->assertContains('role_based_permission_for_staff', $response->json('data.userRolePermissions'));
         $this->assertNotContains('role_based_permission_for_staff', $response->json('data.userDirectPermissions'));
         $this->assertContains('role_based_permission_for_staff', $response->json('data.userPermissions'));
+        $this->assertContains($role->name, $response->json('data.user.roles'));
     }
 
     public function test_users_index_includes_parent_group_name_on_permission_items(): void
@@ -129,7 +143,7 @@ class PermissionParentCategoryTest extends TestCase
 
         $rolePermission = $this->createPermission('role_permission_for_user_list', 'staff');
         $role = Role::create([
-            'name' => 'role_user_list_test_' . uniqid(),
+            'name' => 'role_user_list_test_'.uniqid(),
             'guard_name' => 'web',
         ]);
         $role->givePermissionTo($rolePermission->name);
