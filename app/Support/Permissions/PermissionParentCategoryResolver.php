@@ -30,7 +30,12 @@ class PermissionParentCategoryResolver
             'pending_loan' => 'pending_registration_accounts_form',
 
             'client_saving_account' => 'savings_accounts',
+            'client_saving_account_collection' => 'savings_accounts',
+            'client_saving_account_actions' => 'savings_accounts',
+
             'client_loan_account' => 'loan_accounts',
+            'client_loan_account_collection' => 'loan_accounts',
+            'client_loan_account_actions' => 'loan_accounts',
             
             'pending_req_to_delete_saving_acc' => 'pending_closing_accounts_requests',
             'pending_req_to_delete_loan_acc' => 'pending_closing_accounts_requests',

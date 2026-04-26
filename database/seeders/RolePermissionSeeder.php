@@ -144,14 +144,24 @@ class RolePermissionSeeder extends Seeder
                     'client_saving_account_action_history',
                     'client_saving_account_update',
                     'client_saving_account_delete',
-                    'client_saving_account_change_status',
-                    'client_saving_account_check',
-                    'client_saving_account_closing',
                     'client_saving_account_permanently_delete',
                     'client_saving_account_category_update',
+                ]
+            ],
+            [
+                'groupName'     => 'client_saving_account_collection',
+                'permissions'   => [
                     'client_saving_account_collection_action_history',
                     'client_saving_account_collection_update',
                     'client_saving_account_collection_permanently_delete',
+                ]
+            ],
+            [
+                'groupName'     => 'client_saving_account_actions',
+                'permissions'   => [
+                    'client_saving_account_change_status',
+                    'client_saving_account_check',
+                    'client_saving_account_closing',
                     'client_saving_account_withdrawal_action_history',
                     'permission_to_make_saving_withdrawal',
                     'make_saving_transactions',
@@ -164,16 +174,26 @@ class RolePermissionSeeder extends Seeder
                     'client_loan_account_action_history',
                     'client_loan_account_update',
                     'client_loan_account_delete',
-                    'client_loan_account_change_status',
-                    'client_loan_account_check',
-                    'client_loan_account_closing',
                     'client_loan_account_permanently_delete',
                     'client_loan_account_category_update',
+                ]
+            ],
+            [
+                'groupName'     => 'client_loan_account_collection',
+                'permissions'   => [
                     'client_loan_account_collection_action_history',
                     'client_loan_account_collection_update',
                     'client_loan_account_collection_permanently_delete',
-                    'client_loan_account_saving_withdrawal_action_history',
+                ]
+            ],
+            [
+                'groupName'     => 'client_loan_account_actions',
+                'permissions'   => [
+                    'client_loan_account_change_status',
+                    'client_loan_account_check',
+                    'client_loan_account_closing',
                     'permission_to_make_loan_saving_withdrawal',
+                    'client_loan_account_saving_withdrawal_action_history',
                     'make_loan_transactions',
                 ]
             ],
