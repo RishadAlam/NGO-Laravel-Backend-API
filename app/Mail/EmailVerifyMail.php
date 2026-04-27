@@ -2,17 +2,20 @@
 
 namespace App\Mail;
 
+use App\Models\AppConfig;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\App;
 
 class EmailVerifyMail extends Mailable
 {
     use Queueable, SerializesModels;
-    public $name, $email, $otp, $expired;
+    public $name, $email, $otp, $expired, $company;
 
     /**
      * Create a new message instance.
@@ -23,6 +26,8 @@ class EmailVerifyMail extends Mailable
         $this->email    = $email;
         $this->otp      = $otp;
         $this->expired  = $expired;
+        $this->company  = AppConfig::get_config('company_details');
+        $this->locale   = App::getLocale();
     }
 
     /**
@@ -30,8 +35,10 @@ class EmailVerifyMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $companyName = $this->company->company_name ?? config('app.name');
         return new Envelope(
-            subject: 'Account Verification',
+            from: new Address(config('mail.from.address'), $companyName),
+            subject: $companyName . ' — ' . __('email.otp.subject'),
         );
     }
 
@@ -42,6 +49,9 @@ class EmailVerifyMail extends Mailable
     {
         return new Content(
             view: 'email.sendOTP',
+            with: [
+                'company' => $this->company,
+            ],
         );
     }
 
