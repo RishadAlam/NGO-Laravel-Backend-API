@@ -309,6 +309,13 @@ class RolePermissionSeeder extends Seeder
                     'account_transaction_list_view',
                 ]
             ],
+            // Analytics
+            [
+                'groupName'     => 'analytics',
+                'permissions'   => [
+                    'analytics_dashboard_view',
+                ]
+            ],
             // Income
             [
                 'groupName'     => 'income',

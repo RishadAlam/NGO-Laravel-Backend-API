@@ -58,6 +58,8 @@ class PermissionParentCategoryResolver
             'expense' => 'accounts',
             'expense_category' => 'accounts',
 
+            'analytics' => 'analytics',
+
             'staff' => 'staff',
             'staff_role' => 'staff',
             'staff_permission' => 'staff',

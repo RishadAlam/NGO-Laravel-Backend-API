@@ -16,6 +16,7 @@ use App\Http\Controllers\center\CenterController;
 use App\Http\Controllers\accounts\IncomeController;
 use App\Http\Controllers\accounts\AccountController;
 use App\Http\Controllers\accounts\ExpenseController;
+use App\Http\Controllers\Analytics\AnalyticsController;
 use App\Http\Controllers\config\AppConfigController;
 use App\Http\Controllers\Audit\AuditReportController;
 use App\Http\Controllers\Audit\InternalAuditReportController;
@@ -194,6 +195,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         // Get Account transaction
         Route::GET('transactions/{account_id?}', [AccountController::class, 'get_all_transactions']);
     });
+
+    // Global analytics
+    Route::GET('analytics', [AnalyticsController::class, 'index']);
 
     // =========================================================================
     // STATUS MANAGEMENT
