@@ -147,6 +147,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
     // =========================================================================
 
     Route::GET('dashboard', [DashboardController::class, 'index']);
+    Route::GET('dashboard/loan-given', [DashboardController::class, 'loanGivenViewAll']);
+    Route::GET('dashboard/loan-recovered', [DashboardController::class, 'loanRecoveredViewAll']);
+    Route::GET('dashboard/loan-saving', [DashboardController::class, 'loanSavingViewAll']);
+    Route::GET('dashboard/monthly-loan', [DashboardController::class, 'monthlyLoanViewAll']);
+    Route::GET('dashboard/saving-collections', [DashboardController::class, 'savingCollectionsViewAll']);
+    Route::GET('dashboard/dps-collections', [DashboardController::class, 'dpsCollectionsViewAll']);
     Route::GET('users/permissions/{id}', [UserController::class, 'get_user_permissions']);
     Route::GET('permissions/{id}', [PermissionController::class, 'index']);
     Route::GET('roles/{id}/permissions', [RoleController::class, 'permissions']);

@@ -152,8 +152,8 @@ class LoanAccount extends Model
         $currentDate    = [Carbon::now()->startOfMonth()->format('Y-m-d'), Carbon::now()->endOfMonth()->format('Y-m-d')];
         $lastMonthData  = [Carbon::now()->subMonths()->startOfMonth()->format('Y-m-d'), Carbon::now()->subMonths()->endOfMonth()->format('Y-m-d')];
 
-        $LMTLoanDistribute  = static::approve('is_loan_approved')->whereBetween('start_date', $lastMonthData)->sum('loan_given');
-        $CMTLoanDistSummary = static::approve('is_loan_approved')->whereBetween('start_date', $currentDate)->groupBy('start_date')->selectRaw('SUM(loan_given) as amount, start_date as date')->get();
+        $LMTLoanDistribute  = static::approve('is_loan_approved')->whereBetween('is_loan_approved_at', $lastMonthData)->sum('loan_given');
+        $CMTLoanDistSummary = static::approve('is_loan_approved')->whereBetween('is_loan_approved_at', $currentDate)->groupBy('is_loan_approved_at')->selectRaw('SUM(loan_given) as amount, is_loan_approved_at as date')->get();
         $CMTLoanDistribute  = !empty($CMTLoanDistSummary) ? $CMTLoanDistSummary->sum('amount') : 0;
 
         return  [
