@@ -530,7 +530,8 @@ return [
             'update'            => 'The Closing request has been successfully updated.',
             'delete'            => 'The Closing request has been successfully deleted.',
             'approved'          => 'The Closing request has been successfully approved.',
-            'not_found'         => 'Closing request not found!'
+            'not_found'         => 'Closing request not found!',
+            'balance_must_be_zero' => 'The account main balance must be zero after all deductions before closing.',
         ],
 
         /*

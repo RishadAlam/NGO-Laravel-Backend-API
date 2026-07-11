@@ -16,6 +16,7 @@ use App\Models\accounts\ExpenseCategory;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Models\Withdrawal\SavingWithdrawal;
 use App\Models\Collections\SavingCollection;
+use App\Support\AccountClosingBalanceValidator;
 use App\Http\Traits\BelongsToSavingAccountTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -121,17 +122,22 @@ class SavingAccountClosing extends Model
 
     /**
      * Handle to approved account closing process
+     * @param SavingAccount $account
      * @param object $data
      * 
      * @return void
      */
-    public static function handleApprovedAccountClosing($data)
+    public static function handleApprovedAccountClosing($account, $data)
     {
-        $account            = SavingAccount::with('Category:id,name,is_default')->find($data->account_id);
+        $account->loadMissing('Category:id,name,is_default');
         $categoryConf       = CategoryConfig::categoryID($account->category_id)->first(['saving_acc_closing_fee', 's_col_fee_acc_id']);
 
         $withdrawal_account = null;
-        $withdraw_amount    = $account->balance - $categoryConf->saving_acc_closing_fee;
+
+        AccountClosingBalanceValidator::validate(
+            $account->balance,
+            $categoryConf->saving_acc_closing_fee ?? 0
+        );
 
         if (!empty($data->withdrawal_account_id)) {
             $withdrawal_account = Account::find($data->withdrawal_account_id);
@@ -140,13 +146,18 @@ class SavingAccountClosing extends Model
             static::processClosingFee($account, $categoryConf);
             sleep(1);
         }
-        if ($withdraw_amount > 0) {
-            static::processWithdrawal($account, $withdraw_amount, $data->withdrawal_account_id, $withdrawal_account);
-            sleep(1);
-        }
+        // Client requirement: temporarily disable automatic withdrawal of the remaining main balance.
+        // $withdraw_amount = $account->balance - $categoryConf->saving_acc_closing_fee;
+        // if ($withdraw_amount > 0) {
+        //     static::processWithdrawal($account, $withdraw_amount, $data->withdrawal_account_id, $withdrawal_account);
+        //     sleep(1);
+        // }
         if (!empty($data->interest)) {
             static::processInterest($account, $data->interest, $data->withdrawal_account_id, $withdrawal_account);
         }
+
+        $account->refresh();
+        AccountClosingBalanceValidator::validate($account->balance);
 
         static::deleteAccountAndAssociations($account);
         SavingAccountActionHistory::create(Helper::setActionHistory('saving_account_id', $account->id, 'delete', []));

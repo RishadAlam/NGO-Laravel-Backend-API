@@ -12,6 +12,7 @@ use App\Models\category\CategoryConfig;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\BelongsToAuthorTrait;
 use App\Models\client\AccountFeesCategory;
+use App\Support\AccountClosingBalanceValidator;
 use App\Http\Traits\BelongsToLoanAccountTrait;
 use App\Models\Withdrawal\LoanSavingWithdrawal;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -140,22 +141,31 @@ class LoanAccountClosing extends Model
      */
     public static function handleApprovedAccountClosing($account, $data)
     {
-
-        $withdrawal_account = null;
+        $account->loadMissing('Category:id,name,is_default');
         $categoryConf       = CategoryConfig::categoryID($account->category_id)
             ->first(['loan_acc_closing_fee', 'l_col_fee_acc_id']);
-        $withdraw_amount    = $account->balance - $categoryConf->loan_acc_closing_fee;
 
-        if (!empty($data->withdrawal_account_id)) {
-            $withdrawal_account = Account::find($data->withdrawal_account_id);
-        }
+        AccountClosingBalanceValidator::validate(
+            $account->balance,
+            $categoryConf->loan_acc_closing_fee ?? 0
+        );
+
         if ($categoryConf->loan_acc_closing_fee > 0) {
             static::processClosingFee($account, $categoryConf);
             sleep(1);
         }
-        if ($withdraw_amount > 0) {
-            static::processWithdrawal($account, $withdraw_amount,  $data->withdrawal_account_id, $withdrawal_account);
-        }
+
+        // Client requirement: temporarily disable automatic withdrawal of the remaining main balance.
+        // $withdrawal_account = !empty($data->withdrawal_account_id)
+        //     ? Account::find($data->withdrawal_account_id)
+        //     : null;
+        // $withdraw_amount = $account->balance - $categoryConf->loan_acc_closing_fee;
+        // if ($withdraw_amount > 0) {
+        //     static::processWithdrawal($account, $withdraw_amount, $data->withdrawal_account_id, $withdrawal_account);
+        // }
+
+        $account->refresh();
+        AccountClosingBalanceValidator::validate($account->balance);
 
         static::deleteAccountAndAssociations($account);
         LoanAccountActionHistory::create(Helper::setActionHistory('loan_account_id', $account->id, 'delete', []));

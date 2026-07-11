@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\category\CategoryConfig;
 use App\Models\client\LoanAccountClosing;
+use App\Support\AccountClosingBalanceValidator;
 use App\Http\Requests\ClientAccClosing\StoreLoanAccountClosingRequest;
 
 class LoanAccClosingController extends Controller
@@ -40,24 +41,40 @@ class LoanAccClosingController extends Controller
     {
         $data = (object) $request->validated();
 
-        if ($data->total_balance < 0) {
-            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
-        }
+        return DB::transaction(function () use ($data) {
+            $account = LoanAccount::with('Category:id,name,is_default')
+                ->lockForUpdate()
+                ->find($data->account_id);
 
-        $isExits = LoanAccountClosing::where('loan_account_id', $data->account_id)->first();
-        if (!empty($isExits)) {
-            return create_validation_error_response(__('customValidations.common.request_already_exist'));
-        }
+            if (empty($account)) {
+                return create_validation_error_response(__('customValidations.client.loan.not_found'));
+            }
 
-        $account = LoanAccount::with('Category:id,name,is_default')->find($data->account_id);
-        if ($account->total_loan_remaining > 0) {
-            return create_validation_error_response(__('customValidations.client.loan.loan_err'), 'total_loan_remaining');
-        }
-        if ($account->total_interest_remaining > 0) {
-            return create_validation_error_response(__('customValidations.client.loan.interest_err'), 'total_interest_remaining');
-        }
+            $isExits = LoanAccountClosing::where('loan_account_id', $data->account_id)->first();
+            if (!empty($isExits)) {
+                return create_validation_error_response(__('customValidations.common.request_already_exist'));
+            }
 
-        return DB::transaction(function () use ($data, $account) {
+            if ($account->total_loan_remaining > 0) {
+                return create_validation_error_response(__('customValidations.client.loan.loan_err'), 'total_loan_remaining');
+            }
+            if ($account->total_interest_remaining > 0) {
+                return create_validation_error_response(__('customValidations.client.loan.interest_err'), 'total_interest_remaining');
+            }
+
+            $categoryConf = CategoryConfig::categoryID($account->category_id)
+                ->first(['loan_acc_closing_fee', 'l_col_fee_acc_id']);
+
+            if (!AccountClosingBalanceValidator::isZeroAfterDeductions(
+                $account->balance,
+                $categoryConf->loan_acc_closing_fee ?? 0
+            )) {
+                return create_validation_error_response(
+                    __('customValidations.client.closing.balance_must_be_zero'),
+                    'balance'
+                );
+            }
+
             $isApproved = AppConfig::get_config('loan_account_closing_approval');
             LoanAccountClosing::create(LoanAccountClosing::setFieldMap($data, $account, true, $isApproved));
 
@@ -122,14 +139,38 @@ class LoanAccClosingController extends Controller
     public function approved(string $id)
     {
         return DB::transaction(function () use ($id) {
-            $closing = LoanAccountClosing::find($id);
-            $account = LoanAccount::with('Category:id,name,is_default')->find($closing->loan_account_id);
+            $closing = LoanAccountClosing::lockForUpdate()->find($id);
+
+            if (empty($closing)) {
+                return create_validation_error_response(__('customValidations.client.closing.not_found'));
+            }
+
+            $account = LoanAccount::with('Category:id,name,is_default')
+                ->lockForUpdate()
+                ->find($closing->loan_account_id);
+
+            if (empty($account)) {
+                return create_validation_error_response(__('customValidations.client.loan.not_found'));
+            }
 
             if ($account->total_loan_remaining > 0) {
                 return create_validation_error_response(__('customValidations.client.loan.loan_err'), 'total_loan_remaining');
             }
             if ($account->total_interest_remaining > 0) {
                 return create_validation_error_response(__('customValidations.client.loan.interest_err'), 'total_interest_remaining');
+            }
+
+            $categoryConf = CategoryConfig::categoryID($account->category_id)
+                ->first(['loan_acc_closing_fee', 'l_col_fee_acc_id']);
+
+            if (!AccountClosingBalanceValidator::isZeroAfterDeductions(
+                $account->balance,
+                $categoryConf->loan_acc_closing_fee ?? 0
+            )) {
+                return create_validation_error_response(
+                    __('customValidations.client.closing.balance_must_be_zero'),
+                    'balance'
+                );
             }
 
             LoanAccountClosing::handleApprovedAccountClosing($account, (object) ['withdrawal_account_id' => $closing->account_id]);

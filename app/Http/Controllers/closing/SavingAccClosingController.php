@@ -17,6 +17,7 @@ use App\Models\client\SavingAccountFee;
 use App\Models\client\AccountFeesCategory;
 use App\Models\client\SavingAccountClosing;
 use App\Models\client\SavingAccountActionHistory;
+use App\Support\AccountClosingBalanceValidator;
 use App\Http\Requests\ClientAccClosing\StoreSavingAccountClosingRequest;
 
 class SavingAccClosingController extends Controller
@@ -48,22 +49,39 @@ class SavingAccClosingController extends Controller
     {
         $data = (object) $request->validated();
 
-        if ($data->total_balance < 0) {
-            return create_validation_error_response(__('customValidations.accounts.insufficient_balance'), 'balance');
-        }
-
-        $isExits = SavingAccountClosing::where('saving_account_id', $data->account_id)->first();
-
-        if (!empty($isExits)) {
-            return create_validation_error_response(__('customValidations.common.request_already_exist'));
-        }
-
         return DB::transaction(function () use ($data) {
+            $account = SavingAccount::with('Category:id,name,is_default')
+                ->lockForUpdate()
+                ->find($data->account_id);
+
+            if (empty($account)) {
+                return create_validation_error_response(__('customValidations.client.saving.not_found'));
+            }
+
+            $categoryConf = CategoryConfig::categoryID($account->category_id)
+                ->first(['saving_acc_closing_fee', 's_col_fee_acc_id']);
+
+            if (!AccountClosingBalanceValidator::isZeroAfterDeductions(
+                $account->balance,
+                $categoryConf->saving_acc_closing_fee ?? 0
+            )) {
+                return create_validation_error_response(
+                    __('customValidations.client.closing.balance_must_be_zero'),
+                    'balance'
+                );
+            }
+
+            $isExits = SavingAccountClosing::where('saving_account_id', $data->account_id)->first();
+
+            if (!empty($isExits)) {
+                return create_validation_error_response(__('customValidations.common.request_already_exist'));
+            }
+
             $isApproved = AppConfig::get_config('saving_account_closing_approval');
             SavingAccountClosing::create(SavingAccountClosing::setFieldMap($data, true, $isApproved));
 
             if ($isApproved) {
-                SavingAccountClosing::handleApprovedAccountClosing($data);
+                SavingAccountClosing::handleApprovedAccountClosing($account, $data);
                 return create_response(__('customValidations.client.saving.delete'));
             } else {
                 return create_response(__('customValidations.client.saving.delete_request'));
@@ -119,9 +137,34 @@ class SavingAccClosingController extends Controller
     public function approved(string $id)
     {
         return DB::transaction(function () use ($id) {
-            $closing = SavingAccountClosing::find($id);
+            $closing = SavingAccountClosing::lockForUpdate()->find($id);
 
-            SavingAccountClosing::handleApprovedAccountClosing((object) [
+            if (empty($closing)) {
+                return create_validation_error_response(__('customValidations.client.closing.not_found'));
+            }
+
+            $account = SavingAccount::with('Category:id,name,is_default')
+                ->lockForUpdate()
+                ->find($closing->saving_account_id);
+
+            if (empty($account)) {
+                return create_validation_error_response(__('customValidations.client.saving.not_found'));
+            }
+
+            $categoryConf = CategoryConfig::categoryID($account->category_id)
+                ->first(['saving_acc_closing_fee', 's_col_fee_acc_id']);
+
+            if (!AccountClosingBalanceValidator::isZeroAfterDeductions(
+                $account->balance,
+                $categoryConf->saving_acc_closing_fee ?? 0
+            )) {
+                return create_validation_error_response(
+                    __('customValidations.client.closing.balance_must_be_zero'),
+                    'balance'
+                );
+            }
+
+            SavingAccountClosing::handleApprovedAccountClosing($account, (object) [
                 'account_id' => $closing->saving_account_id,
                 'withdrawal_account_id' => $closing->account_id,
                 'interest' => $closing->interest
