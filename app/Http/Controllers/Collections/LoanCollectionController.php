@@ -246,11 +246,20 @@ class LoanCollectionController extends Controller
     public function approved(LoanCollectionApprovedRequest $request)
     {
         $approvedList = $request->validated()['approvedList'];
-        $collections = LoanCollection::whereIn('id', $approvedList)
-            ->get(['id', 'loan_account_id', 'account_id', 'deposit', 'loan', 'interest', 'total', 'installment']);
 
-        DB::transaction(function () use ($collections, $approvedList) {
-            LoanCollection::whereIn('id', $approvedList)
+        DB::transaction(function () use ($approvedList) {
+            // Lock the pending rows before crediting, so retries cannot credit them again.
+            $collections = LoanCollection::whereIn('id', $approvedList)
+                ->pending()
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get(['id', 'loan_account_id', 'account_id', 'deposit', 'loan', 'interest', 'total', 'installment']);
+
+            if ($collections->isEmpty()) {
+                return;
+            }
+
+            LoanCollection::whereIn('id', $collections->modelKeys())
                 ->update(['is_approved' => true, 'approved_by' => auth()->id(), 'approved_at' => Carbon::now('Asia/Dhaka')]);
 
             foreach ($collections as  $collection) {
@@ -265,7 +274,7 @@ class LoanCollectionController extends Controller
                 Account::find($collection->account_id)
                     ->increment('total_deposit', $collection->total);
             }
-        });
+        }, 3);
 
         return create_response(__('customValidations.client.collection.approved'));
     }

@@ -323,11 +323,20 @@ class SavingCollectionController extends Controller
     public function approved(SavingCollectionApprovedRequest $request)
     {
         $approvedList = $request->validated()['approvedList'];
-        $collections = SavingCollection::whereIn('id', $approvedList)
-            ->get(['id', 'saving_account_id', 'account_id', 'deposit', 'installment']);
 
-        DB::transaction(function () use ($collections, $approvedList) {
-            SavingCollection::whereIn('id', $approvedList)
+        DB::transaction(function () use ($approvedList) {
+            // Lock the pending rows before crediting, so retries cannot credit them again.
+            $collections = SavingCollection::whereIn('id', $approvedList)
+                ->pending()
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get(['id', 'saving_account_id', 'account_id', 'deposit', 'installment']);
+
+            if ($collections->isEmpty()) {
+                return;
+            }
+
+            SavingCollection::whereIn('id', $collections->modelKeys())
                 ->update(['is_approved' => true, 'approved_by' => auth()->id(), 'approved_at' => Carbon::now('Asia/Dhaka')]);
 
             foreach ($collections as  $collection) {
@@ -340,7 +349,7 @@ class SavingCollectionController extends Controller
                 Account::find($collection->account_id)
                     ->increment('total_deposit', $collection->deposit);
             }
-        });
+        }, 3);
 
         return create_response(__('customValidations.client.collection.approved'));
     }
