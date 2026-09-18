@@ -1,21 +1,43 @@
-name: Laravel Deployment
+name: Laravel checks and deployment
 
 on:
+  pull_request:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'release' && 'backend-production' || format('backend-{0}', github.ref) }}
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  verify-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # 🚀 NO COMPOSER INSTALL
-      # 🚀 NO VENDOR UPLOAD
-
-      - name: Deploy Code Only (FAST)
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, pdo_mysql
+          coverage: none
+      - name: Install locked test dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Run backend tests
+        run: php artisan test
+        env:
+          APP_ENV: testing
+          APP_KEY: '0123456789abcdef0123456789abcdef'
+      - name: Build production autoloader and dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+      - name: Verify production response helpers
+        run: |
+          php -r 'require "vendor/autoload.php"; exit(function_exists("create_response") && function_exists("create_validation_error_response") ? 0 : 1);'
+      - name: Build routes for the deployed source
+        run: php artisan route:cache
+      - name: Deploy tested backend and production dependencies
+        if: github.event_name == 'release'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
@@ -28,16 +50,19 @@ jobs:
           exclude: |
             **/.git*
             **/.github/**
-            **/.env
+            **/.env*
             **/node_modules/**
             **/tests/**
-            **/vendor/**
             storage/**
-            bootstrap/cache/*.php
+            bootstrap/cache/config.php
             **/*.md
-
-      - name: Run Artisan Commands
+      - name: Run production migrations and rebuild caches
+        if: github.event_name == 'release'
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
-          curl -s -X POST \
-          "https://backend.jonokollan.com/__deploy/run?key=${{ secrets.DEPLOY_KEY }}" \
-          --header 'Accept: application/json'
+          test -n "$DEPLOY_KEY"
+          curl --fail-with-body --silent --show-error --max-time 300 -X POST \
+            'https://backend.jonokollan.com/__deploy/run' \
+            --header "X-Deploy-Key: $DEPLOY_KEY" \
+            --header 'Accept: application/json'
