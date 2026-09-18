@@ -35,7 +35,7 @@ class SavingCollectionController extends Controller
         $this->middleware('can:permission_to_do_saving_collection')->only('store');
         $this->middleware('permission:regular_saving_collection_update|pending_saving_collection_update')->only('update');
         $this->middleware('permission:regular_saving_collection_permanently_delete|pending_saving_collection_permanently_delete')->only('permanently_destroy');
-        $this->middleware('permission:regular_loan_collection_approval|pending_saving_collection_approval')->only('approved');
+        $this->middleware('permission:regular_saving_collection_approval|pending_saving_collection_approval')->only('approved');
     }
 
     /**

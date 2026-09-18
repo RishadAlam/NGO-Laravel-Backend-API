@@ -142,6 +142,48 @@ class CollectionApprovalTest extends TestCase
         $this->assertBalances('loan', true);
     }
 
+    public static function approvalPermissions(): array
+    {
+        return [
+            'savings regular approver' => ['saving', 'regular_saving_collection_approval', 200],
+            'savings pending approver' => ['saving', 'pending_saving_collection_approval', 200],
+            'savings rejects regular loan grant' => ['saving', 'regular_loan_collection_approval', 403],
+            'savings rejects pending loan grant' => ['saving', 'pending_loan_collection_approval', 403],
+            'savings rejects no approval grant' => ['saving', null, 403],
+            'loan regular approver' => ['loan', 'regular_loan_collection_approval', 200],
+            'loan pending approver' => ['loan', 'pending_loan_collection_approval', 200],
+            'loan rejects regular savings grant' => ['loan', 'regular_saving_collection_approval', 403],
+            'loan rejects pending savings grant' => ['loan', 'pending_saving_collection_approval', 403],
+            'loan rejects no approval grant' => ['loan', null, 403],
+        ];
+    }
+
+    /** @dataProvider approvalPermissions */
+    public function test_approval_permission_boundary(string $type, ?string $permission, int $status): void
+    {
+        $collection = $this->storePending($type);
+        $actor = User::factory()->create(['status' => true, 'email_verified_at' => now(), 'password' => 'synthetic-test-password']);
+        if ($permission !== null) {
+            $actor->givePermissionTo($permission);
+        }
+        Sanctum::actingAs($actor);
+
+        $response = $this->postJson("/api/collection/{$type}/approved", ['approvedList' => [$collection->id]]);
+        $response->assertStatus($status);
+
+        if ($status === 200) {
+            $response->assertJsonPath('success', true);
+            $this->assertTrue((bool) $collection->fresh()->is_approved);
+            $this->assertSame($actor->id, (int) $collection->fresh()->approved_by);
+            $this->assertCredits($type, 1);
+        } else {
+            $this->assertFalse((bool) $collection->fresh()->is_approved);
+            $this->assertNull($collection->fresh()->approved_by);
+            $this->assertNull($collection->fresh()->approved_at);
+            $this->assertCredits($type, 0);
+        }
+    }
+
     public function test_saving_automatic_approval_reconciles_balances_and_reports(): void
     {
         $this->verifyAutomaticApproval('saving');
