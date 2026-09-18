@@ -178,8 +178,13 @@ class AuthController extends Controller
      */
     public function authorization()
     {
+        $data = self::createAuthorizedRes(auth()->user(), __('customValidations.authorize.successful'));
+        if ($session = request()->attributes->get('impersonation')) {
+            $data['impersonation'] = $session->metadata();
+        }
+
         return response(
-            self::createAuthorizedRes(auth()->user(), __('customValidations.authorize.successful')),
+            $data,
             200
         );
     }
@@ -304,6 +309,11 @@ class AuthController extends Controller
      */
     public function logout()
     {
+        if ($session = request()->attributes->get('impersonation')) {
+            $session->finish('logout');
+
+            return $this->create_response(__('impersonation.ended'));
+        }
         auth::user()->currentAccessToken()->delete();
 
         return $this->create_response(__('customValidations.logout.successful'));

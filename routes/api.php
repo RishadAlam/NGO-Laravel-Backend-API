@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\client\SavingAccountFee;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImpersonationController;
 use App\Support\Permissions\PermissionParentCategoryResolver;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\field\FieldController;
@@ -128,6 +129,9 @@ Route::fallback(function () {
 // =============================================================================
 
 Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeUser']], function () {
+
+    Route::post('users/{id}/impersonation', [ImpersonationController::class, 'start']);
+    Route::post('impersonation/stop', [ImpersonationController::class, 'stop']);
 
     // =========================================================================
     // AUTHENTICATION & USER MANAGEMENT

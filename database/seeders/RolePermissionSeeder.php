@@ -385,6 +385,7 @@ class RolePermissionSeeder extends Seeder
                 'groupName'     => 'staff',
                 'permissions'   => [
                     'staff_list_view',
+                    'staff_impersonate',
                     'staff_registration',
                     'staff_data_update',
                     'staff_status_update',

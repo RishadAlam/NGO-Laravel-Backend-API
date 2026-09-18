@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        $schedule->command('impersonation:expire')->everyMinute()->withoutOverlapping();
         $schedule->command('create:audit-report')->yearlyOn(7, 1, '00:00');
     }
 
