@@ -22,7 +22,9 @@ class OTPVerificationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "otp" => "required|numeric"
+            'user_id' => 'required|integer',
+            'purpose' => 'required|in:verification,recovery',
+            'otp' => 'required|digits:6',
         ];
     }
 }

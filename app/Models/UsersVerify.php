@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class UsersVerify extends Model
 {
@@ -18,6 +17,7 @@ class UsersVerify extends Model
     protected $fillable = [
         'user_id',
         'otp',
+        'purpose',
         'expired_at',
     ];
 

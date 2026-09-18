@@ -22,10 +22,12 @@ class ResetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id'       => 'required',
-            'new_password'  =>
-            [
+            'user_id' => 'required|integer',
+            'reset_token' => 'required|string|size:64',
+            'new_password' => [
                 'required',
+                'string',
+                'max:72',
                 'min:8',
                 'regex:/[a-z]/',      // must contain at least one lowercase letter
                 'regex:/[A-Z]/',      // must contain at least one uppercase letter

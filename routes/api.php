@@ -91,10 +91,10 @@ Route::group(['middleware' => 'LangCheck'], function () {
     // Authentication & Account Recovery
     Route::controller(AuthController::class)->group(function () {
         Route::POST('login', 'login');
-        Route::POST('forget-password', 'forget_password');
-        Route::GET('otp-resend/{id}', 'otp_resend');
-        Route::POST('account-verification', 'otp_verification');
-        Route::PUT('reset-password', 'reset_password');
+        Route::POST('forget-password', 'forget_password')->middleware('throttle:5,1');
+        Route::GET('otp-resend/{id}', 'otp_resend')->middleware('throttle:5,1');
+        Route::POST('account-verification', 'otp_verification')->middleware('throttle:account-code');
+        Route::PUT('reset-password', 'reset_password')->middleware('throttle:10,1');
     });
 
     // Application Configuration (Public)

@@ -13,9 +13,9 @@ use App\Http\Requests\VerifyUserRequest;
 use App\Mail\EmailVerifyMail;
 use App\Mail\RegistrationGreetingsMail;
 use App\Models\User;
-use App\Models\UsersVerify;
-use Carbon\Carbon;
+use App\Services\AccountRecovery;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
@@ -98,22 +98,9 @@ class AuthController extends Controller
      *
      * @return array
      */
-    public static function createOTP($userId)
+    public static function createOTP($userId, string $purpose = 'verification')
     {
-        $otp = rand(111111, 999999);
-        $expired = Carbon::now()->addMinutes(5);
-        UsersVerify::create(
-            [
-                'user_id' => $userId,
-                'otp' => $otp,
-                'expired_at' => $expired,
-            ]
-        );
-
-        return [
-            'otp' => $otp,
-            'expired' => $expired,
-        ];
+        return app(AccountRecovery::class)->issueCode((int) $userId, $purpose);
     }
 
     /**
@@ -276,29 +263,34 @@ class AuthController extends Controller
             );
         }
 
-        $user = Auth::user();
-        $authorizationData = self::buildAuthorizationData($user);
-        $token = $user->createToken('auth_token')->plainTextToken;
+        return DB::transaction(function () use ($user, $data) {
+            $user = User::whereKey($user->id)->lockForUpdate()->first();
+            if (! $user || ! $user->status || ! $user->hasVerifiedEmail() || ! Hash::check($data->password, $user->password)) {
+                return $this->create_validation_error_response('message', __('customValidations.login.incorrectPassword'), 401);
+            }
+            $authorizationData = self::buildAuthorizationData($user);
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response(
-            [
-                'success' => true,
-                'message' => __('customValidations.login.successful'),
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'email_verified_at' => $user->email_verified_at,
-                'phone' => $user->phone,
-                'image' => $user->image,
-                'image_uri' => $user->image_uri,
-                'status' => $user->status,
-                'role' => $authorizationData['roles'],
-                'permissions' => $authorizationData['permissions'],
-            ],
-            200
-        );
+            return response(
+                [
+                    'success' => true,
+                    'message' => __('customValidations.login.successful'),
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'email_verified_at' => $user->email_verified_at,
+                    'phone' => $user->phone,
+                    'image' => $user->image,
+                    'image_uri' => $user->image_uri,
+                    'status' => $user->status,
+                    'role' => $authorizationData['roles'],
+                    'permissions' => $authorizationData['permissions'],
+                ],
+                200
+            );
+        });
     }
 
     /**
@@ -372,7 +364,7 @@ class AuthController extends Controller
             );
         }
 
-        $otpResponse = self::createOTP($user->id);
+        $otpResponse = self::createOTP($user->id, 'recovery');
         self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
 
         return response(
@@ -392,6 +384,7 @@ class AuthController extends Controller
      */
     public function otp_resend($id)
     {
+        $data = request()->validate(['purpose' => 'required|in:verification,recovery']);
         $user = User::find($id);
 
         if (! $user) {
@@ -408,7 +401,7 @@ class AuthController extends Controller
             );
         }
 
-        $otpResponse = self::createOTP($user->id);
+        $otpResponse = self::createOTP($user->id, $data['purpose']);
         self::sendOTP($user->email, $user->name, $otpResponse['otp'], $otpResponse['expired']);
 
         return response(
@@ -427,33 +420,16 @@ class AuthController extends Controller
      */
     public function otp_verification(OTPVerificationRequest $request)
     {
-        $data = (object) $request->validated();
-        $userOtp = UsersVerify::where('otp', $data->otp)->latest()->first(['id', 'user_id', 'expired_at']);
-
-        if (! $userOtp) {
-            return $this->create_validation_error_response(
-                'message',
-                __('customValidations.otp.otpIsInvalid'),
-                '202'
-            );
-        } elseif ($userOtp->expired_at < Carbon::now()) {
-            return $this->create_validation_error_response(
-                'message',
-                __('customValidations.otp.otpIsExpired'),
-                '202'
-            );
+        $data = $request->validated();
+        $proof = app(AccountRecovery::class)->verify((int) $data['user_id'], (string) $data['otp'], $data['purpose']);
+        if ($proof === null) {
+            return $this->create_validation_error_response('message', __('customValidations.otp.otpIsInvalid'), 202);
         }
 
-        User::find($userOtp->user_id)->update(['email_verified_at' => Carbon::now()]);
-        UsersVerify::where('user_id', $userOtp->user_id)->delete();
-
-        return response(
-            [
-                'success' => true,
-                'message' => __('customValidations.otp.successful'),
-            ],
-            200
-        );
+        return response()->json(array_merge([
+            'success' => true,
+            'message' => __('customValidations.otp.successful'),
+        ], $proof))->header('Cache-Control', 'no-store');
     }
 
     /**
@@ -464,10 +440,10 @@ class AuthController extends Controller
      */
     public function reset_password(ResetPasswordRequest $request)
     {
-        $data = (object) $request->validated();
-        $user = User::find($data->user_id);
-        $user->update(['password' => bcrypt($request->new_password)]);
-        $user->tokens()->delete();
+        $data = $request->validated();
+        if (! app(AccountRecovery::class)->reset((int) $data['user_id'], $data['reset_token'], $data['new_password'])) {
+            return $this->create_validation_error_response('message', __('passwords.token'), 422);
+        }
 
         return $this->create_response(__('customValidations.resetPassword.successful'));
     }
