@@ -192,4 +192,20 @@ class ImpersonationTest extends TestCase
         $this->assertNotNull(PersonalAccessToken::findToken($original));
         $this->assertDatabaseHas('user_impersonation_sessions', ['end_reason' => 'expired', 'ended_at' => $expiresAt]);
     }
+
+    public function test_cleanup_records_revoked_tokens_without_waiting_for_session_expiry(): void
+    {
+        $this->freezeTime();
+        foreach (['original', 'temporary'] as $revoked) {
+            $admin = $this->user(['staff_impersonate']);
+            [$original, $temporary, $response] = $this->visit($admin, $this->user());
+            PersonalAccessToken::findToken(${$revoked})->delete();
+            $this->artisan('impersonation:expire')->assertSuccessful();
+            $this->assertNull(PersonalAccessToken::findToken($temporary));
+            $this->assertDatabaseHas('user_impersonation_sessions', [
+                'id' => $response->json('impersonation.id'),
+                'end_reason' => 'revoked', 'ended_at' => now()->toDateTimeString(),
+            ]);
+        }
+    }
 }
