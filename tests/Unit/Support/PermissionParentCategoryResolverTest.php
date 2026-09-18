@@ -9,7 +9,7 @@ class PermissionParentCategoryResolverTest extends TestCase
 {
     public function test_it_resolves_known_child_groups_to_parent_category(): void
     {
-        $this->assertSame('fields', PermissionParentCategoryResolver::resolve('field'));
+        $this->assertSame('field', PermissionParentCategoryResolver::resolve('field'));
         $this->assertSame('collections', PermissionParentCategoryResolver::resolve('regular_loan_collection'));
         $this->assertSame(
             'pending_collections',
