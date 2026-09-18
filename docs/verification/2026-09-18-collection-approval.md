@@ -10,13 +10,14 @@ This prevents new repeat-approval errors; it does not recalculate historical bal
 
 ## Regression evidence
 
-Before repair, the expanded suite reproduced eight replay/metadata/overlap failures plus the two existing permission failures. After repair, the native idempotency/workflow suite passes **19 tests / 513 assertions**, covering:
+Before repair, the expanded suite reproduced eight replay/metadata/overlap failures plus the two existing permission failures. After both authorized repairs, the native collection suite passes **29 tests / 583 assertions**, covering:
 
 - Savings/loan pending creation, collector denial, single approval, automatic approval, balances, history, regular category/center queues, prior-day category queues and audit totals.
 - Repeated approval, overlapping batches, duplicate IDs, and replay of automatically approved records.
 - Preservation of original approver/timestamp and member/cash/installment/principal/interest counters.
 - Unknown and soft-deleted IDs remain ignored, preserving existing behavior.
 - Failure during the second collection's cash update rolls back the entire batch, including all earlier balance changes and approval metadata.
+- Ten HTTP permission cases: each product's regular/pending approvers are accepted; the other product's grants and accounts with no approval grant are denied without changing metadata or balances.
 
 Run from the backend directory (the config-cache file must not exist):
 
@@ -26,7 +27,7 @@ rtk proxy env APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=:memory: DATABASE
 
 The test refuses to migrate unless running in testing against SQLite `:memory:`, with no database URL override and array mail/cache/session drivers.
 
-Full backend suite: **55 tests / 696 assertions; 54 pass, 1 existing failure**. The unchanged failure is `PermissionParentCategoryResolverTest::test_it_resolves_known_child_groups_to_parent_category`, expecting `fields` but receiving `field`.
+Full backend suite: **65 tests / 766 assertions; 64 pass, 1 existing failure**. The unchanged failure is `PermissionParentCategoryResolverTest::test_it_resolves_known_child_groups_to_parent_category`, expecting `fields` but receiving `field`.
 
 Modified controllers and the new test pass PHP syntax checks; the test passes Pint; diff whitespace checks pass. Independent code review found no introduced blocking issue. The debugging, test-driven-development and verification-before-completion skills guided reproduction before repair and fresh verification afterward.
 
@@ -47,12 +48,12 @@ Loan principal/interest and first-approval metadata also matched. These are cont
 
 Temporary evidence remains in `verify.php`, `results.json` and logs under the directory above. The owned server is stopped and both synthetic datadirs were removed (approximately 200 MB); the small evidence files remain. No permanent concurrency CI job was added.
 
-## Issue #2: backend permission defect confirmed, not changed
+## Issue #2: backend permission defect corrected
 
-The request asked to verify the second issue. `app/Http/Controllers/Collections/SavingCollectionController.php:38` still checks `regular_loan_collection_approval|pending_saving_collection_approval`.
+Following explicit approval, `app/Http/Controllers/Collections/SavingCollectionController.php:38` now checks `regular_saving_collection_approval|pending_saving_collection_approval`. Only the incorrect regular-loan grant was replaced. No existing role grants or records were changed.
 
-Fresh isolated HTTP checks confirm savings-only approval is denied (403), while loan-only approval incorrectly succeeds and changes a savings balance. Both reproductions remain unchanged in the sibling frontend's `verification/backend/CollectionReleaseVerificationTest.php` (`--filter only_approver`). They are separate from the passing native idempotency suite.
+The new permission matrix reproduced both failures before the one-line correction. Afterward, savings-only approval succeeds and loan-only approval is denied. Pending savings approval is retained, loan approval rules are unchanged, and denied requests preserve all counters and approval metadata. Regular/pending date and ownership policy have not been redefined.
 
-Permission-rule correction was offered separately and awaits confirmation. The intended replacement is `regular_saving_collection_approval`, retaining the pending-savings alternative. Regular/pending date and ownership policy have not been redefined.
+The original sibling frontend release tests also pass unchanged: **9 collection tests / 314 assertions**, including both original permission reproductions and duplicate-approval cases. Independent code review approved the scoped permission correction.
 
-This is not full deployment sign-off: the permission defect, previously reported password-recovery defect, existing baseline test mismatch, and remaining inbox/physical-phone checks are unresolved.
+This is not full deployment sign-off: the previously reported password-recovery defect, existing baseline test mismatch, and remaining inbox/physical-phone checks are unresolved.
