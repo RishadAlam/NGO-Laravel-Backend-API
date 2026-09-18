@@ -5,11 +5,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Audit\AuditReportPage;
 use Illuminate\Support\Facades\Route;
 use App\Models\client\SavingAccountFee;
-use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ImpersonationController;
-use App\Support\Permissions\PermissionParentCategoryResolver;
-use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\field\FieldController;
 use App\Http\Controllers\staffs\RoleController;
 use App\Http\Controllers\staffs\UserController;
@@ -46,39 +43,6 @@ use App\Http\Controllers\ClientAccountFees\LoanAccountFeesController;
 use App\Http\Controllers\ClientAccountFees\SavingAccountFeesController;
 use App\Http\Controllers\ClientAccountChecks\LoanAccountCheckController;
 use App\Http\Controllers\ClientAccountChecks\SavingAccountCheckController;
-
-// =============================================================================
-// ARTISAN UTILITY ROUTES
-// =============================================================================
-// Quick access endpoints for clearing caches and running maintenance tasks
-// These should be disabled or protected in production environments
-// =============================================================================
-
-Route::GET('/cache-clear', function () {
-    Artisan::call('cache:clear');
-
-    return response('cache cleared');
-});
-Route::GET('/config-clear', function () {
-    Artisan::call('config:clear');
-
-    return response('config cleared');
-});
-Route::GET('/route-clear', function () {
-    Artisan::call('route:clear');
-
-    return response('route cleared');
-});
-Route::GET('/optimize-clear', function () {
-    Artisan::call('optimize:clear');
-
-    return response('optimize cleared');
-});
-Route::GET('/storage-link', function () {
-    Artisan::call('storage:link');
-
-    return response('storage Linked');
-});
 
 // =============================================================================
 // PUBLIC ROUTES (No Authentication Required)
@@ -461,41 +425,4 @@ Route::group(['middleware' => ['auth:sanctum', 'verified', 'LangCheck', 'activeU
         Route::PUT('categories-config-update', 'config_update');
     });
 
-    // =========================================================================
-    // DEVELOPMENT/TESTING ROUTES
-    // =========================================================================
-    // TODO: Remove or secure this endpoint before production deployment
-    // =========================================================================
-
-    Route::POST('/add-permission', function (Request $request) {
-        $parentGroupName = PermissionParentCategoryResolver::resolve(
-            $request->group_name,
-            $request->parent_group_name
-        );
-
-        foreach ($request->permissions as $permission) {
-            if (count(Permission::where('name', $permission)->get())) {
-                continue;
-            }
-
-            $newPermission = Permission::create(
-                [
-                    'name' => $permission,
-                    'group_name' => $request->group_name,
-                    'parent_group_name' => $parentGroupName,
-                    'guard_name' => 'web',
-                ]
-            );
-
-            auth()->user()->givePermissionTo($newPermission);
-        }
-
-        return response(
-            [
-                'success' => true,
-                'message' => __('customValidations.authorize.successful'),
-            ],
-            200
-        );
-    });
 });

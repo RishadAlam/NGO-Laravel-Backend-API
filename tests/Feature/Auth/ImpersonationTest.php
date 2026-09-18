@@ -105,7 +105,7 @@ class ImpersonationTest extends TestCase
         foreach ([
             ['PUT', 'profile-update'], ['PUT', 'change-password'],
             ['POST', 'registration'], ['POST', 'login'], ['POST', 'forget-password'],
-            ['POST', 'add-permission'], ['POST', "users/{$admin->id}/impersonation"],
+            ['POST', "users/{$admin->id}/impersonation"],
             ['DELETE', "users/{$admin->id}"], ['GET', 'transactions/approve-transactions/1/saving_to_saving'],
             ['GET', 'cache-clear'], ['HEAD', 'storage-link'], ['GET', "otp-resend/{$target->id}"],
         ] as [$method, $path]) {
